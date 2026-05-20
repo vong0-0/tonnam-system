@@ -1,0 +1,58 @@
+type: object
+description: A single orderable item on the menu.
+properties:
+  id:
+    type: string
+    format: uuid
+    example: "f6a7b8c9-d0e1-2345-fabc-456789012345"
+  categoryId:
+    type: string
+    format: uuid
+    description: The category this item belongs to.
+    example: "e5f6a7b8-c9d0-1234-efab-345678901234"
+  name:
+    type: string
+    description: Display name of the dish.
+    example: "Pad Thai"
+  description:
+    type: string
+    nullable: true
+    description: Optional description of ingredients or preparation.
+    example: "Stir-fried rice noodles with shrimp, egg, and peanuts."
+  price:
+    type: number
+    format: decimal
+    description: Selling price in the restaurant's currency (THB).
+    minimum: 0
+    example: 120.00
+  imageUrl:
+    type: string
+    format: uri
+    nullable: true
+    description: URL to the item's photo.
+    example: "https://cdn.srms.example.com/images/pad-thai.jpg"
+  isAvailable:
+    type: boolean
+    description: Whether the item is currently available for ordering.
+    default: true
+  sortOrder:
+    type: integer
+    description: Display position within the category (ascending).
+    example: 1
+  createdAt:
+    type: string
+    format: date-time
+    example: "2025-01-01T08:00:00Z"
+  updatedAt:
+    type: string
+    format: date-time
+    example: "2025-05-20T12:00:00Z"
+required:
+  - id
+  - categoryId
+  - name
+  - price
+  - isAvailable
+  - sortOrder
+  - createdAt
+  - updatedAt

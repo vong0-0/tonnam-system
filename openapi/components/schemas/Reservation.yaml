@@ -1,0 +1,52 @@
+type: object
+description: A table reservation made in advance for a guest.
+properties:
+  id:
+    type: string
+    format: uuid
+    example: "d4e5f6a7-b8c9-0123-defa-234567890123"
+  tableId:
+    type: string
+    format: uuid
+    description: The table being reserved.
+    example: "b2c3d4e5-f6a7-8901-bcde-f12345678901"
+  guestName:
+    type: string
+    description: Name of the guest who made the reservation.
+    example: "Wanchai Pongsakorn"
+  guestCount:
+    type: integer
+    description: Expected number of guests.
+    minimum: 1
+    example: 4
+  reservedAt:
+    type: string
+    format: date-time
+    description: Scheduled date and time for the reservation.
+    example: "2025-05-21T19:00:00Z"
+  notes:
+    type: string
+    nullable: true
+    description: Optional special instructions or notes from the guest.
+    example: "Anniversary dinner, please arrange flowers."
+  createdBy:
+    type: string
+    format: uuid
+    description: User who created the reservation.
+  createdAt:
+    type: string
+    format: date-time
+    example: "2025-05-20T10:00:00Z"
+  updatedAt:
+    type: string
+    format: date-time
+    example: "2025-05-20T10:00:00Z"
+required:
+  - id
+  - tableId
+  - guestName
+  - guestCount
+  - reservedAt
+  - createdBy
+  - createdAt
+  - updatedAt

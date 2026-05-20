@@ -6,7 +6,7 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "validate": "redocly lint openapi/index.yaml",
     "bundle": "redocly bundle openapi/index.yaml -o dist/openapi.yaml",
-    "preview": "redocly preview-docs openapi/index.yaml"
+    "preview": "redocly build-docs openapi/index.yaml -o dist/index.html && start dist/index.html"
   },
   "author": "Vongsouvan Chanthasone",
   "license": "ISC",

@@ -1,0 +1,60 @@
+page:
+  name: page
+  in: query
+  description: Page number for pagination.
+  required: false
+  schema:
+    type: integer
+    minimum: 1
+    default: 1
+    example: 1
+
+limit:
+  name: limit
+  in: query
+  description: Number of items per page.
+  required: false
+  schema:
+    type: integer
+    minimum: 1
+    maximum: 100
+    default: 20
+    example: 20
+
+search:
+  name: search
+  in: query
+  description: Keyword to filter results by name or relevant text fields.
+  required: false
+  schema:
+    type: string
+    example: "Pad Thai"
+
+date:
+  name: date
+  in: query
+  description: Filter results by a specific date.
+  required: false
+  schema:
+    type: string
+    format: date
+    example: "2025-05-20"
+
+status:
+  name: status
+  in: query
+  description: Filter results by status.
+  required: false
+  schema:
+    type: string
+    example: "OPEN"
+
+period:
+  name: period
+  in: query
+  description: Time period for analytics queries.
+  required: false
+  schema:
+    type: string
+    enum: [daily, weekly, monthly, yearly]
+    example: "weekly"

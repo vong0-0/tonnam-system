@@ -1,0 +1,67 @@
+type: object
+description: >
+  A single menu item within an order. Price and name are snapshotted at order
+  time so menu changes do not affect existing records.
+properties:
+  id:
+    type: string
+    format: uuid
+    example: "c9d0e1f2-a3b4-5678-cdef-789012345678"
+  orderId:
+    type: string
+    format: uuid
+    description: The order this item belongs to.
+    example: "b8c9d0e1-f2a3-4567-bcde-678901234567"
+  menuItemId:
+    type: string
+    format: uuid
+    description: Reference to the original MenuItem.
+    example: "f6a7b8c9-d0e1-2345-fabc-456789012345"
+  menuItemName:
+    type: string
+    description: Snapshot of the menu item name at the time the order was placed.
+    example: "Pad Thai"
+  unitPrice:
+    type: number
+    format: decimal
+    description: Snapshot of the price at the time the order was placed.
+    example: 120.00
+  quantity:
+    type: integer
+    description: Number of units ordered.
+    minimum: 1
+    example: 2
+  notes:
+    type: string
+    nullable: true
+    description: Special instructions from the customer (e.g. no peanuts).
+    example: "No peanuts please."
+  status:
+    type: string
+    enum: [COOKED, CANCELLED]
+    description: >
+      Set by kitchen staff. Items start implicitly pending when the parent
+      order is SENT_TO_KITCHEN. CANCELLED requires a reason and creates an AuditLog entry.
+  cancelReason:
+    type: string
+    nullable: true
+    description: Required when status is CANCELLED.
+    example: null
+  createdAt:
+    type: string
+    format: date-time
+    example: "2025-05-20T19:00:00Z"
+  updatedAt:
+    type: string
+    format: date-time
+    example: "2025-05-20T19:25:00Z"
+required:
+  - id
+  - orderId
+  - menuItemId
+  - menuItemName
+  - unitPrice
+  - quantity
+  - status
+  - createdAt
+  - updatedAt

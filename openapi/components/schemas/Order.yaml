@@ -1,0 +1,50 @@
+type: object
+description: >
+  A batch of items sent to the kitchen by a waiter.
+  One bill can have multiple orders (e.g. additional rounds).
+properties:
+  id:
+    type: string
+    format: uuid
+    example: "b8c9d0e1-f2a3-4567-bcde-678901234567"
+  billId:
+    type: string
+    format: uuid
+    description: The bill this order is charged to.
+    example: "a7b8c9d0-e1f2-3456-abcd-567890123456"
+  tableId:
+    type: string
+    format: uuid
+    description: Denormalized table reference for the kitchen display.
+    example: "b2c3d4e5-f6a7-8901-bcde-f12345678901"
+  status:
+    type: string
+    enum: [SENT_TO_KITCHEN, COOKED, CANCELLED]
+    description: >
+      Lifecycle: SENT_TO_KITCHEN → COOKED or CANCELLED.
+      CANCELLED requires a reason and creates an AuditLog entry.
+  sentBy:
+    type: string
+    format: uuid
+    description: ID of the waiter who submitted this order.
+  cancelReason:
+    type: string
+    nullable: true
+    description: Required when status is CANCELLED.
+    example: null
+  createdAt:
+    type: string
+    format: date-time
+    example: "2025-05-20T19:00:00Z"
+  updatedAt:
+    type: string
+    format: date-time
+    example: "2025-05-20T19:30:00Z"
+required:
+  - id
+  - billId
+  - tableId
+  - status
+  - sentBy
+  - createdAt
+  - updatedAt

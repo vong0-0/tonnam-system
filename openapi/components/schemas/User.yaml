@@ -1,0 +1,39 @@
+type: object
+description: A system user account. Roles map to the four subsystem actors.
+properties:
+  id:
+    type: string
+    format: uuid
+    example: "a1b2c3d4-e5f6-7890-abcd-ef1234567890"
+  username:
+    type: string
+    description: Unique login identifier.
+    example: "cashier01"
+  displayName:
+    type: string
+    description: Human-readable name shown in the UI.
+    example: "Somchai K."
+  role:
+    type: string
+    enum: [ADMIN, CASHIER, WAITER, KITCHEN]
+    description: Role determines which subsystem the user can access.
+  isActive:
+    type: boolean
+    description: Whether the account is enabled.
+    default: true
+  createdAt:
+    type: string
+    format: date-time
+    example: "2025-01-01T08:00:00Z"
+  updatedAt:
+    type: string
+    format: date-time
+    example: "2025-05-20T12:00:00Z"
+required:
+  - id
+  - username
+  - displayName
+  - role
+  - isActive
+  - createdAt
+  - updatedAt

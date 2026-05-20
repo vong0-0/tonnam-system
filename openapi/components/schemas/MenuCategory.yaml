@@ -1,0 +1,39 @@
+type: object
+description: A grouping of menu items (e.g. Appetizers, Main Course, Beverages).
+properties:
+  id:
+    type: string
+    format: uuid
+    example: "e5f6a7b8-c9d0-1234-efab-345678901234"
+  name:
+    type: string
+    description: Display name of the category.
+    example: "Main Course"
+  description:
+    type: string
+    nullable: true
+    description: Optional longer description of the category.
+    example: "Signature dishes from our chef."
+  isActive:
+    type: boolean
+    description: Whether the category is visible to staff and customers.
+    default: true
+  sortOrder:
+    type: integer
+    description: Display position relative to other categories (ascending).
+    example: 2
+  createdAt:
+    type: string
+    format: date-time
+    example: "2025-01-01T08:00:00Z"
+  updatedAt:
+    type: string
+    format: date-time
+    example: "2025-05-20T12:00:00Z"
+required:
+  - id
+  - name
+  - isActive
+  - sortOrder
+  - createdAt
+  - updatedAt

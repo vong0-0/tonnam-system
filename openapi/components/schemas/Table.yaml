@@ -1,0 +1,43 @@
+type: object
+description: A physical restaurant table. Status reflects current occupancy and billing state.
+properties:
+  id:
+    type: string
+    format: uuid
+    example: "b2c3d4e5-f6a7-8901-bcde-f12345678901"
+  number:
+    type: string
+    description: Human-readable table identifier displayed to staff.
+    example: "T01"
+  capacity:
+    type: integer
+    description: Maximum number of guests the table can seat.
+    minimum: 1
+    example: 4
+  status:
+    type: string
+    enum: [AVAILABLE, RESERVED, OCCUPIED, PARTIALLY_PAID, PAID]
+    description: >
+      Lifecycle: AVAILABLE → RESERVED → OCCUPIED → PARTIALLY_PAID → PAID.
+      Returns to AVAILABLE after checkout is complete.
+  mergeGroupId:
+    type: string
+    format: uuid
+    nullable: true
+    description: ID of the TableMergeGroup this table belongs to, if any.
+    example: null
+  createdAt:
+    type: string
+    format: date-time
+    example: "2025-01-01T08:00:00Z"
+  updatedAt:
+    type: string
+    format: date-time
+    example: "2025-05-20T12:00:00Z"
+required:
+  - id
+  - number
+  - capacity
+  - status
+  - createdAt
+  - updatedAt
