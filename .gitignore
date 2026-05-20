@@ -1,0 +1,11 @@
+node_modules/
+dist/
+bundle/
+*.bundle.yaml
+*.bundle.json
+
+.env
+.env.local
+
+.DS_Store
+Thumbs.db

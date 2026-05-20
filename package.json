@@ -1,0 +1,26 @@
+{
+  "name": "srms-api-contract",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "validate": "redocly lint openapi/index.yaml",
+    "bundle": "redocly bundle openapi/index.yaml -o dist/openapi.yaml",
+    "preview": "redocly preview-docs openapi/index.yaml"
+  },
+  "author": "Vongsouvan Chanthasone",
+  "license": "ISC",
+  "description": "OpenAPI 3.0 contract for Smart Restaurant Management System (SRMS) — covers POS, Waiter App, Kitchen System, and Admin Backend APIs",
+  "keywords": [
+    "openapi",
+    "api-contract",
+    "restaurant",
+    "pos",
+    "smart-restaurant",
+    "srms",
+    "openapi3"
+  ],
+  "devDependencies": {
+    "@redocly/cli": "^2.31.2"
+  }
+}
