@@ -177,6 +177,10 @@ by-id:
       Permanently deletes a table. Only allowed when the table has no pending bills (BR-T02).
       Accessible to ADMIN and CASHIER.
       Returns 409 if the table has pending bills.
+      Note: This is a permanent (hard) delete by design, unlike Users which use soft delete.
+      This is acceptable because Table is not an Actor in AuditLog entries —
+      AuditLog records which User performed an action, not which Table.
+      Impact on referential integrity is therefore minimal.
     operationId: deleteTable
     responses:
       '200':
@@ -217,6 +221,8 @@ move:
     description: >
       Moves all bills and orders from the source table to the target table.
       The source table becomes AVAILABLE after the move.
+      The source table must have at least one active bill to move.
+      Returns 409 if the source table has no bills to transfer.
       If the target table is occupied, returns 409 and suggests using
       POST /table-merge-groups instead.
       Only ADMIN and CASHIER can perform this action (BR-T08).
@@ -286,7 +292,23 @@ move:
                         - from_table
                         - to_table
       '400':
-        $ref: '../components/responses/errors.yaml#/ValidationError'
+        description: Validation error. Occurs when source and target are the same table.
+        content:
+          application/problem+json:
+            schema:
+              $ref: '../components/schemas/ProblemDetail.yaml'
+            example:
+              type: "https://srms.example.com/errors/same-table-move"
+              title: "Same Table Move"
+              status: 400
+              detail: "Source and target table must be different."
+              instance: "/v1/tables/64f1a2b3c4d5e6f7a8b9c0d1/move"
+              traceId: "abc-123-xyz"
+              timestamp: "2024-01-01T14:32:00Z"
+              errors:
+                - field: "target_table_id"
+                  message: "Target table must be different from the source table."
+                  code: "SAME_TABLE_MOVE"
       '401':
         $ref: '../components/responses/errors.yaml#/Unauthorized'
       '403':
@@ -336,6 +358,10 @@ status:
       - PAID → AVAILABLE (clears all bill_ids from the table)
 
       All other status transitions are handled automatically by the system.
+      RESERVED, PARTIALLY_PAID, and PAID are intentionally excluded from the manual
+      transition enum — RESERVED is managed by the Reservation system,
+      and PARTIALLY_PAID and PAID are managed by the Payment system.
+      Manual override for these statuses is out of scope by design.
       Returns 400 with problem type `invalid-status-transition` on disallowed transitions.
       Returns 409 when trying to set AVAILABLE but the table has pending bills.
       Accessible to ADMIN and CASHIER.
