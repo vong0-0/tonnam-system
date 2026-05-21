@@ -24,7 +24,7 @@ login:
               - username
               - password
     responses:
-      '200':
+      "200":
         description: Login successful.
         headers:
           Set-Cookie:
@@ -36,7 +36,7 @@ login:
           application/json:
             schema:
               allOf:
-                - $ref: '../components/schemas/EnvelopeResponse.yaml'
+                - $ref: "../components/schemas/EnvelopeResponse.yaml"
                 - type: object
                   properties:
                     data:
@@ -74,14 +74,14 @@ login:
                       required:
                         - access_token
                         - user
-      '400':
-        $ref: '../components/responses/errors.yaml#/ValidationError'
-      '401':
-        $ref: '../components/responses/errors.yaml#/Unauthorized'
-      '403':
-        $ref: '../components/responses/errors.yaml#/Forbidden'
-      '429':
-        $ref: '../components/responses/errors.yaml#/RateLimitExceeded'
+      "400":
+        $ref: "../components/responses/errors.yaml#/ValidationError"
+      "401":
+        $ref: "../components/responses/errors.yaml#/Unauthorized"
+      "403":
+        $ref: "../components/responses/errors.yaml#/Forbidden"
+      "429":
+        $ref: "../components/responses/errors.yaml#/RateLimitExceeded"
 
 refresh:
   post:
@@ -97,9 +97,13 @@ refresh:
         required: true
         schema:
           type: string
-        description: HttpOnly refresh token cookie set at login.
+        description: >
+          HttpOnly refresh token cookie set at login.
+          Browsers send this cookie automatically with every request.
+          Backend reads it directly from the Cookie header.
+          Client code does not need to handle this manually.
     responses:
-      '200':
+      "200":
         description: Token refreshed successfully.
         headers:
           Set-Cookie:
@@ -111,7 +115,7 @@ refresh:
           application/json:
             schema:
               allOf:
-                - $ref: '../components/schemas/EnvelopeResponse.yaml'
+                - $ref: "../components/schemas/EnvelopeResponse.yaml"
                 - type: object
                   properties:
                     data:
@@ -123,10 +127,10 @@ refresh:
                           example: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
                       required:
                         - access_token
-      '401':
-        $ref: '../components/responses/errors.yaml#/Unauthorized'
-      '429':
-        $ref: '../components/responses/errors.yaml#/RateLimitExceeded'
+      "401":
+        $ref: "../components/responses/errors.yaml#/Unauthorized"
+      "429":
+        $ref: "../components/responses/errors.yaml#/RateLimitExceeded"
 
 logout:
   post:
@@ -143,9 +147,13 @@ logout:
         required: true
         schema:
           type: string
-        description: HttpOnly refresh token cookie to invalidate.
+        description: >
+          HttpOnly refresh token cookie to invalidate.
+          Browsers send this cookie automatically with every request.
+          Backend reads it directly from the Cookie header.
+          Client code does not need to handle this manually.
     responses:
-      '200':
+      "200":
         description: Logged out successfully.
         headers:
           Set-Cookie:
@@ -157,14 +165,14 @@ logout:
           application/json:
             schema:
               allOf:
-                - $ref: '../components/schemas/EnvelopeResponse.yaml'
+                - $ref: "../components/schemas/EnvelopeResponse.yaml"
                 - type: object
                   properties:
                     data:
                       nullable: true
                       example: null
-      '401':
-        $ref: '../components/responses/errors.yaml#/Unauthorized'
+      "401":
+        $ref: "../components/responses/errors.yaml#/Unauthorized"
 
 ws-ticket:
   post:
@@ -176,13 +184,13 @@ ws-ticket:
     security:
       - BearerAuth: []
     responses:
-      '201':
+      "201":
         description: WebSocket ticket issued successfully.
         content:
           application/json:
             schema:
               allOf:
-                - $ref: '../components/schemas/EnvelopeResponse.yaml'
+                - $ref: "../components/schemas/EnvelopeResponse.yaml"
                 - type: object
                   properties:
                     data:
@@ -199,9 +207,9 @@ ws-ticket:
                       required:
                         - ticket
                         - expires_in
-      '401':
-        $ref: '../components/responses/errors.yaml#/Unauthorized'
-      '403':
-        $ref: '../components/responses/errors.yaml#/Forbidden'
-      '429':
-        $ref: '../components/responses/errors.yaml#/RateLimitExceeded'
+      "401":
+        $ref: "../components/responses/errors.yaml#/Unauthorized"
+      "403":
+        $ref: "../components/responses/errors.yaml#/Forbidden"
+      "429":
+        $ref: "../components/responses/errors.yaml#/RateLimitExceeded"
