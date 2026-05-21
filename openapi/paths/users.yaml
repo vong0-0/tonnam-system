@@ -209,7 +209,9 @@ by-id:
       The account is not permanently deleted and can be reactivated
       by updating is_active via PATCH /users/{id}.
       Returns 409 if the user has an active session.
-    operationId: deleteUser
+      Note: Password change via POST /users/{id}/change-password
+      is out of MVP scope and will be implemented in a future phase.
+    operationId: deactivateUser
     responses:
       '200':
         description: Staff account deactivated successfully.
