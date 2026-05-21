@@ -5,77 +5,64 @@ description: >
 properties:
   id:
     type: string
-    format: uuid
-    example: "a7b8c9d0-e1f2-3456-abcd-567890123456"
-  billNumber:
+    example: "64f1a2b3c4d5e6f7a8b9c0d1"
+  short_id:
     type: string
     description: Human-readable bill identifier. Sub-bills use parent number with suffix.
     example: "B-0001"
-  tableId:
+  name:
     type: string
-    format: uuid
+    description: Display name of the bill.
+    example: "บิลโต๊ะ 5"
+  table_id:
+    type: string
     description: The table this bill belongs to.
-    example: "b2c3d4e5-f6a7-8901-bcde-f12345678901"
-  parentBillId:
+    example: "64f1a2b3c4d5e6f7a8b9c0d2"
+  parent_bill_id:
     type: string
-    format: uuid
     nullable: true
     description: Set when this bill was created by splitting a parent bill.
     example: null
+  split_label:
+    type: string
+    nullable: true
+    description: Label suffix for this split bill (e.g. "A", "B").
+    example: "A"
   status:
     type: string
     enum: [OPEN, PARTIALLY_PAID, PAID, CANCELLED]
     description: >
       Lifecycle: OPEN → PARTIALLY_PAID → PAID.
       CANCELLED requires a reason and creates an AuditLog entry.
-  totalAmount:
+  total_amount:
     type: number
     format: decimal
-    description: Sum of all order item prices before discounts.
+    description: Sum of all order item prices.
     example: 560.00
-  discountAmount:
-    type: number
-    format: decimal
-    description: Total discount applied. Discount changes require an AuditLog entry.
-    default: 0
-    example: 0.00
-  netAmount:
-    type: number
-    format: decimal
-    description: Payable amount after discount (totalAmount - discountAmount).
-    example: 560.00
-  paidAmount:
-    type: number
-    format: decimal
-    description: Amount already paid across all payments for this bill.
-    default: 0
-    example: 0.00
-  createdBy:
+  created_by:
     type: string
-    format: uuid
     description: ID of the cashier who opened this bill.
-  cancelReason:
+    example: "64f1a2b3c4d5e6f7a8b9c0d3"
+  cancel_reason:
     type: string
     nullable: true
     description: Required when status is CANCELLED.
     example: null
-  createdAt:
+  created_at:
     type: string
     format: date-time
     example: "2025-05-20T18:30:00Z"
-  updatedAt:
+  updated_at:
     type: string
     format: date-time
     example: "2025-05-20T21:00:00Z"
 required:
   - id
-  - billNumber
-  - tableId
+  - short_id
+  - name
+  - table_id
   - status
-  - totalAmount
-  - discountAmount
-  - netAmount
-  - paidAmount
-  - createdBy
-  - createdAt
-  - updatedAt
+  - total_amount
+  - created_by
+  - created_at
+  - updated_at

@@ -3,50 +3,58 @@ description: A table reservation made in advance for a guest.
 properties:
   id:
     type: string
-    format: uuid
-    example: "d4e5f6a7-b8c9-0123-defa-234567890123"
-  tableId:
+    example: "64f1a2b3c4d5e6f7a8b9c0d1"
+  table_id:
     type: string
-    format: uuid
     description: The table being reserved.
-    example: "b2c3d4e5-f6a7-8901-bcde-f12345678901"
-  guestName:
+    example: "64f1a2b3c4d5e6f7a8b9c0d2"
+  reserver_name:
     type: string
     description: Name of the guest who made the reservation.
     example: "Wanchai Pongsakorn"
-  guestCount:
+  phone:
+    type: string
+    description: Contact phone number of the guest.
+    example: "0812345678"
+  party_size:
     type: integer
     description: Expected number of guests.
     minimum: 1
     example: 4
-  reservedAt:
+  reserved_at:
     type: string
     format: date-time
     description: Scheduled date and time for the reservation.
     example: "2025-05-21T19:00:00Z"
+  status:
+    type: string
+    enum: [PENDING, CONFIRMED, CANCELLED]
+    description: Current status of the reservation.
   notes:
     type: string
     nullable: true
     description: Optional special instructions or notes from the guest.
     example: "Anniversary dinner, please arrange flowers."
-  createdBy:
+  created_by:
     type: string
-    format: uuid
-    description: User who created the reservation.
-  createdAt:
+    description: ID of the user who created the reservation.
+    example: "64f1a2b3c4d5e6f7a8b9c0d4"
+  created_at:
     type: string
     format: date-time
     example: "2025-05-20T10:00:00Z"
-  updatedAt:
+  updated_at:
     type: string
     format: date-time
     example: "2025-05-20T10:00:00Z"
 required:
   - id
-  - tableId
-  - guestName
-  - guestCount
-  - reservedAt
-  - createdBy
-  - createdAt
-  - updatedAt
+  - table_id
+  - reserver_name
+  - phone
+  - party_size
+  - reserved_at
+  - status
+  - created_by
+  - created_at
+  - updated_at

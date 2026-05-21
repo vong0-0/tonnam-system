@@ -6,12 +6,24 @@ description: >
 properties:
   id:
     type: string
-    format: uuid
-    example: "e1f2a3b4-c5d6-7890-efab-901234567890"
-  userId:
-    type: string
-    format: uuid
-    description: ID of the user who performed the action.
+    example: "64f1a2b3c4d5e6f7a8b9c0d1"
+  actor:
+    type: object
+    description: The user who performed the action.
+    properties:
+      id:
+        type: string
+        example: "64f1a2b3c4d5e6f7a8b9c0d5"
+      username:
+        type: string
+        example: "cashier01"
+      role:
+        type: string
+        example: "CASHIER"
+    required:
+      - id
+      - username
+      - role
   action:
     type: string
     description: >
@@ -19,37 +31,44 @@ properties:
       Examples: CANCEL_BILL, CANCEL_ORDER, CANCEL_ORDER_ITEM,
       APPLY_DISCOUNT, MERGE_TABLES, UNMERGE_TABLES, SPLIT_BILL.
     example: "CANCEL_BILL"
-  entityType:
+  entity_name:
     type: string
     description: The type of resource that was affected.
     enum: [Bill, Order, OrderItem, Table, TableMergeGroup, Payment]
     example: "Bill"
-  entityId:
+  entity_id:
     type: string
-    format: uuid
     description: ID of the affected resource.
-    example: "a7b8c9d0-e1f2-3456-abcd-567890123456"
+    example: "64f1a2b3c4d5e6f7a8b9c0d2"
   reason:
     type: string
     description: Mandatory justification provided by the user at the time of the action.
     example: "Customer changed mind and left before payment."
-  metadata:
+  before_state:
     type: object
     nullable: true
     additionalProperties: true
-    description: Optional snapshot or additional context captured at the time of the action.
+    description: Snapshot of the resource before the change.
     example:
-      previousStatus: "OPEN"
-      totalAmount: 560.00
-  createdAt:
+      status: "OPEN"
+      total_amount: 560.00
+  after_state:
+    type: object
+    nullable: true
+    additionalProperties: true
+    description: Snapshot of the resource after the change.
+    example:
+      status: "CANCELLED"
+      total_amount: 560.00
+  created_at:
     type: string
     format: date-time
     example: "2025-05-20T21:05:00Z"
 required:
   - id
-  - userId
+  - actor
   - action
-  - entityType
-  - entityId
+  - entity_name
+  - entity_id
   - reason
-  - createdAt
+  - created_at

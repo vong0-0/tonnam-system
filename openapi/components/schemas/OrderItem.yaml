@@ -5,23 +5,20 @@ description: >
 properties:
   id:
     type: string
-    format: uuid
-    example: "c9d0e1f2-a3b4-5678-cdef-789012345678"
-  orderId:
+    example: "64f1a2b3c4d5e6f7a8b9c0d1"
+  order_id:
     type: string
-    format: uuid
     description: The order this item belongs to.
-    example: "b8c9d0e1-f2a3-4567-bcde-678901234567"
-  menuItemId:
+    example: "64f1a2b3c4d5e6f7a8b9c0d2"
+  menu_item_id:
     type: string
-    format: uuid
     description: Reference to the original MenuItem.
-    example: "f6a7b8c9-d0e1-2345-fabc-456789012345"
-  menuItemName:
+    example: "64f1a2b3c4d5e6f7a8b9c0d3"
+  name:
     type: string
     description: Snapshot of the menu item name at the time the order was placed.
     example: "Pad Thai"
-  unitPrice:
+  unit_price:
     type: number
     format: decimal
     description: Snapshot of the price at the time the order was placed.
@@ -42,26 +39,26 @@ properties:
     description: >
       Set by kitchen staff. Items start implicitly pending when the parent
       order is SENT_TO_KITCHEN. CANCELLED requires a reason and creates an AuditLog entry.
-  cancelReason:
+  cancel_reason:
     type: string
     nullable: true
     description: Required when status is CANCELLED.
     example: null
-  createdAt:
+  created_at:
     type: string
     format: date-time
     example: "2025-05-20T19:00:00Z"
-  updatedAt:
+  updated_at:
     type: string
     format: date-time
     example: "2025-05-20T19:25:00Z"
 required:
   - id
-  - orderId
-  - menuItemId
-  - menuItemName
-  - unitPrice
+  - order_id
+  - menu_item_id
+  - name
+  - unit_price
   - quantity
   - status
-  - createdAt
-  - updatedAt
+  - created_at
+  - updated_at

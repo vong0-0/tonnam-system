@@ -35,16 +35,23 @@ properties:
   errors:
     type: array
     nullable: true
-    description: List of feild-level validation errors.
+    description: List of field-level validation errors.
     items:
       type: object
       properties:
-      field:
-        type: string
-        example: "username"
-      message:
-        type: string
-        example: "must be between 2 and 100 characters"
+        field:
+          type: string
+          example: "username"
+        message:
+          type: string
+          example: "must be between 2 and 100 characters"
+        code:
+          type: string
+          example: "REQUIRED_FIELD"
+      required:
+        - field
+        - message
+        - code
 required:
   - type
   - title

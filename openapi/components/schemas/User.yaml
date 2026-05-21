@@ -3,37 +3,50 @@ description: A system user account. Roles map to the four subsystem actors.
 properties:
   id:
     type: string
-    format: uuid
-    example: "a1b2c3d4-e5f6-7890-abcd-ef1234567890"
+    example: "64f1a2b3c4d5e6f7a8b9c0d1"
   username:
     type: string
     description: Unique login identifier.
     example: "cashier01"
-  displayName:
+  first_name:
     type: string
-    description: Human-readable name shown in the UI.
-    example: "Somchai K."
+    example: "Somchai"
+  last_name:
+    type: string
+    example: "Kongkiat"
+  phone:
+    type: string
+    description: Staff phone number.
+    example: "0812345678"
+  email:
+    type: string
+    format: email
+    nullable: true
+    description: Optional staff email address.
+    example: "somchai@srms.example.com"
   role:
     type: string
     enum: [ADMIN, CASHIER, WAITER, KITCHEN]
     description: Role determines which subsystem the user can access.
-  isActive:
+  is_active:
     type: boolean
     description: Whether the account is enabled.
     default: true
-  createdAt:
+  created_at:
     type: string
     format: date-time
     example: "2025-01-01T08:00:00Z"
-  updatedAt:
+  updated_at:
     type: string
     format: date-time
     example: "2025-05-20T12:00:00Z"
 required:
   - id
   - username
-  - displayName
+  - first_name
+  - last_name
+  - phone
   - role
-  - isActive
-  - createdAt
-  - updatedAt
+  - is_active
+  - created_at
+  - updated_at

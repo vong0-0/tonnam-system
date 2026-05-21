@@ -2,17 +2,15 @@ type: object
 description: >
   A payment transaction applied to a bill.
   Supports CASH, QR_PROMPTPAY, and MIXED methods.
-  A bill may receive multiple partial payments until netAmount is fully covered.
+  A bill may receive multiple partial payments until total_amount is fully covered.
 properties:
   id:
     type: string
-    format: uuid
-    example: "d0e1f2a3-b4c5-6789-defa-890123456789"
-  billId:
+    example: "64f1a2b3c4d5e6f7a8b9c0d1"
+  bill_id:
     type: string
-    format: uuid
     description: The bill this payment is applied to.
-    example: "a7b8c9d0-e1f2-3456-abcd-567890123456"
+    example: "64f1a2b3c4d5e6f7a8b9c0d2"
   method:
     type: string
     enum: [CASH, QR_PROMPTPAY, MIXED]
@@ -23,36 +21,52 @@ properties:
     description: Total amount of this payment transaction.
     minimum: 0.01
     example: 560.00
-  cashAmount:
-    type: number
-    format: decimal
+  cash:
+    type: object
     nullable: true
-    description: Cash portion. Required when method is CASH or MIXED.
-    example: 600.00
-  qrAmount:
-    type: number
-    format: decimal
+    description: Required when method is CASH or MIXED.
+    properties:
+      amount:
+        type: number
+        format: decimal
+        example: 600.00
+      received_amount:
+        type: number
+        format: decimal
+        example: 600.00
+      change_amount:
+        type: number
+        format: decimal
+        example: 40.00
+  qr_promptpay:
+    type: object
     nullable: true
-    description: QR PromptPay portion. Required when method is QR_PROMPTPAY or MIXED.
-    example: null
-  changeAmount:
-    type: number
-    format: decimal
-    nullable: true
-    description: Change returned to the customer. Applies to CASH and MIXED payments.
-    example: 40.00
-  processedBy:
+    description: Required when method is QR_PROMPTPAY or MIXED.
+    properties:
+      amount:
+        type: number
+        format: decimal
+        example: 560.00
+      received_amount:
+        type: number
+        format: decimal
+        example: 560.00
+      change_amount:
+        type: number
+        format: decimal
+        example: 0.00
+  confirmed_by:
     type: string
-    format: uuid
     description: ID of the cashier who processed this payment.
-  createdAt:
+    example: "64f1a2b3c4d5e6f7a8b9c0d3"
+  created_at:
     type: string
     format: date-time
     example: "2025-05-20T21:00:00Z"
 required:
   - id
-  - billId
+  - bill_id
   - method
   - amount
-  - processedBy
-  - createdAt
+  - confirmed_by
+  - created_at

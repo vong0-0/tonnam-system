@@ -3,13 +3,11 @@ description: A single orderable item on the menu.
 properties:
   id:
     type: string
-    format: uuid
-    example: "f6a7b8c9-d0e1-2345-fabc-456789012345"
-  categoryId:
+    example: "64f1a2b3c4d5e6f7a8b9c0d1"
+  category_id:
     type: string
-    format: uuid
     description: The category this item belongs to.
-    example: "e5f6a7b8-c9d0-1234-efab-345678901234"
+    example: "64f1a2b3c4d5e6f7a8b9c0d2"
   name:
     type: string
     description: Display name of the dish.
@@ -25,34 +23,36 @@ properties:
     description: Selling price in the restaurant's currency (THB).
     minimum: 0
     example: 120.00
-  imageUrl:
+  image_url:
     type: string
     format: uri
     nullable: true
     description: URL to the item's photo.
     example: "https://cdn.srms.example.com/images/pad-thai.jpg"
-  isAvailable:
+  is_available:
     type: boolean
     description: Whether the item is currently available for ordering.
     default: true
-  sortOrder:
-    type: integer
-    description: Display position within the category (ascending).
-    example: 1
-  createdAt:
+  is_sold_out:
+    type: boolean
+    description: >
+      Whether this item is temporarily sold out.
+      Still visible on the menu but cannot be ordered.
+    default: false
+  created_at:
     type: string
     format: date-time
     example: "2025-01-01T08:00:00Z"
-  updatedAt:
+  updated_at:
     type: string
     format: date-time
     example: "2025-05-20T12:00:00Z"
 required:
   - id
-  - categoryId
+  - category_id
   - name
   - price
-  - isAvailable
-  - sortOrder
-  - createdAt
-  - updatedAt
+  - is_available
+  - is_sold_out
+  - created_at
+  - updated_at
