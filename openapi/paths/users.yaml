@@ -203,12 +203,16 @@ by-id:
   delete:
     tags:
       - Users
-    summary: Delete a staff account
-    description: Permanently deletes a staff account. Accessible to ADMIN only. Returns 409 if the user has an active session.
+    summary: Deactivate a staff account
+    description: >
+      Deactivates a staff account by setting is_active to false.
+      The account is not permanently deleted and can be reactivated
+      by updating is_active via PATCH /users/{id}.
+      Returns 409 if the user has an active session.
     operationId: deleteUser
     responses:
       '200':
-        description: Staff account deleted successfully.
+        description: Staff account deactivated successfully.
         content:
           application/json:
             schema:
@@ -217,8 +221,7 @@ by-id:
                 - type: object
                   properties:
                     data:
-                      nullable: true
-                      example: null
+                      $ref: '../components/schemas/User.yaml'
       '401':
         $ref: '../components/responses/errors.yaml#/Unauthorized'
       '403':
