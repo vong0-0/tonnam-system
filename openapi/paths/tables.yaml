@@ -1,0 +1,394 @@
+list-create:
+  get:
+    tags:
+      - Tables
+    summary: List all tables
+    description: Returns a paginated list of tables. Accessible to ADMIN, CASHIER, and WAITER.
+    operationId: listTables
+    parameters:
+      - $ref: '../components/parameters/common.yaml#/page'
+      - $ref: '../components/parameters/common.yaml#/limit'
+      - $ref: '../components/parameters/common.yaml#/search'
+      - name: status
+        in: query
+        required: false
+        schema:
+          type: string
+          enum: [AVAILABLE, RESERVED, OCCUPIED, PARTIALLY_PAID, PAID]
+        description: Filter by table status.
+      - name: is_temporary
+        in: query
+        required: false
+        schema:
+          type: boolean
+        description: Filter by whether the table is a temporary extension table.
+    responses:
+      '200':
+        description: Tables retrieved successfully.
+        content:
+          application/json:
+            schema:
+              allOf:
+                - $ref: '../components/schemas/EnvelopeResponse.yaml'
+                - type: object
+                  properties:
+                    data:
+                      type: array
+                      items:
+                        $ref: '../components/schemas/Table.yaml'
+                    pagination:
+                      $ref: '../components/schemas/Pagination.yaml'
+      '401':
+        $ref: '../components/responses/errors.yaml#/Unauthorized'
+      '403':
+        $ref: '../components/responses/errors.yaml#/Forbidden'
+
+  post:
+    tags:
+      - Tables
+    summary: Create a new table
+    description: Creates a new table. Accessible to ADMIN and CASHIER. Returns 409 on duplicate table_name.
+    operationId: createTable
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              table_name:
+                type: string
+                example: "T01"
+              capacity:
+                type: integer
+                minimum: 1
+                example: 4
+              is_temporary:
+                type: boolean
+                default: false
+                description: Set to true for temporary extension tables.
+            required:
+              - table_name
+              - capacity
+    responses:
+      '201':
+        description: Table created successfully.
+        content:
+          application/json:
+            schema:
+              allOf:
+                - $ref: '../components/schemas/EnvelopeResponse.yaml'
+                - type: object
+                  properties:
+                    data:
+                      $ref: '../components/schemas/Table.yaml'
+      '400':
+        $ref: '../components/responses/errors.yaml#/ValidationError'
+      '401':
+        $ref: '../components/responses/errors.yaml#/Unauthorized'
+      '403':
+        $ref: '../components/responses/errors.yaml#/Forbidden'
+      '409':
+        $ref: '../components/responses/errors.yaml#/Conflict'
+
+by-id:
+  parameters:
+    - name: id
+      in: path
+      required: true
+      schema:
+        type: string
+        example: "64f1a2b3c4d5e6f7a8b9c0d1"
+      description: MongoDB ObjectId of the table.
+
+  get:
+    tags:
+      - Tables
+    summary: Get a table by ID
+    description: Returns a single table by ID. Accessible to ADMIN, CASHIER, and WAITER.
+    operationId: getTableById
+    responses:
+      '200':
+        description: Table retrieved successfully.
+        content:
+          application/json:
+            schema:
+              allOf:
+                - $ref: '../components/schemas/EnvelopeResponse.yaml'
+                - type: object
+                  properties:
+                    data:
+                      $ref: '../components/schemas/Table.yaml'
+      '401':
+        $ref: '../components/responses/errors.yaml#/Unauthorized'
+      '403':
+        $ref: '../components/responses/errors.yaml#/Forbidden'
+      '404':
+        $ref: '../components/responses/errors.yaml#/NotFound'
+
+  patch:
+    tags:
+      - Tables
+    summary: Update table details
+    description: Partially updates table details. Accessible to ADMIN and CASHIER. Returns 409 on duplicate table_name.
+    operationId: updateTable
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              table_name:
+                type: string
+                example: "T01-A"
+              capacity:
+                type: integer
+                minimum: 1
+                example: 6
+    responses:
+      '200':
+        description: Table updated successfully.
+        content:
+          application/json:
+            schema:
+              allOf:
+                - $ref: '../components/schemas/EnvelopeResponse.yaml'
+                - type: object
+                  properties:
+                    data:
+                      $ref: '../components/schemas/Table.yaml'
+      '400':
+        $ref: '../components/responses/errors.yaml#/ValidationError'
+      '401':
+        $ref: '../components/responses/errors.yaml#/Unauthorized'
+      '403':
+        $ref: '../components/responses/errors.yaml#/Forbidden'
+      '404':
+        $ref: '../components/responses/errors.yaml#/NotFound'
+      '409':
+        $ref: '../components/responses/errors.yaml#/Conflict'
+
+  delete:
+    tags:
+      - Tables
+    summary: Delete a table
+    description: >
+      Permanently deletes a table. Only allowed when the table has no pending bills (BR-T02).
+      Accessible to ADMIN and CASHIER.
+      Returns 409 if the table has pending bills.
+    operationId: deleteTable
+    responses:
+      '200':
+        description: Table deleted successfully.
+        content:
+          application/json:
+            schema:
+              allOf:
+                - $ref: '../components/schemas/EnvelopeResponse.yaml'
+                - type: object
+                  properties:
+                    data:
+                      nullable: true
+                      example: null
+      '401':
+        $ref: '../components/responses/errors.yaml#/Unauthorized'
+      '403':
+        $ref: '../components/responses/errors.yaml#/Forbidden'
+      '404':
+        $ref: '../components/responses/errors.yaml#/NotFound'
+      '409':
+        $ref: '../components/responses/errors.yaml#/Conflict'
+
+move:
+  parameters:
+    - name: id
+      in: path
+      required: true
+      schema:
+        type: string
+        example: "64f1a2b3c4d5e6f7a8b9c0d1"
+      description: MongoDB ObjectId of the source table.
+
+  post:
+    tags:
+      - Tables
+    summary: Move a table to another location
+    description: >
+      Moves all bills and orders from the source table to the target table.
+      The source table becomes AVAILABLE after the move.
+      If the target table is occupied, returns 409 and suggests using
+      POST /table-merge-groups instead.
+      Only ADMIN and CASHIER can perform this action (BR-T08).
+      Returns 400 if source and target are the same table.
+    operationId: moveTable
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              target_table_id:
+                type: string
+                description: MongoDB ObjectId of the target table to move bills and orders to.
+                example: "64f1a2b3c4d5e6f7a8b9c0d2"
+            required:
+              - target_table_id
+    responses:
+      '200':
+        description: Table moved successfully.
+        content:
+          application/json:
+            schema:
+              allOf:
+                - $ref: '../components/schemas/EnvelopeResponse.yaml'
+                - type: object
+                  properties:
+                    data:
+                      type: object
+                      properties:
+                        from_table:
+                          type: object
+                          description: The source table after the move (now AVAILABLE).
+                          properties:
+                            id:
+                              type: string
+                              example: "64f1a2b3c4d5e6f7a8b9c0d1"
+                            table_name:
+                              type: string
+                              example: "T01"
+                            status:
+                              type: string
+                              example: "AVAILABLE"
+                          required:
+                            - id
+                            - table_name
+                            - status
+                        to_table:
+                          type: object
+                          description: The target table after the move (now OCCUPIED).
+                          properties:
+                            id:
+                              type: string
+                              example: "64f1a2b3c4d5e6f7a8b9c0d2"
+                            table_name:
+                              type: string
+                              example: "T02"
+                            status:
+                              type: string
+                              example: "OCCUPIED"
+                          required:
+                            - id
+                            - table_name
+                            - status
+                      required:
+                        - from_table
+                        - to_table
+      '400':
+        $ref: '../components/responses/errors.yaml#/ValidationError'
+      '401':
+        $ref: '../components/responses/errors.yaml#/Unauthorized'
+      '403':
+        $ref: '../components/responses/errors.yaml#/Forbidden'
+      '404':
+        $ref: '../components/responses/errors.yaml#/NotFound'
+      '409':
+        description: >
+          Conflict. Occurs when the target table is occupied.
+          Use POST /table-merge-groups instead to merge tables.
+        content:
+          application/problem+json:
+            schema:
+              $ref: '../components/schemas/ProblemDetail.yaml'
+            example:
+              type: "https://srms.example.com/errors/conflict"
+              title: "Conflict"
+              status: 409
+              detail: "Target table is occupied. Use POST /table-merge-groups to merge tables instead."
+              instance: "/v1/tables/64f1a2b3c4d5e6f7a8b9c0d1/move"
+              traceId: "abc-123-xyz"
+              timestamp: "2024-01-01T14:32:00Z"
+              errors: null
+
+status:
+  parameters:
+    - name: id
+      in: path
+      required: true
+      schema:
+        type: string
+        example: "64f1a2b3c4d5e6f7a8b9c0d1"
+      description: MongoDB ObjectId of the table.
+
+  patch:
+    tags:
+      - Tables
+    summary: Manually update table status
+    description: >
+      Manually transitions the table to a new status.
+      Only the following transitions are allowed:
+
+      - AVAILABLE → OCCUPIED (guests seated, no order yet)
+
+      - OCCUPIED → AVAILABLE (no bills or all bills CANCELLED)
+
+      - PAID → AVAILABLE (clears all bill_ids from the table)
+
+      All other status transitions are handled automatically by the system.
+      Returns 400 with problem type `invalid-status-transition` on disallowed transitions.
+      Returns 409 when trying to set AVAILABLE but the table has pending bills.
+      Accessible to ADMIN and CASHIER.
+    operationId: updateTableStatus
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              status:
+                type: string
+                enum: [AVAILABLE, OCCUPIED]
+                description: Target status. Only AVAILABLE and OCCUPIED are allowed for manual transitions.
+                example: "OCCUPIED"
+            required:
+              - status
+    responses:
+      '200':
+        description: Table status updated successfully.
+        content:
+          application/json:
+            schema:
+              allOf:
+                - $ref: '../components/schemas/EnvelopeResponse.yaml'
+                - type: object
+                  properties:
+                    data:
+                      $ref: '../components/schemas/Table.yaml'
+      '400':
+        description: Invalid status transition.
+        content:
+          application/problem+json:
+            schema:
+              $ref: '../components/schemas/ProblemDetail.yaml'
+            example:
+              type: "https://srms.example.com/errors/invalid-status-transition"
+              title: "Invalid Status Transition"
+              status: 400
+              detail: "Cannot transition table status from OCCUPIED to RESERVED."
+              instance: "/v1/tables/64f1a2b3c4d5e6f7a8b9c0d1/status"
+              traceId: "abc-123-xyz"
+              timestamp: "2024-01-01T14:32:00Z"
+              errors:
+                - field: "status"
+                  message: "Cannot transition from OCCUPIED to RESERVED"
+                  code: "INVALID_STATUS_TRANSITION"
+      '401':
+        $ref: '../components/responses/errors.yaml#/Unauthorized'
+      '403':
+        $ref: '../components/responses/errors.yaml#/Forbidden'
+      '404':
+        $ref: '../components/responses/errors.yaml#/NotFound'
+      '409':
+        $ref: '../components/responses/errors.yaml#/Conflict'

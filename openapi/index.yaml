@@ -178,3 +178,11 @@ paths:
     $ref: './paths/users.yaml#/list-create'
   /users/{id}:
     $ref: './paths/users.yaml#/by-id'
+  /tables:
+    $ref: './paths/tables.yaml#/list-create'
+  /tables/{id}:
+    $ref: './paths/tables.yaml#/by-id'
+  /tables/{id}/move:
+    $ref: './paths/tables.yaml#/move'
+  /tables/{id}/status:
+    $ref: './paths/tables.yaml#/status'
