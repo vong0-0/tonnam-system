@@ -226,3 +226,8 @@ paths:
     $ref: './paths/orders.yaml#/status'
   /orders/{id}/items/{item_id}:
     $ref: './paths/orders.yaml#/item-by-id'
+  /payments:
+    $ref: './paths/payments.yaml#/create'
+  /payments/{id}:
+    $ref: './paths/payments.yaml#/by-id'
+

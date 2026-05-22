@@ -1,0 +1,226 @@
+create:
+  post:
+    tags:
+      - Payments
+    summary: Process a payment
+    description: >
+      Creates a payment transaction for a bill.
+      
+      Supports three methods: CASH, QR_PROMPTPAY, and MIXED.
+      A bill may receive multiple partial payments until fully paid.
+      MIXED method must cover the full bill amount in a single transaction.
+      For CASH: cashAmount is required, change_amount is auto-calculated.
+      For QR_PROMPTPAY: qr_amount is required.
+      For MIXED: both cash.amount and qr_promptpay.amount are required
+      and must together equal the remaining bill amount.
+      
+      Bill status auto-transitions:
+        - OPEN → PARTIALLY_PAID (when partial payment received)
+        - PARTIALLY_PAID → PAID (when remaining amount covered)
+        - OPEN → PAID (when full amount paid in one transaction)
+        
+      Returns 404 if bill_id not found.
+      Returns 409 if bill is already PAID or CANCELLED.
+    operationId: createPayment
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              bill_id:
+                type: string
+                description: The bill ID this payment is applied to.
+                example: "64f1a2b3c4d5e6f7a8b9c0d2"
+              method:
+                type: string
+                enum: [CASH, QR_PROMPTPAY, MIXED]
+                description: Payment method used.
+                example: "CASH"
+              amount:
+                type: number
+                format: decimal
+                minimum: 0.01
+                description: Total amount of this payment transaction.
+                example: 560.00
+              cash:
+                type: object
+                nullable: true
+                description: Required when method is CASH or MIXED.
+                properties:
+                  received_amount:
+                    type: number
+                    format: decimal
+                    description: Cash amount received from the customer.
+                    example: 600.00
+                required:
+                  - received_amount
+              qr_promptpay:
+                type: object
+                nullable: true
+                description: Required when method is QR_PROMPTPAY or MIXED.
+                properties:
+                  received_amount:
+                    type: number
+                    format: decimal
+                    description: Amount received via QR PromptPay.
+                    example: 560.00
+                required:
+                  - received_amount
+            required:
+              - bill_id
+              - method
+              - amount
+    responses:
+      "201":
+        description: Payment processed successfully.
+        content:
+          application/json:
+            schema:
+              allOf:
+                - $ref: "../components/schemas/EnvelopeResponse.yaml"
+                - type: object
+                  properties:
+                    data:
+                      type: object
+                      properties:
+                        payment:
+                          $ref: "../components/schemas/Payment.yaml"
+                        bill:
+                          $ref: "../components/schemas/Bill.yaml"
+                      required:
+                        - payment
+                        - bill
+      "400":
+        description: >
+          Validation error. Occurs when required payment fields
+          are missing for the selected method, or when MIXED
+          payment amounts do not equal the remaining bill amount.
+        content:
+          application/problem+json:
+            schema:
+              $ref: "../components/schemas/ProblemDetail.yaml"
+            examples:
+              missing_cash:
+                summary: Cash object missing for CASH or MIXED method
+                value:
+                  type: "https://srms.example.com/errors/validation-error"
+                  title: "Validation Error"
+                  status: 400
+                  detail: "cash object is required when method is CASH or MIXED."
+                  instance: "/v1/payments"
+                  traceId: "abc-123-xyz"
+                  timestamp: "2024-01-01T14:32:00Z"
+                  errors:
+                    - field: "cash"
+                      message: "cash is required when method is CASH or MIXED."
+                      code: "REQUIRED_FIELD"
+              mixed_amount_mismatch:
+                summary: MIXED payment amounts do not cover remaining bill amount
+                value:
+                  type: "https://srms.example.com/errors/validation-error"
+                  title: "Validation Error"
+                  status: 400
+                  detail: "MIXED payment must cover the full remaining bill amount."
+                  instance: "/v1/payments"
+                  traceId: "abc-123-xyz"
+                  timestamp: "2024-01-01T14:32:00Z"
+                  errors:
+                    - field: "amount"
+                      message: "Cash and QR amounts must together equal the remaining bill amount."
+                      code: "MIXED_AMOUNT_MISMATCH"
+      "401":
+        $ref: "../components/responses/errors.yaml#/Unauthorized"
+      "403":
+        $ref: "../components/responses/errors.yaml#/Forbidden"
+      "404":
+        description: The specified bill_id does not exist.
+        content:
+          application/problem+json:
+            schema:
+              $ref: "../components/schemas/ProblemDetail.yaml"
+            example:
+              type: "https://srms.example.com/errors/not-found"
+              title: "Not Found"
+              status: 404
+              detail: "The specified bill was not found."
+              instance: "/v1/payments"
+              traceId: "abc-123-xyz"
+              timestamp: "2024-01-01T14:32:00Z"
+              errors:
+                - field: "bill_id"
+                  message: "Bill with the given ID was not found."
+                  code: "BILL_NOT_FOUND"
+      "409":
+        description: Conflict. The bill is already PAID or CANCELLED.
+        content:
+          application/problem+json:
+            schema:
+              $ref: "../components/schemas/ProblemDetail.yaml"
+            examples:
+              AlreadyPaid:
+                summary: Bill is already paid
+                value:
+                  type: "https://srms.example.com/errors/conflict"
+                  title: "Conflict"
+                  status: 409
+                  detail: "Cannot process payment for an already paid bill."
+                  instance: "/v1/payments"
+                  traceId: "abc-123-xyz"
+                  timestamp: "2024-01-01T14:32:00Z"
+                  errors:
+                    - field: "bill_id"
+                      message: "The bill is already in PAID status."
+                      code: "BILL_ALREADY_PAID"
+              BillCancelled:
+                summary: Bill is cancelled
+                value:
+                  type: "https://srms.example.com/errors/conflict"
+                  title: "Conflict"
+                  status: 409
+                  detail: "Cannot process payment for a cancelled bill."
+                  instance: "/v1/payments"
+                  traceId: "abc-123-xyz"
+                  timestamp: "2024-01-01T14:32:00Z"
+                  errors:
+                    - field: "bill_id"
+                      message: "The bill is in CANCELLED status."
+                      code: "BILL_CANCELLED"
+
+by-id:
+  parameters:
+    - name: id
+      in: path
+      required: true
+      schema:
+        type: string
+        example: "64f1a2b3c4d5e6f7a8b9c0d1"
+      description: MongoDB ObjectId of the payment.
+
+  get:
+    tags:
+      - Payments
+    summary: Get a payment by ID
+    description: >
+      Returns details of a single payment transaction by its ID.
+      Accessible to ADMIN and CASHIER.
+    operationId: getPaymentById
+    responses:
+      "200":
+        description: Payment retrieved successfully.
+        content:
+          application/json:
+            schema:
+              allOf:
+                - $ref: "../components/schemas/EnvelopeResponse.yaml"
+                - type: object
+                  properties:
+                    data:
+                      $ref: "../components/schemas/Payment.yaml"
+      "401":
+        $ref: "../components/responses/errors.yaml#/Unauthorized"
+      "403":
+        $ref: "../components/responses/errors.yaml#/Forbidden"
+      "404":
+        $ref: "../components/responses/errors.yaml#/NotFound"
