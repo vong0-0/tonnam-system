@@ -1,0 +1,877 @@
+sales-summary:
+  get:
+    tags:
+      - Analytics
+    summary: Get sales summary
+    description: >
+      Returns sales summary for a given period.
+      Includes total_revenue, total_bills, total_orders,
+      average_bill_amount, payment_breakdown, peak object,
+      and a breakdown array appropriate for the period.
+
+      daily → hourly_breakdown (hour, revenue, bills)
+      weekly → daily_breakdown (date, day, revenue, bills)
+      monthly → daily_breakdown (date, day, revenue, bills)
+      yearly → monthly_breakdown (month, revenue, bills)
+
+      peak object contains label, revenue, bills.
+      payment_breakdown contains cash and qr_promptpay amounts.
+      Accessible to ADMIN and CASHIER.
+    operationId: getSalesSummary
+    parameters:
+      - name: period
+        in: query
+        required: true
+        schema:
+          type: string
+          enum: [daily, weekly, monthly, yearly]
+        description: Time period for the summary.
+      - name: date
+        in: query
+        required: true
+        schema:
+          type: string
+          format: date
+          example: "2025-05-20"
+        description: >
+          Reference date for the period.
+          daily = that day, weekly = week containing that date,
+          monthly = that month, yearly = that year.
+    responses:
+      "200":
+        description: Sales summary retrieved successfully.
+        content:
+          application/json:
+            schema:
+              allOf:
+                - $ref: "../components/schemas/EnvelopeResponse.yaml"
+                - type: object
+                  properties:
+                    data:
+                      type: object
+                      properties:
+                        period:
+                          type: string
+                          example: "daily"
+                        date:
+                          type: string
+                          format: date
+                          example: "2025-05-20"
+                        total_revenue:
+                          type: number
+                          format: decimal
+                          example: 25600.00
+                        total_bills:
+                          type: integer
+                          example: 48
+                        total_orders:
+                          type: integer
+                          example: 120
+                        average_bill_amount:
+                          type: number
+                          format: decimal
+                          example: 533.33
+                        payment_breakdown:
+                          type: object
+                          properties:
+                            cash:
+                              type: number
+                              format: decimal
+                              example: 15000.00
+                            qr_promptpay:
+                              type: number
+                              format: decimal
+                              example: 10600.00
+                          required:
+                            - cash
+                            - qr_promptpay
+                        peak:
+                          type: object
+                          description: The highest-revenue period within the summary range.
+                          properties:
+                            label:
+                              type: string
+                              description: >
+                                Hour label for daily (e.g. "19:00"),
+                                date for weekly/monthly (e.g. "2025-05-20"),
+                                month for yearly (e.g. "May").
+                              example: "19:00"
+                            revenue:
+                              type: number
+                              format: decimal
+                              example: 4200.00
+                            bills:
+                              type: integer
+                              example: 8
+                          required:
+                            - label
+                            - revenue
+                            - bills
+                        breakdown:
+                          description: >
+                            Period-specific breakdown array.
+                            daily → hourly_breakdown: array of {hour, revenue, bills}.
+                            weekly/monthly → daily_breakdown: array of {date, day, revenue, bills}.
+                            yearly → monthly_breakdown: array of {month, revenue, bills}.
+                          oneOf:
+                            - title: hourly_breakdown
+                              type: array
+                              items:
+                                type: object
+                                properties:
+                                  hour:
+                                    type: string
+                                    example: "09:00"
+                                  revenue:
+                                    type: number
+                                    format: decimal
+                                    example: 1200.00
+                                  bills:
+                                    type: integer
+                                    example: 3
+                                required:
+                                  - hour
+                                  - revenue
+                                  - bills
+                            - title: daily_breakdown
+                              type: array
+                              items:
+                                type: object
+                                properties:
+                                  date:
+                                    type: string
+                                    format: date
+                                    example: "2025-05-20"
+                                  day:
+                                    type: string
+                                    example: "Tuesday"
+                                  revenue:
+                                    type: number
+                                    format: decimal
+                                    example: 8500.00
+                                  bills:
+                                    type: integer
+                                    example: 16
+                                required:
+                                  - date
+                                  - day
+                                  - revenue
+                                  - bills
+                            - title: monthly_breakdown
+                              type: array
+                              items:
+                                type: object
+                                properties:
+                                  month:
+                                    type: string
+                                    example: "May"
+                                  revenue:
+                                    type: number
+                                    format: decimal
+                                    example: 320000.00
+                                  bills:
+                                    type: integer
+                                    example: 620
+                                required:
+                                  - month
+                                  - revenue
+                                  - bills
+                      required:
+                        - period
+                        - date
+                        - total_revenue
+                        - total_bills
+                        - total_orders
+                        - average_bill_amount
+                        - payment_breakdown
+                        - peak
+                        - breakdown
+      "400":
+        description: Validation error. Occurs when period or date is missing or invalid.
+        content:
+          application/problem+json:
+            schema:
+              $ref: "../components/schemas/ProblemDetail.yaml"
+            example:
+              type: "https://srms.example.com/errors/validation-error"
+              title: "Validation Error"
+              status: 400
+              detail: "One or more query parameters failed validation."
+              instance: "/v1/analytics/sales/summary"
+              traceId: "abc-123-xyz"
+              timestamp: "2024-01-01T14:32:00Z"
+              errors:
+                - field: "period"
+                  message: "period must be one of: daily, weekly, monthly, yearly."
+                  code: "INVALID_VALUE"
+      "401":
+        $ref: "../components/responses/errors.yaml#/Unauthorized"
+      "403":
+        $ref: "../components/responses/errors.yaml#/Forbidden"
+
+sales-comparison:
+  get:
+    tags:
+      - Analytics
+    summary: Compare sales between two periods
+    description: >
+      Compares sales between two periods of the same type.
+      Returns current and previous period summaries with change metrics.
+      Accessible to ADMIN only.
+    operationId: getSalesComparison
+    parameters:
+      - name: period
+        in: query
+        required: true
+        schema:
+          type: string
+          enum: [daily, weekly, monthly, yearly]
+        description: Time period type for both current and previous.
+      - name: current_date
+        in: query
+        required: true
+        schema:
+          type: string
+          format: date
+          example: "2025-05-20"
+        description: Reference date for the current period.
+      - name: previous_date
+        in: query
+        required: true
+        schema:
+          type: string
+          format: date
+          example: "2025-05-13"
+        description: Reference date for the previous period.
+    responses:
+      "200":
+        description: Sales comparison retrieved successfully.
+        content:
+          application/json:
+            schema:
+              allOf:
+                - $ref: "../components/schemas/EnvelopeResponse.yaml"
+                - type: object
+                  properties:
+                    data:
+                      type: object
+                      properties:
+                        period:
+                          type: string
+                          example: "weekly"
+                        current:
+                          type: object
+                          properties:
+                            date:
+                              type: string
+                              format: date
+                              example: "2025-05-20"
+                            total_revenue:
+                              type: number
+                              format: decimal
+                              example: 175000.00
+                            total_bills:
+                              type: integer
+                              example: 320
+                            total_orders:
+                              type: integer
+                              example: 810
+                            average_bill_amount:
+                              type: number
+                              format: decimal
+                              example: 546.88
+                          required:
+                            - date
+                            - total_revenue
+                            - total_bills
+                            - total_orders
+                            - average_bill_amount
+                        previous:
+                          type: object
+                          properties:
+                            date:
+                              type: string
+                              format: date
+                              example: "2025-05-13"
+                            total_revenue:
+                              type: number
+                              format: decimal
+                              example: 158000.00
+                            total_bills:
+                              type: integer
+                              example: 295
+                            total_orders:
+                              type: integer
+                              example: 740
+                            average_bill_amount:
+                              type: number
+                              format: decimal
+                              example: 535.59
+                          required:
+                            - date
+                            - total_revenue
+                            - total_bills
+                            - total_orders
+                            - average_bill_amount
+                        changes:
+                          type: object
+                          properties:
+                            revenue_change:
+                              type: number
+                              format: decimal
+                              description: Absolute change in revenue (current - previous).
+                              example: 17000.00
+                            revenue_change_percent:
+                              type: number
+                              format: decimal
+                              description: Percentage change in revenue.
+                              example: 10.76
+                            bills_change:
+                              type: integer
+                              description: Absolute change in bill count.
+                              example: 25
+                            bills_change_percent:
+                              type: number
+                              format: decimal
+                              example: 8.47
+                            orders_change:
+                              type: integer
+                              description: Absolute change in order count.
+                              example: 70
+                            orders_change_percent:
+                              type: number
+                              format: decimal
+                              example: 9.46
+                          required:
+                            - revenue_change
+                            - revenue_change_percent
+                            - bills_change
+                            - bills_change_percent
+                            - orders_change
+                            - orders_change_percent
+                      required:
+                        - period
+                        - current
+                        - previous
+                        - changes
+      "400":
+        description: Validation error. Occurs when period, current_date, or previous_date is missing or invalid.
+        content:
+          application/problem+json:
+            schema:
+              $ref: "../components/schemas/ProblemDetail.yaml"
+            example:
+              type: "https://srms.example.com/errors/validation-error"
+              title: "Validation Error"
+              status: 400
+              detail: "One or more query parameters failed validation."
+              instance: "/v1/analytics/sales/comparison"
+              traceId: "abc-123-xyz"
+              timestamp: "2024-01-01T14:32:00Z"
+              errors:
+                - field: "previous_date"
+                  message: "previous_date is required."
+                  code: "REQUIRED_FIELD"
+      "401":
+        $ref: "../components/responses/errors.yaml#/Unauthorized"
+      "403":
+        $ref: "../components/responses/errors.yaml#/Forbidden"
+
+sales-by-category:
+  get:
+    tags:
+      - Analytics
+    summary: Get sales breakdown by menu category
+    description: >
+      Returns revenue breakdown by menu category for a given period.
+      Each category includes revenue, percentage of total, and total_items_sold.
+      Accessible to ADMIN only.
+    operationId: getSalesByCategory
+    parameters:
+      - name: period
+        in: query
+        required: true
+        schema:
+          type: string
+          enum: [daily, weekly, monthly, yearly]
+        description: Time period for the breakdown.
+      - name: date
+        in: query
+        required: true
+        schema:
+          type: string
+          format: date
+          example: "2025-05-20"
+        description: Reference date for the period.
+    responses:
+      "200":
+        description: Sales by category retrieved successfully.
+        content:
+          application/json:
+            schema:
+              allOf:
+                - $ref: "../components/schemas/EnvelopeResponse.yaml"
+                - type: object
+                  properties:
+                    data:
+                      type: object
+                      properties:
+                        period:
+                          type: string
+                          example: "monthly"
+                        date:
+                          type: string
+                          format: date
+                          example: "2025-05-01"
+                        total_revenue:
+                          type: number
+                          format: decimal
+                          example: 680000.00
+                        categories:
+                          type: array
+                          items:
+                            type: object
+                            properties:
+                              category_id:
+                                type: string
+                                example: "64f1a2b3c4d5e6f7a8b9c0d2"
+                              category_name:
+                                type: string
+                                example: "Main Course"
+                              revenue:
+                                type: number
+                                format: decimal
+                                example: 420000.00
+                              percentage:
+                                type: number
+                                format: decimal
+                                description: Revenue as a percentage of total_revenue.
+                                example: 61.76
+                              total_items_sold:
+                                type: integer
+                                example: 1850
+                            required:
+                              - category_id
+                              - category_name
+                              - revenue
+                              - percentage
+                              - total_items_sold
+                      required:
+                        - period
+                        - date
+                        - total_revenue
+                        - categories
+      "400":
+        description: Validation error. Occurs when period or date is missing or invalid.
+        content:
+          application/problem+json:
+            schema:
+              $ref: "../components/schemas/ProblemDetail.yaml"
+            example:
+              type: "https://srms.example.com/errors/validation-error"
+              title: "Validation Error"
+              status: 400
+              detail: "One or more query parameters failed validation."
+              instance: "/v1/analytics/sales/by-category"
+              traceId: "abc-123-xyz"
+              timestamp: "2024-01-01T14:32:00Z"
+              errors:
+                - field: "date"
+                  message: "date is required and must be a valid date format (YYYY-MM-DD)."
+                  code: "REQUIRED_FIELD"
+      "401":
+        $ref: "../components/responses/errors.yaml#/Unauthorized"
+      "403":
+        $ref: "../components/responses/errors.yaml#/Forbidden"
+
+menu-best-sellers:
+  get:
+    tags:
+      - Analytics
+    summary: Get best-selling menu items
+    description: >
+      Returns top selling menu items ranked by quantity sold.
+      Default limit is 10.
+      Accessible to ADMIN and CASHIER.
+    operationId: getMenuBestSellers
+    parameters:
+      - name: period
+        in: query
+        required: true
+        schema:
+          type: string
+          enum: [daily, weekly, monthly, yearly]
+        description: Time period for the ranking.
+      - name: date
+        in: query
+        required: true
+        schema:
+          type: string
+          format: date
+          example: "2025-05-20"
+        description: Reference date for the period.
+      - name: limit
+        in: query
+        required: false
+        schema:
+          type: integer
+          minimum: 1
+          maximum: 50
+          default: 10
+        description: Maximum number of items to return.
+    responses:
+      "200":
+        description: Best sellers retrieved successfully.
+        content:
+          application/json:
+            schema:
+              allOf:
+                - $ref: "../components/schemas/EnvelopeResponse.yaml"
+                - type: object
+                  properties:
+                    data:
+                      type: object
+                      properties:
+                        period:
+                          type: string
+                          example: "weekly"
+                        date:
+                          type: string
+                          format: date
+                          example: "2025-05-20"
+                        items:
+                          type: array
+                          items:
+                            type: object
+                            properties:
+                              rank:
+                                type: integer
+                                example: 1
+                              menu_item_id:
+                                type: string
+                                example: "64f1a2b3c4d5e6f7a8b9c0d3"
+                              name:
+                                type: string
+                                example: "Pad Thai"
+                              category_name:
+                                type: string
+                                example: "Main Course"
+                              total_quantity_sold:
+                                type: integer
+                                example: 320
+                              total_revenue:
+                                type: number
+                                format: decimal
+                                example: 38400.00
+                              unit_price:
+                                type: number
+                                format: decimal
+                                example: 120.00
+                            required:
+                              - rank
+                              - menu_item_id
+                              - name
+                              - category_name
+                              - total_quantity_sold
+                              - total_revenue
+                              - unit_price
+                      required:
+                        - period
+                        - date
+                        - items
+      "400":
+        description: Validation error. Occurs when period or date is missing or invalid.
+        content:
+          application/problem+json:
+            schema:
+              $ref: "../components/schemas/ProblemDetail.yaml"
+            example:
+              type: "https://srms.example.com/errors/validation-error"
+              title: "Validation Error"
+              status: 400
+              detail: "One or more query parameters failed validation."
+              instance: "/v1/analytics/menu/best-sellers"
+              traceId: "abc-123-xyz"
+              timestamp: "2024-01-01T14:32:00Z"
+              errors:
+                - field: "date"
+                  message: "date is required and must be a valid date format (YYYY-MM-DD)."
+                  code: "REQUIRED_FIELD"
+      "401":
+        $ref: "../components/responses/errors.yaml#/Unauthorized"
+      "403":
+        $ref: "../components/responses/errors.yaml#/Forbidden"
+
+menu-dead-items:
+  get:
+    tags:
+      - Analytics
+    summary: Get dead menu items
+    description: >
+      Returns menu items that have sold below the threshold quantity.
+      Default threshold is 5.
+      daily period is not supported — only weekly, monthly, yearly.
+      Accessible to ADMIN only.
+    operationId: getMenuDeadItems
+    parameters:
+      - name: period
+        in: query
+        required: true
+        schema:
+          type: string
+          enum: [weekly, monthly, yearly]
+        description: Time period. daily is not supported for dead item detection.
+      - name: date
+        in: query
+        required: true
+        schema:
+          type: string
+          format: date
+          example: "2025-05-20"
+        description: Reference date for the period.
+      - name: threshold
+        in: query
+        required: false
+        schema:
+          type: integer
+          minimum: 0
+          default: 5
+        description: Items sold below this quantity are considered dead. Default is 5.
+    responses:
+      "200":
+        description: Dead menu items retrieved successfully.
+        content:
+          application/json:
+            schema:
+              allOf:
+                - $ref: "../components/schemas/EnvelopeResponse.yaml"
+                - type: object
+                  properties:
+                    data:
+                      type: object
+                      properties:
+                        period:
+                          type: string
+                          example: "monthly"
+                        date:
+                          type: string
+                          format: date
+                          example: "2025-05-01"
+                        threshold:
+                          type: integer
+                          example: 5
+                        items:
+                          type: array
+                          items:
+                            type: object
+                            properties:
+                              menu_item_id:
+                                type: string
+                                example: "64f1a2b3c4d5e6f7a8b9c0d4"
+                              name:
+                                type: string
+                                example: "Steamed Fish with Lemon"
+                              category_name:
+                                type: string
+                                example: "Main Course"
+                              total_quantity_sold:
+                                type: integer
+                                example: 2
+                              total_revenue:
+                                type: number
+                                format: decimal
+                                example: 560.00
+                              unit_price:
+                                type: number
+                                format: decimal
+                                example: 280.00
+                              is_available:
+                                type: boolean
+                                example: true
+                              is_sold_out:
+                                type: boolean
+                                example: false
+                            required:
+                              - menu_item_id
+                              - name
+                              - category_name
+                              - total_quantity_sold
+                              - total_revenue
+                              - unit_price
+                              - is_available
+                              - is_sold_out
+                      required:
+                        - period
+                        - date
+                        - threshold
+                        - items
+      "400":
+        description: >
+          Validation error. Occurs when period or date is missing,
+          or when period is daily (not supported for dead item detection).
+        content:
+          application/problem+json:
+            schema:
+              $ref: "../components/schemas/ProblemDetail.yaml"
+            examples:
+              missing_date:
+                summary: date parameter missing
+                value:
+                  type: "https://srms.example.com/errors/validation-error"
+                  title: "Validation Error"
+                  status: 400
+                  detail: "One or more query parameters failed validation."
+                  instance: "/v1/analytics/menu/dead-items"
+                  traceId: "abc-123-xyz"
+                  timestamp: "2024-01-01T14:32:00Z"
+                  errors:
+                    - field: "date"
+                      message: "date is required and must be a valid date format (YYYY-MM-DD)."
+                      code: "REQUIRED_FIELD"
+              daily_not_supported:
+                summary: daily period not supported
+                value:
+                  type: "https://srms.example.com/errors/validation-error"
+                  title: "Validation Error"
+                  status: 400
+                  detail: "daily period is not supported for dead item detection."
+                  instance: "/v1/analytics/menu/dead-items"
+                  traceId: "abc-123-xyz"
+                  timestamp: "2024-01-01T14:32:00Z"
+                  errors:
+                    - field: "period"
+                      message: "period must be one of: weekly, monthly, yearly."
+                      code: "INVALID_VALUE"
+      "401":
+        $ref: "../components/responses/errors.yaml#/Unauthorized"
+      "403":
+        $ref: "../components/responses/errors.yaml#/Forbidden"
+
+menu-mix:
+  get:
+    tags:
+      - Analytics
+    summary: Get menu mix analysis
+    description: >
+      Returns menu mix analysis showing quantity and revenue percentage
+      contribution of each menu item.
+      Optional category_id filter to scope to one category.
+      Accessible to ADMIN only.
+    operationId: getMenuMix
+    parameters:
+      - name: period
+        in: query
+        required: true
+        schema:
+          type: string
+          enum: [daily, weekly, monthly, yearly]
+        description: Time period for the analysis.
+      - name: date
+        in: query
+        required: true
+        schema:
+          type: string
+          format: date
+          example: "2025-05-20"
+        description: Reference date for the period.
+      - name: category_id
+        in: query
+        required: false
+        schema:
+          type: string
+          example: "64f1a2b3c4d5e6f7a8b9c0d2"
+        description: Filter analysis to a specific menu category.
+    responses:
+      "200":
+        description: Menu mix analysis retrieved successfully.
+        content:
+          application/json:
+            schema:
+              allOf:
+                - $ref: "../components/schemas/EnvelopeResponse.yaml"
+                - type: object
+                  properties:
+                    data:
+                      type: object
+                      properties:
+                        period:
+                          type: string
+                          example: "monthly"
+                        date:
+                          type: string
+                          format: date
+                          example: "2025-05-01"
+                        total_items_sold:
+                          type: integer
+                          example: 4820
+                        total_revenue:
+                          type: number
+                          format: decimal
+                          example: 680000.00
+                        items:
+                          type: array
+                          items:
+                            type: object
+                            properties:
+                              menu_item_id:
+                                type: string
+                                example: "64f1a2b3c4d5e6f7a8b9c0d3"
+                              name:
+                                type: string
+                                example: "Pad Thai"
+                              category_name:
+                                type: string
+                                example: "Main Course"
+                              total_quantity_sold:
+                                type: integer
+                                example: 320
+                              total_revenue:
+                                type: number
+                                format: decimal
+                                example: 38400.00
+                              quantity_percentage:
+                                type: number
+                                format: decimal
+                                description: This item's quantity as a percentage of total_items_sold.
+                                example: 6.64
+                              revenue_percentage:
+                                type: number
+                                format: decimal
+                                description: This item's revenue as a percentage of total_revenue.
+                                example: 5.65
+                            required:
+                              - menu_item_id
+                              - name
+                              - category_name
+                              - total_quantity_sold
+                              - total_revenue
+                              - quantity_percentage
+                              - revenue_percentage
+                      required:
+                        - period
+                        - date
+                        - total_items_sold
+                        - total_revenue
+                        - items
+      "400":
+        description: Validation error. Occurs when period or date is missing or invalid.
+        content:
+          application/problem+json:
+            schema:
+              $ref: "../components/schemas/ProblemDetail.yaml"
+            example:
+              type: "https://srms.example.com/errors/validation-error"
+              title: "Validation Error"
+              status: 400
+              detail: "One or more query parameters failed validation."
+              instance: "/v1/analytics/menu/mix"
+              traceId: "abc-123-xyz"
+              timestamp: "2024-01-01T14:32:00Z"
+              errors:
+                - field: "period"
+                  message: "period is required."
+                  code: "REQUIRED_FIELD"
+      "401":
+        $ref: "../components/responses/errors.yaml#/Unauthorized"
+      "403":
+        $ref: "../components/responses/errors.yaml#/Forbidden"

@@ -234,4 +234,16 @@ paths:
     $ref: './paths/audit-logs.yaml#/list'
   /audit-logs/{id}:
     $ref: './paths/audit-logs.yaml#/by-id'
+  /analytics/sales/summary:
+    $ref: './paths/analytics.yaml#/sales-summary'
+  /analytics/sales/comparison:
+    $ref: './paths/analytics.yaml#/sales-comparison'
+  /analytics/sales/by-category:
+    $ref: './paths/analytics.yaml#/sales-by-category'
+  /analytics/menu/best-sellers:
+    $ref: './paths/analytics.yaml#/menu-best-sellers'
+  /analytics/menu/dead-items:
+    $ref: './paths/analytics.yaml#/menu-dead-items'
+  /analytics/menu/mix:
+    $ref: './paths/analytics.yaml#/menu-mix'
 
