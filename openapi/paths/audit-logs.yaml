@@ -1,0 +1,92 @@
+list:
+  get:
+    tags:
+      - AuditLogs
+    summary: List all audit log entries
+    description: >
+      Returns a paginated list of audit log entries.
+      Audit logs are immutable and cannot be created, updated, or deleted
+      via the API. They are created automatically by the system
+      when sensitive operations are performed.
+      Accessible to ADMIN only.
+    operationId: listAuditLogs
+    parameters:
+      - $ref: "../components/parameters/common.yaml#/page"
+      - $ref: "../components/parameters/common.yaml#/limit"
+      - name: entity_name
+        in: query
+        required: false
+        schema:
+          type: string
+          enum: [Bill, Order, OrderItem, Table, TableMergeGroup, Payment]
+        description: Filter by affected entity type.
+      - name: entity_id
+        in: query
+        required: false
+        schema:
+          type: string
+          example: "64f1a2b3c4d5e6f7a8b9c0d2"
+        description: Filter by specific entity ID.
+      - name: action
+        in: query
+        required: false
+        schema:
+          type: string
+          example: "CANCEL_BILL"
+        description: Filter by action type.
+      - $ref: "../components/parameters/common.yaml#/date"
+    responses:
+      "200":
+        description: Audit log entries retrieved successfully.
+        content:
+          application/json:
+            schema:
+              allOf:
+                - $ref: "../components/schemas/EnvelopeResponse.yaml"
+                - type: object
+                  properties:
+                    data:
+                      type: array
+                      items:
+                        $ref: "../components/schemas/AuditLog.yaml"
+                    pagination:
+                      $ref: "../components/schemas/Pagination.yaml"
+      "401":
+        $ref: "../components/responses/errors.yaml#/Unauthorized"
+      "403":
+        $ref: "../components/responses/errors.yaml#/Forbidden"
+
+by-id:
+  parameters:
+    - name: id
+      in: path
+      required: true
+      schema:
+        type: string
+        example: "64f1a2b3c4d5e6f7a8b9c0d1"
+      description: MongoDB ObjectId of the audit log entry.
+
+  get:
+    tags:
+      - AuditLogs
+    summary: Get an audit log entry by ID
+    description: Returns a single audit log entry by ID. Accessible to ADMIN only.
+    operationId: getAuditLogById
+    responses:
+      "200":
+        description: Audit log entry retrieved successfully.
+        content:
+          application/json:
+            schema:
+              allOf:
+                - $ref: "../components/schemas/EnvelopeResponse.yaml"
+                - type: object
+                  properties:
+                    data:
+                      $ref: "../components/schemas/AuditLog.yaml"
+      "401":
+        $ref: "../components/responses/errors.yaml#/Unauthorized"
+      "403":
+        $ref: "../components/responses/errors.yaml#/Forbidden"
+      "404":
+        $ref: "../components/responses/errors.yaml#/NotFound"

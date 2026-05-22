@@ -230,4 +230,8 @@ paths:
     $ref: './paths/payments.yaml#/create'
   /payments/{id}:
     $ref: './paths/payments.yaml#/by-id'
+  /audit-logs:
+    $ref: './paths/audit-logs.yaml#/list'
+  /audit-logs/{id}:
+    $ref: './paths/audit-logs.yaml#/by-id'
 
