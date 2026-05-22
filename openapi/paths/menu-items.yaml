@@ -1,0 +1,374 @@
+list-create:
+  get:
+    tags:
+      - MenuItems
+    summary: List all menu items
+    description: Returns a paginated list of menu items. Accessible to ADMIN, CASHIER, and WAITER.
+    operationId: listMenuItems
+    parameters:
+      - $ref: "../components/parameters/common.yaml#/page"
+      - $ref: "../components/parameters/common.yaml#/limit"
+      - $ref: "../components/parameters/common.yaml#/search"
+      - name: category_id
+        in: query
+        required: false
+        schema:
+          type: string
+        description: Filter by category ID.
+      - name: is_available
+        in: query
+        required: false
+        schema:
+          type: boolean
+        description: Filter by availability status.
+      - name: is_sold_out
+        in: query
+        required: false
+        schema:
+          type: boolean
+        description: Filter by sold-out status.
+    responses:
+      "200":
+        description: Menu items retrieved successfully.
+        content:
+          application/json:
+            schema:
+              allOf:
+                - $ref: "../components/schemas/EnvelopeResponse.yaml"
+                - type: object
+                  properties:
+                    data:
+                      type: array
+                      items:
+                        $ref: "../components/schemas/MenuItem.yaml"
+                    pagination:
+                      $ref: "../components/schemas/Pagination.yaml"
+      "401":
+        $ref: "../components/responses/errors.yaml#/Unauthorized"
+      "403":
+        $ref: "../components/responses/errors.yaml#/Forbidden"
+
+  post:
+    tags:
+      - MenuItems
+    summary: Create a new menu item
+    description: >
+      Creates a new menu item. Accessible to ADMIN only.
+      Returns 404 if the specified category_id does not exist.
+      Returns 409 on duplicate name within the same category.
+    operationId: createMenuItem
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              category_id:
+                type: string
+                example: "64f1a2b3c4d5e6f7a8b9c0d2"
+              name:
+                type: string
+                example: "Pad Thai"
+              price:
+                type: number
+                format: decimal
+                minimum: 0
+                example: 120.00
+              description:
+                type: string
+                nullable: true
+                example: "Stir-fried rice noodles with shrimp, egg, and peanuts."
+              image_url:
+                type: string
+                format: uri
+                nullable: true
+                example: "https://cdn.srms.example.com/images/pad-thai.jpg"
+              is_available:
+                type: boolean
+                default: true
+            required:
+              - category_id
+              - name
+              - price
+    responses:
+      "201":
+        description: Menu item created successfully.
+        content:
+          application/json:
+            schema:
+              allOf:
+                - $ref: "../components/schemas/EnvelopeResponse.yaml"
+                - type: object
+                  properties:
+                    data:
+                      $ref: "../components/schemas/MenuItem.yaml"
+      "400":
+        $ref: "../components/responses/errors.yaml#/ValidationError"
+      "401":
+        $ref: "../components/responses/errors.yaml#/Unauthorized"
+      "403":
+        $ref: "../components/responses/errors.yaml#/Forbidden"
+      "404":
+        description: The specified category_id does not exist.
+        content:
+          application/problem+json:
+            schema:
+              $ref: "../components/schemas/ProblemDetail.yaml"
+            example:
+              type: "https://srms.example.com/errors/not-found"
+              title: "Not Found"
+              status: 404
+              detail: "The specified menu category was not found."
+              instance: "/v1/menu-items"
+              traceId: "abc-123-xyz"
+              timestamp: "2024-01-01T14:32:00Z"
+              errors:
+                - field: "category_id"
+                  message: "The specified menu category was not found."
+                  code: "CATEGORY_NOT_FOUND"
+      "409":
+        description: A menu item with the same name already exists in this category.
+        content:
+          application/problem+json:
+            schema:
+              $ref: "../components/schemas/ProblemDetail.yaml"
+            example:
+              type: "https://srms.example.com/errors/conflict"
+              title: "Conflict"
+              status: 409
+              detail: "A menu item with this name already exists in the selected category."
+              instance: "/v1/menu-items"
+              traceId: "abc-123-xyz"
+              timestamp: "2024-01-01T14:32:00Z"
+              errors:
+                - field: "name"
+                  message: "A menu item with this name already exists in the selected category."
+                  code: "DUPLICATE_ITEM_NAME"
+
+by-id:
+  parameters:
+    - name: id
+      in: path
+      required: true
+      schema:
+        type: string
+        example: "64f1a2b3c4d5e6f7a8b9c0d1"
+      description: MongoDB ObjectId of the menu item.
+
+  get:
+    tags:
+      - MenuItems
+    summary: Get a menu item by ID
+    description: Returns a single menu item by ID. Accessible to ADMIN, CASHIER, and WAITER.
+    operationId: getMenuItemById
+    responses:
+      "200":
+        description: Menu item retrieved successfully.
+        content:
+          application/json:
+            schema:
+              allOf:
+                - $ref: "../components/schemas/EnvelopeResponse.yaml"
+                - type: object
+                  properties:
+                    data:
+                      $ref: "../components/schemas/MenuItem.yaml"
+      "401":
+        $ref: "../components/responses/errors.yaml#/Unauthorized"
+      "403":
+        $ref: "../components/responses/errors.yaml#/Forbidden"
+      "404":
+        $ref: "../components/responses/errors.yaml#/NotFound"
+
+  patch:
+    tags:
+      - MenuItems
+    summary: Update a menu item
+    description: >
+      Partially updates a menu item. Accessible to ADMIN only.
+      Returns 404 if the specified category_id does not exist.
+      Returns 409 on duplicate name within the same category.
+    operationId: updateMenuItem
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              category_id:
+                type: string
+                example: "64f1a2b3c4d5e6f7a8b9c0d2"
+              name:
+                type: string
+                example: "Pad Thai Special"
+              price:
+                type: number
+                format: decimal
+                minimum: 0
+                example: 135.00
+              description:
+                type: string
+                nullable: true
+                example: "Stir-fried rice noodles with prawns, egg, and peanuts."
+              image_url:
+                type: string
+                format: uri
+                nullable: true
+                example: "https://cdn.srms.example.com/images/pad-thai-special.jpg"
+              is_available:
+                type: boolean
+    responses:
+      "200":
+        description: Menu item updated successfully.
+        content:
+          application/json:
+            schema:
+              allOf:
+                - $ref: "../components/schemas/EnvelopeResponse.yaml"
+                - type: object
+                  properties:
+                    data:
+                      $ref: "../components/schemas/MenuItem.yaml"
+      "400":
+        $ref: "../components/responses/errors.yaml#/ValidationError"
+      "401":
+        $ref: "../components/responses/errors.yaml#/Unauthorized"
+      "403":
+        $ref: "../components/responses/errors.yaml#/Forbidden"
+      "404":
+        description: The menu item or specified category_id was not found.
+        content:
+          application/problem+json:
+            schema:
+              $ref: "../components/schemas/ProblemDetail.yaml"
+            example:
+              type: "https://srms.example.com/errors/not-found"
+              title: "Not Found"
+              status: 404
+              detail: "The specified menu category was not found."
+              instance: "/v1/menu-items/64f1a2b3c4d5e6f7a8b9c0d1"
+              traceId: "abc-123-xyz"
+              timestamp: "2024-01-01T14:32:00Z"
+              errors:
+                - field: "category_id"
+                  message: "The specified menu category was not found."
+                  code: "CATEGORY_NOT_FOUND"
+      "409":
+        description: A menu item with the same name already exists in this category.
+        content:
+          application/problem+json:
+            schema:
+              $ref: "../components/schemas/ProblemDetail.yaml"
+            example:
+              type: "https://srms.example.com/errors/conflict"
+              title: "Conflict"
+              status: 409
+              detail: "A menu item with this name already exists in the selected category."
+              instance: "/v1/menu-items/64f1a2b3c4d5e6f7a8b9c0d1"
+              traceId: "abc-123-xyz"
+              timestamp: "2024-01-01T14:32:00Z"
+              errors:
+                - field: "name"
+                  message: "A menu item with this name already exists in the selected category."
+                  code: "DUPLICATE_ITEM_NAME"
+
+  delete:
+    tags:
+      - MenuItems
+    summary: Delete a menu item
+    description: Permanently deletes a menu item. Accessible to ADMIN only.
+    operationId: deleteMenuItem
+    responses:
+      "200":
+        description: Menu item deleted successfully.
+        content:
+          application/json:
+            schema:
+              allOf:
+                - $ref: "../components/schemas/EnvelopeResponse.yaml"
+                - type: object
+                  properties:
+                    data:
+                      nullable: true
+                      example: null
+      "401":
+        $ref: "../components/responses/errors.yaml#/Unauthorized"
+      "403":
+        $ref: "../components/responses/errors.yaml#/Forbidden"
+      "404":
+        $ref: "../components/responses/errors.yaml#/NotFound"
+
+availability:
+  parameters:
+    - name: id
+      in: path
+      required: true
+      schema:
+        type: string
+        example: "64f1a2b3c4d5e6f7a8b9c0d1"
+      description: MongoDB ObjectId of the menu item.
+
+  patch:
+    tags:
+      - MenuItems
+    summary: Update menu item availability
+    description: >
+      Toggles is_available or is_sold_out for a menu item.
+      Accessible to ADMIN and CASHIER.
+      At least one of is_available or is_sold_out must be provided.
+      Triggers a menu:item_availability_updated WebSocket event
+      to all subscribed clients (POS and Waiter App).
+    operationId: updateMenuItemAvailability
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              is_available:
+                type: boolean
+                description: Whether the item is currently available for ordering.
+              is_sold_out:
+                type: boolean
+                description: Whether this item is temporarily sold out.
+    responses:
+      "200":
+        description: Menu item availability updated successfully.
+        content:
+          application/json:
+            schema:
+              allOf:
+                - $ref: "../components/schemas/EnvelopeResponse.yaml"
+                - type: object
+                  properties:
+                    data:
+                      $ref: "../components/schemas/MenuItem.yaml"
+      "400":
+        description: >
+          Validation error. Occurs when neither
+          is_available nor is_sold_out is provided.
+        content:
+          application/problem+json:
+            schema:
+              $ref: "../components/schemas/ProblemDetail.yaml"
+            example:
+              type: "https://srms.example.com/errors/validation-error"
+              title: "Validation Error"
+              status: 400
+              detail: "At least one of is_available or is_sold_out must be provided."
+              instance: "/v1/menu-items/64f1a2b3c4d5e6f7a8b9c0d1/availability"
+              traceId: "abc-123-xyz"
+              timestamp: "2024-01-01T14:32:00Z"
+              errors:
+                - field: "is_available"
+                  message: "At least one of is_available or is_sold_out must be provided."
+                  code: "AT_LEAST_ONE_REQUIRED"
+      "401":
+        $ref: "../components/responses/errors.yaml#/Unauthorized"
+      "403":
+        $ref: "../components/responses/errors.yaml#/Forbidden"
+      "404":
+        $ref: "../components/responses/errors.yaml#/NotFound"

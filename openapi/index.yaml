@@ -202,3 +202,9 @@ paths:
     $ref: './paths/menu-categories.yaml#/list-create'
   /menu-categories/{id}:
     $ref: './paths/menu-categories.yaml#/by-id'
+  /menu-items:
+    $ref: './paths/menu-items.yaml#/list-create'
+  /menu-items/{id}:
+    $ref: './paths/menu-items.yaml#/by-id'
+  /menu-items/{id}/availability:
+    $ref: './paths/menu-items.yaml#/availability'
