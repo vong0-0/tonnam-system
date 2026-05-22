@@ -1,0 +1,359 @@
+list-create:
+  get:
+    tags:
+      - Reservations
+    summary: List all reservations
+    description: Returns a paginated list of reservations. Accessible to ADMIN, CASHIER, and WAITER.
+    operationId: listReservations
+    parameters:
+      - $ref: '../components/parameters/common.yaml#/page'
+      - $ref: '../components/parameters/common.yaml#/limit'
+      - $ref: '../components/parameters/common.yaml#/search'
+      - name: status
+        in: query
+        required: false
+        schema:
+          type: string
+          enum: [PENDING, CONFIRMED, CANCELLED]
+        description: Filter by reservation status.
+      - name: table_id
+        in: query
+        required: false
+        schema:
+          type: string
+          example: "64f1a2b3c4d5e6f7a8b9c0d2"
+        description: Filter by table ID.
+      - $ref: '../components/parameters/common.yaml#/date'
+    responses:
+      '200':
+        description: Reservations retrieved successfully.
+        content:
+          application/json:
+            schema:
+              allOf:
+                - $ref: '../components/schemas/EnvelopeResponse.yaml'
+                - type: object
+                  properties:
+                    data:
+                      type: array
+                      items:
+                        $ref: '../components/schemas/Reservation.yaml'
+                    pagination:
+                      $ref: '../components/schemas/Pagination.yaml'
+      '401':
+        $ref: '../components/responses/errors.yaml#/Unauthorized'
+      '403':
+        $ref: '../components/responses/errors.yaml#/Forbidden'
+
+  post:
+    tags:
+      - Reservations
+    summary: Create a reservation
+    description: >
+      Creates a new reservation for a table.
+      The table must be in AVAILABLE status.
+      On success the table automatically transitions to RESERVED.
+      Accessible to ADMIN and CASHIER.
+    operationId: createReservation
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              table_id:
+                type: string
+                description: ID of the table to reserve.
+                example: "64f1a2b3c4d5e6f7a8b9c0d2"
+              reserver_name:
+                type: string
+                description: Name of the guest making the reservation.
+                example: "Wanchai Pongsakorn"
+              phone:
+                type: string
+                description: Contact phone number of the guest.
+                example: "0812345678"
+              party_size:
+                type: integer
+                minimum: 1
+                description: Expected number of guests.
+                example: 4
+              reserved_at:
+                type: string
+                format: date-time
+                description: Scheduled date and time for the reservation.
+                example: "2025-05-21T19:00:00Z"
+              notes:
+                type: string
+                nullable: true
+                description: Optional special instructions or notes from the guest.
+                example: "Anniversary dinner, please arrange flowers."
+            required:
+              - table_id
+              - reserver_name
+              - phone
+              - party_size
+              - reserved_at
+    responses:
+      '201':
+        description: Reservation created successfully. Table status is now RESERVED.
+        content:
+          application/json:
+            schema:
+              allOf:
+                - $ref: '../components/schemas/EnvelopeResponse.yaml'
+                - type: object
+                  properties:
+                    data:
+                      $ref: '../components/schemas/Reservation.yaml'
+      '400':
+        $ref: '../components/responses/errors.yaml#/ValidationError'
+      '401':
+        $ref: '../components/responses/errors.yaml#/Unauthorized'
+      '403':
+        $ref: '../components/responses/errors.yaml#/Forbidden'
+      '404':
+        description: Table not found.
+        content:
+          application/problem+json:
+            schema:
+              $ref: '../components/schemas/ProblemDetail.yaml'
+            example:
+              type: "https://srms.example.com/errors/not-found"
+              title: "Not Found"
+              status: 404
+              detail: "The requested resource was not found."
+              instance: "/v1/reservations"
+              traceId: "abc-123-xyz"
+              timestamp: "2024-01-01T14:32:00Z"
+              errors:
+                - field: "table_id"
+                  message: "Table with the given ID was not found."
+                  code: "TABLE_NOT_FOUND"
+      '409':
+        description: Conflict. The table is not available for reservation.
+        content:
+          application/problem+json:
+            schema:
+              $ref: '../components/schemas/ProblemDetail.yaml'
+            example:
+              type: "https://srms.example.com/errors/conflict"
+              title: "Conflict"
+              status: 409
+              detail: "Table is not available for reservation."
+              instance: "/v1/reservations"
+              traceId: "abc-123-xyz"
+              timestamp: "2024-01-01T14:32:00Z"
+              errors:
+                - field: "table_id"
+                  message: "Table is not available for reservation."
+                  code: "TABLE_NOT_AVAILABLE"
+
+by-id:
+  parameters:
+    - name: id
+      in: path
+      required: true
+      schema:
+        type: string
+        example: "64f1a2b3c4d5e6f7a8b9c0d1"
+      description: MongoDB ObjectId of the reservation.
+
+  get:
+    tags:
+      - Reservations
+    summary: Get a reservation by ID
+    description: Returns a single reservation by ID. Accessible to ADMIN, CASHIER, and WAITER.
+    operationId: getReservationById
+    responses:
+      '200':
+        description: Reservation retrieved successfully.
+        content:
+          application/json:
+            schema:
+              allOf:
+                - $ref: '../components/schemas/EnvelopeResponse.yaml'
+                - type: object
+                  properties:
+                    data:
+                      $ref: '../components/schemas/Reservation.yaml'
+      '401':
+        $ref: '../components/responses/errors.yaml#/Unauthorized'
+      '403':
+        $ref: '../components/responses/errors.yaml#/Forbidden'
+      '404':
+        $ref: '../components/responses/errors.yaml#/NotFound'
+
+  patch:
+    tags:
+      - Reservations
+    summary: Update a reservation
+    description: >
+      Partially updates a reservation. Only allowed when the reservation is in PENDING status.
+      Returns 409 if the reservation is already CONFIRMED or CANCELLED.
+      Accessible to ADMIN and CASHIER.
+    operationId: updateReservation
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              reserver_name:
+                type: string
+                example: "Wanchai Pongsakorn"
+              phone:
+                type: string
+                example: "0812345678"
+              party_size:
+                type: integer
+                minimum: 1
+                example: 6
+              reserved_at:
+                type: string
+                format: date-time
+                example: "2025-05-21T20:00:00Z"
+              notes:
+                type: string
+                nullable: true
+                example: "Window seat preferred."
+    responses:
+      '200':
+        description: Reservation updated successfully.
+        content:
+          application/json:
+            schema:
+              allOf:
+                - $ref: '../components/schemas/EnvelopeResponse.yaml'
+                - type: object
+                  properties:
+                    data:
+                      $ref: '../components/schemas/Reservation.yaml'
+      '400':
+        $ref: '../components/responses/errors.yaml#/ValidationError'
+      '401':
+        $ref: '../components/responses/errors.yaml#/Unauthorized'
+      '403':
+        $ref: '../components/responses/errors.yaml#/Forbidden'
+      '404':
+        $ref: '../components/responses/errors.yaml#/NotFound'
+      '409':
+        description: >
+          Conflict. Reservation cannot be updated because
+          it is no longer in PENDING status.
+        content:
+          application/problem+json:
+            schema:
+              $ref: '../components/schemas/ProblemDetail.yaml'
+            example:
+              type: "https://srms.example.com/errors/conflict"
+              title: "Conflict"
+              status: 409
+              detail: "Reservation cannot be updated after it has been confirmed or cancelled."
+              instance: "/v1/reservations/64f1a2b3c4d5e6f7a8b9c0d1"
+              traceId: "abc-123-xyz"
+              timestamp: "2024-01-01T14:32:00Z"
+              errors:
+                - field: "status"
+                  message: "Reservation is already CONFIRMED and cannot be modified."
+                  code: "RESERVATION_NOT_PENDING"
+
+status:
+  parameters:
+    - name: id
+      in: path
+      required: true
+      schema:
+        type: string
+        example: "64f1a2b3c4d5e6f7a8b9c0d1"
+      description: MongoDB ObjectId of the reservation.
+
+  patch:
+    tags:
+      - Reservations
+    summary: Update reservation status
+    description: >
+      Transitions the reservation to a new status.
+      Only the following transitions are allowed:
+
+      - PENDING → CONFIRMED: table auto-transitions from RESERVED to OCCUPIED.
+
+      - PENDING → CANCELLED: table auto-transitions from RESERVED to AVAILABLE.
+
+      ADMIN and CASHIER can set both CONFIRMED and CANCELLED.
+      WAITER can only set CONFIRMED.
+      Returns 400 with problem type `invalid-status-transition` on disallowed transitions.
+      Returns 403 if a WAITER attempts to set CANCELLED.
+    operationId: updateReservationStatus
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              status:
+                type: string
+                enum: [CONFIRMED, CANCELLED]
+                description: Target status. Only CONFIRMED and CANCELLED are allowed.
+                example: "CONFIRMED"
+            required:
+              - status
+    responses:
+      '200':
+        description: Reservation status updated successfully.
+        content:
+          application/json:
+            schema:
+              allOf:
+                - $ref: '../components/schemas/EnvelopeResponse.yaml'
+                - type: object
+                  properties:
+                    data:
+                      allOf:
+                        - $ref: '../components/schemas/Reservation.yaml'
+                        - type: object
+                          properties:
+                            table:
+                              type: object
+                              description: The associated table after the status transition.
+                              properties:
+                                id:
+                                  type: string
+                                  example: "64f1a2b3c4d5e6f7a8b9c0d2"
+                                table_name:
+                                  type: string
+                                  example: "T05"
+                                status:
+                                  type: string
+                                  example: "OCCUPIED"
+                              required:
+                                - id
+                                - table_name
+                                - status
+      '400':
+        description: Invalid status transition.
+        content:
+          application/problem+json:
+            schema:
+              $ref: '../components/schemas/ProblemDetail.yaml'
+            example:
+              type: "https://srms.example.com/errors/invalid-status-transition"
+              title: "Invalid Status Transition"
+              status: 400
+              detail: "Cannot transition reservation status from CONFIRMED to PENDING."
+              instance: "/v1/reservations/64f1a2b3c4d5e6f7a8b9c0d1/status"
+              traceId: "abc-123-xyz"
+              timestamp: "2024-01-01T14:32:00Z"
+              errors:
+                - field: "status"
+                  message: "Cannot transition from CONFIRMED to PENDING."
+                  code: "INVALID_STATUS_TRANSITION"
+      '401':
+        $ref: '../components/responses/errors.yaml#/Unauthorized'
+      '403':
+        $ref: '../components/responses/errors.yaml#/Forbidden'
+      '404':
+        $ref: '../components/responses/errors.yaml#/NotFound'

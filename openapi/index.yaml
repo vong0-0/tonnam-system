@@ -192,3 +192,9 @@ paths:
     $ref: './paths/table-merge-groups.yaml#/by-id'
   /table-merge-groups/{id}/unmerge:
     $ref: './paths/table-merge-groups.yaml#/unmerge'
+  /reservations:
+    $ref: './paths/reservations.yaml#/list-create'
+  /reservations/{id}:
+    $ref: './paths/reservations.yaml#/by-id'
+  /reservations/{id}/status:
+    $ref: './paths/reservations.yaml#/status'
