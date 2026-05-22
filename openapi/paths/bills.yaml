@@ -1,0 +1,445 @@
+list-create:
+  get:
+    tags:
+      - Bills
+    summary: List all bills
+    description: Returns a paginated list of bills. Accessible to ADMIN, CASHIER, and WAITER.
+    operationId: listBills
+    parameters:
+      - $ref: "../components/parameters/common.yaml#/page"
+      - $ref: "../components/parameters/common.yaml#/limit"
+      - $ref: "../components/parameters/common.yaml#/search"
+      - name: table_id
+        in: query
+        required: false
+        schema:
+          type: string
+        description: Filter by table ID.
+      - name: status
+        in: query
+        required: false
+        schema:
+          type: string
+          enum: [OPEN, PARTIALLY_PAID, PAID, CANCELLED]
+        description: Filter by bill status.
+    responses:
+      "200":
+        description: Bills retrieved successfully.
+        content:
+          application/json:
+            schema:
+              allOf:
+                - $ref: "../components/schemas/EnvelopeResponse.yaml"
+                - type: object
+                  properties:
+                    data:
+                      type: array
+                      items:
+                        $ref: "../components/schemas/Bill.yaml"
+                    pagination:
+                      $ref: "../components/schemas/Pagination.yaml"
+      "401":
+        $ref: "../components/responses/errors.yaml#/Unauthorized"
+      "403":
+        $ref: "../components/responses/errors.yaml#/Forbidden"
+
+  post:
+    tags:
+      - Bills
+    summary: Create a new bill
+    description: >
+      Creates a new bill for a table. Accessible to ADMIN and CASHIER.
+      The table must be in OCCUPIED status.
+      short_id is auto-generated in format B-XXXX.
+      name defaults to "บิล" + table_name if not provided.
+      Returns 404 if table_id does not exist.
+      Returns 409 if the table is not OCCUPIED.
+    operationId: createBill
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              table_id:
+                type: string
+                example: "64f1a2b3c4d5e6f7a8b9c0d2"
+              name:
+                type: string
+                description: Defaults to "บิล" + table_name if not provided.
+                example: "บิลโต๊ะ 5"
+            required:
+              - table_id
+    responses:
+      "201":
+        description: Bill created successfully.
+        content:
+          application/json:
+            schema:
+              allOf:
+                - $ref: "../components/schemas/EnvelopeResponse.yaml"
+                - type: object
+                  properties:
+                    data:
+                      $ref: "../components/schemas/Bill.yaml"
+      "400":
+        $ref: "../components/responses/errors.yaml#/ValidationError"
+      "401":
+        $ref: "../components/responses/errors.yaml#/Unauthorized"
+      "403":
+        $ref: "../components/responses/errors.yaml#/Forbidden"
+      "404":
+        description: The specified table_id does not exist.
+        content:
+          application/problem+json:
+            schema:
+              $ref: "../components/schemas/ProblemDetail.yaml"
+            example:
+              type: "https://srms.example.com/errors/not-found"
+              title: "Not Found"
+              status: 404
+              detail: "The specified table was not found."
+              instance: "/v1/bills"
+              traceId: "abc-123-xyz"
+              timestamp: "2024-01-01T14:32:00Z"
+              errors:
+                - field: "table_id"
+                  message: "Table with the given ID was not found."
+                  code: "TABLE_NOT_FOUND"
+      "409":
+        description: The table is not in OCCUPIED status.
+        content:
+          application/problem+json:
+            schema:
+              $ref: "../components/schemas/ProblemDetail.yaml"
+            example:
+              type: "https://srms.example.com/errors/conflict"
+              title: "Conflict"
+              status: 409
+              detail: "A bill can only be created for a table that is currently OCCUPIED."
+              instance: "/v1/bills"
+              traceId: "abc-123-xyz"
+              timestamp: "2024-01-01T14:32:00Z"
+              errors:
+                - field: "table_id"
+                  message: "The table is not in OCCUPIED status."
+                  code: "TABLE_NOT_OCCUPIED"
+
+by-id:
+  parameters:
+    - name: id
+      in: path
+      required: true
+      schema:
+        type: string
+        example: "64f1a2b3c4d5e6f7a8b9c0d1"
+      description: MongoDB ObjectId of the bill.
+
+  get:
+    tags:
+      - Bills
+    summary: Get a bill by ID
+    description: >
+      Returns a single bill by ID with its orders and order items embedded.
+      Each order includes its items array.
+      Accessible to ADMIN, CASHIER, and WAITER.
+    operationId: getBillById
+    responses:
+      "200":
+        description: Bill retrieved successfully.
+        content:
+          application/json:
+            schema:
+              allOf:
+                - $ref: "../components/schemas/EnvelopeResponse.yaml"
+                - type: object
+                  properties:
+                    data:
+                      allOf:
+                        - $ref: "../components/schemas/Bill.yaml"
+                        - type: object
+                          properties:
+                            orders:
+                              type: array
+                              description: Orders associated with this bill, each including their items.
+                              items:
+                                allOf:
+                                  - $ref: "../components/schemas/Order.yaml"
+                                  - type: object
+                                    properties:
+                                      items:
+                                        type: array
+                                        items:
+                                          $ref: "../components/schemas/OrderItem.yaml"
+      "401":
+        $ref: "../components/responses/errors.yaml#/Unauthorized"
+      "403":
+        $ref: "../components/responses/errors.yaml#/Forbidden"
+      "404":
+        $ref: "../components/responses/errors.yaml#/NotFound"
+
+  patch:
+    tags:
+      - Bills
+    summary: Update bill details
+    description: >
+      Updates bill details. Accessible to ADMIN and CASHIER.
+      Allowed at any status except CANCELLED.
+      Every edit requires a reason field.
+      Creates an AuditLog entry automatically.
+      Returns 409 if the bill is CANCELLED.
+    operationId: updateBill
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              name:
+                type: string
+                example: "บิลกลุ่มนักท่องเที่ยว"
+              reason:
+                type: string
+                description: Mandatory reason for every edit. Recorded in AuditLog.
+                example: "Customer requested name change."
+            required:
+              - reason
+    responses:
+      "200":
+        description: Bill updated successfully.
+        content:
+          application/json:
+            schema:
+              allOf:
+                - $ref: "../components/schemas/EnvelopeResponse.yaml"
+                - type: object
+                  properties:
+                    data:
+                      $ref: "../components/schemas/Bill.yaml"
+      "400":
+        $ref: "../components/responses/errors.yaml#/ValidationError"
+      "401":
+        $ref: "../components/responses/errors.yaml#/Unauthorized"
+      "403":
+        $ref: "../components/responses/errors.yaml#/Forbidden"
+      "404":
+        $ref: "../components/responses/errors.yaml#/NotFound"
+      "409":
+        description: The bill is CANCELLED and cannot be edited.
+        content:
+          application/problem+json:
+            schema:
+              $ref: "../components/schemas/ProblemDetail.yaml"
+            example:
+              type: "https://srms.example.com/errors/conflict"
+              title: "Conflict"
+              status: 409
+              detail: "Cannot edit a cancelled bill."
+              instance: "/v1/bills/64f1a2b3c4d5e6f7a8b9c0d1"
+              traceId: "abc-123-xyz"
+              timestamp: "2024-01-01T14:32:00Z"
+              errors:
+                - field: "status"
+                  message: "Cannot edit a cancelled bill."
+                  code: "BILL_CANCELLED"
+
+status:
+  parameters:
+    - name: id
+      in: path
+      required: true
+      schema:
+        type: string
+        example: "64f1a2b3c4d5e6f7a8b9c0d1"
+      description: MongoDB ObjectId of the bill.
+
+  patch:
+    tags:
+      - Bills
+    summary: Cancel a bill
+    description: >
+      Manually cancel a bill. Accessible to ADMIN and CASHIER.
+      Only OPEN bills can be cancelled manually.
+      PARTIALLY_PAID and PAID transitions are handled automatically by the Payment system.
+      Cancelling a bill sets all PENDING order items to CANCELLED.
+      COOKED order items remain COOKED.
+      Requires a reason field. Creates an AuditLog entry automatically.
+      Returns 400 with problem type invalid-status-transition on disallowed transitions.
+    operationId: updateBillStatus
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              status:
+                type: string
+                enum: [CANCELLED]
+                description: Only CANCELLED is allowed for manual transitions.
+                example: "CANCELLED"
+              reason:
+                type: string
+                description: Mandatory reason for cancellation. Recorded in AuditLog.
+                example: "Customer left without ordering."
+            required:
+              - status
+              - reason
+    responses:
+      "200":
+        description: Bill cancelled successfully.
+        content:
+          application/json:
+            schema:
+              allOf:
+                - $ref: "../components/schemas/EnvelopeResponse.yaml"
+                - type: object
+                  properties:
+                    data:
+                      $ref: "../components/schemas/Bill.yaml"
+      "400":
+        description: Invalid status transition.
+        content:
+          application/problem+json:
+            schema:
+              $ref: "../components/schemas/ProblemDetail.yaml"
+            example:
+              type: "https://srms.example.com/errors/invalid-status-transition"
+              title: "Invalid Status Transition"
+              status: 400
+              detail: "Cannot cancel a bill that is already PAID."
+              instance: "/v1/bills/64f1a2b3c4d5e6f7a8b9c0d1/status"
+              traceId: "abc-123-xyz"
+              timestamp: "2024-01-01T14:32:00Z"
+              errors:
+                - field: "status"
+                  message: "Only OPEN bills can be cancelled manually."
+                  code: "INVALID_STATUS_TRANSITION"
+      "401":
+        $ref: "../components/responses/errors.yaml#/Unauthorized"
+      "403":
+        $ref: "../components/responses/errors.yaml#/Forbidden"
+      "404":
+        $ref: "../components/responses/errors.yaml#/NotFound"
+
+split:
+  parameters:
+    - name: id
+      in: path
+      required: true
+      schema:
+        type: string
+        example: "64f1a2b3c4d5e6f7a8b9c0d1"
+      description: MongoDB ObjectId of the bill to split.
+
+  post:
+    tags:
+      - Bills
+    summary: Split a bill
+    description: >
+      Splits a bill into two or more sub-bills. Accessible to ADMIN and CASHIER.
+      The original bill is cancelled after splitting.
+      Sub-bills use slash notation: B-0001/A, B-0001/B.
+      Sub-bill names default to {original_name}/A, {original_name}/B.
+      Only OPEN bills can be split.
+      Returns 409 if the bill is not OPEN.
+    operationId: splitBill
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              splits:
+                type: array
+                minItems: 2
+                description: List of sub-bills to create. Minimum 2 entries required.
+                items:
+                  type: object
+                  properties:
+                    name:
+                      type: string
+                      description: Display name for the sub-bill. Defaults to auto-generated if not provided.
+                      example: "บิลกลุ่ม A"
+                    order_item_ids:
+                      type: array
+                      description: Order item IDs to include in this sub-bill.
+                      items:
+                        type: string
+                        example: "64f1a2b3c4d5e6f7a8b9c0d4"
+                  required:
+                    - order_item_ids
+            required:
+              - splits
+    responses:
+      "201":
+        description: Bill split successfully.
+        content:
+          application/json:
+            schema:
+              allOf:
+                - $ref: "../components/schemas/EnvelopeResponse.yaml"
+                - type: object
+                  properties:
+                    data:
+                      type: object
+                      properties:
+                        original_bill_id:
+                          type: string
+                          description: ID of the original bill, which is now CANCELLED.
+                          example: "64f1a2b3c4d5e6f7a8b9c0d1"
+                        sub_bills:
+                          type: array
+                          description: The newly created sub-bills.
+                          items:
+                            $ref: "../components/schemas/Bill.yaml"
+                      required:
+                        - original_bill_id
+                        - sub_bills
+      "400":
+        description: >
+          Validation error. Occurs when splits array has fewer than 2 entries
+          or order_item_ids contain items not belonging to this bill.
+        content:
+          application/problem+json:
+            schema:
+              $ref: "../components/schemas/ProblemDetail.yaml"
+            example:
+              type: "https://srms.example.com/errors/validation-error"
+              title: "Validation Error"
+              status: 400
+              detail: "One or more order items do not belong to this bill."
+              instance: "/v1/bills/64f1a2b3c4d5e6f7a8b9c0d1/split"
+              traceId: "abc-123-xyz"
+              timestamp: "2024-01-01T14:32:00Z"
+              errors:
+                - field: "splits[0].order_item_ids"
+                  message: "Order item does not belong to this bill."
+                  code: "INVALID_ORDER_ITEM"
+      "401":
+        $ref: "../components/responses/errors.yaml#/Unauthorized"
+      "403":
+        $ref: "../components/responses/errors.yaml#/Forbidden"
+      "404":
+        $ref: "../components/responses/errors.yaml#/NotFound"
+      "409":
+        description: The bill is not OPEN and cannot be split.
+        content:
+          application/problem+json:
+            schema:
+              $ref: "../components/schemas/ProblemDetail.yaml"
+            example:
+              type: "https://srms.example.com/errors/conflict"
+              title: "Conflict"
+              status: 409
+              detail: "Only OPEN bills can be split."
+              instance: "/v1/bills/64f1a2b3c4d5e6f7a8b9c0d1/split"
+              traceId: "abc-123-xyz"
+              timestamp: "2024-01-01T14:32:00Z"
+              errors:
+                - field: "status"
+                  message: "Only OPEN bills can be split."
+                  code: "BILL_NOT_OPEN"
