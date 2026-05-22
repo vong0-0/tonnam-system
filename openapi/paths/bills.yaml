@@ -141,7 +141,7 @@ by-id:
       - Bills
     summary: Get a bill by ID
     description: >
-      Returns a single bill by ID with its orders and order items embedded.
+      Returns a single bill by ID with its table, orders, order items, and payments embedded.
       Each order includes its items array.
       Accessible to ADMIN, CASHIER, and WAITER.
     operationId: getBillById
@@ -160,6 +160,23 @@ by-id:
                         - $ref: "../components/schemas/Bill.yaml"
                         - type: object
                           properties:
+                            table:
+                              type: object
+                              description: The table this bill belongs to.
+                              properties:
+                                id:
+                                  type: string
+                                  example: "64f1a2b3c4d5e6f7a8b9c0d2"
+                                table_name:
+                                  type: string
+                                  example: "โต๊ะ 5"
+                                status:
+                                  type: string
+                                  example: "OCCUPIED"
+                              required:
+                                - id
+                                - table_name
+                                - status
                             orders:
                               type: array
                               description: Orders associated with this bill, each including their items.
@@ -172,6 +189,11 @@ by-id:
                                         type: array
                                         items:
                                           $ref: "../components/schemas/OrderItem.yaml"
+                            payments:
+                              type: array
+                              description: Payment transactions applied to this bill.
+                              items:
+                                $ref: "../components/schemas/Payment.yaml"
       "401":
         $ref: "../components/responses/errors.yaml#/Unauthorized"
       "403":
