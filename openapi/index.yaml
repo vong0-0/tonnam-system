@@ -134,6 +134,8 @@ components:
       $ref: "./components/responses/errors.yaml#/RateLimitExceeded"
     InternalServerError:
       $ref: "./components/responses/errors.yaml#/InternalServerError"
+    UnprocessableEntity:
+      $ref: "./components/responses/errors.yaml#/UnprocessableEntity"
 
   schemas:
     Pagination:
@@ -216,3 +218,11 @@ paths:
     $ref: './paths/bills.yaml#/status'
   /bills/{id}/split:
     $ref: './paths/bills.yaml#/split'
+  /orders:
+    $ref: './paths/orders.yaml#/list-create'
+  /orders/{id}:
+    $ref: './paths/orders.yaml#/by-id'
+  /orders/{id}/status:
+    $ref: './paths/orders.yaml#/status'
+  /orders/{id}/items/{item_id}:
+    $ref: './paths/orders.yaml#/item-by-id'

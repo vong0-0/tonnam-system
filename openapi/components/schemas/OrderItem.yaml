@@ -34,11 +34,14 @@ properties:
     description: Special instructions from the customer (e.g. no peanuts).
     example: "No peanuts please."
   status:
-    type: string
-    enum: [COOKED, CANCELLED]
+    oneOf:
+      - type: string
+        enum: [COOKED, CANCELLED]
+      - type: null
     description: >
-      Set by kitchen staff. Items start implicitly pending when the parent
-      order is SENT_TO_KITCHEN. CANCELLED requires a reason and creates an AuditLog entry.
+      Null when the item is pending kitchen action.
+      Set to COOKED by kitchen staff when prepared.
+      Set to CANCELLED with a required reason.
   cancel_reason:
     type: string
     nullable: true
