@@ -186,3 +186,9 @@ paths:
     $ref: './paths/tables.yaml#/move'
   /tables/{id}/status:
     $ref: './paths/tables.yaml#/status'
+  /table-merge-groups:
+    $ref: './paths/table-merge-groups.yaml#/create'
+  /table-merge-groups/{id}:
+    $ref: './paths/table-merge-groups.yaml#/by-id'
+  /table-merge-groups/{id}/unmerge:
+    $ref: './paths/table-merge-groups.yaml#/unmerge'
