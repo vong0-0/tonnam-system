@@ -198,3 +198,7 @@ paths:
     $ref: './paths/reservations.yaml#/by-id'
   /reservations/{id}/status:
     $ref: './paths/reservations.yaml#/status'
+  /menu-categories:
+    $ref: './paths/menu-categories.yaml#/list-create'
+  /menu-categories/{id}:
+    $ref: './paths/menu-categories.yaml#/by-id'

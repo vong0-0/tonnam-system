@@ -1,0 +1,224 @@
+list-create:
+  get:
+    tags:
+      - MenuCategories
+    summary: List all menu categories
+    description: Returns a paginated list of menu categories. Accessible to ADMIN, CASHIER, and WAITER.
+    operationId: listMenuCategories
+    parameters:
+      - $ref: "../components/parameters/common.yaml#/page"
+      - $ref: "../components/parameters/common.yaml#/limit"
+      - $ref: "../components/parameters/common.yaml#/search"
+    responses:
+      "200":
+        description: Menu categories retrieved successfully.
+        content:
+          application/json:
+            schema:
+              allOf:
+                - $ref: "../components/schemas/EnvelopeResponse.yaml"
+                - type: object
+                  properties:
+                    data:
+                      type: array
+                      items:
+                        $ref: "../components/schemas/MenuCategory.yaml"
+                    pagination:
+                      $ref: "../components/schemas/Pagination.yaml"
+      "401":
+        $ref: "../components/responses/errors.yaml#/Unauthorized"
+      "403":
+        $ref: "../components/responses/errors.yaml#/Forbidden"
+
+  post:
+    tags:
+      - MenuCategories
+    summary: Create a new menu category
+    description: Creates a new menu category. Accessible to ADMIN only. Returns 409 on duplicate name.
+    operationId: createMenuCategory
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              name:
+                type: string
+                example: "Main Course"
+            required:
+              - name
+    responses:
+      "201":
+        description: Menu category created successfully.
+        content:
+          application/json:
+            schema:
+              allOf:
+                - $ref: "../components/schemas/EnvelopeResponse.yaml"
+                - type: object
+                  properties:
+                    data:
+                      $ref: "../components/schemas/MenuCategory.yaml"
+      "400":
+        $ref: "../components/responses/errors.yaml#/ValidationError"
+      "401":
+        $ref: "../components/responses/errors.yaml#/Unauthorized"
+      "403":
+        $ref: "../components/responses/errors.yaml#/Forbidden"
+      "409":
+        description: A menu category with the same name already exists.
+        content:
+          application/problem+json:
+            schema:
+              $ref: "../components/schemas/ProblemDetail.yaml"
+            example:
+              type: "https://srms.example.com/errors/conflict"
+              title: "Conflict"
+              status: 409
+              detail: "A menu category with this name already exists."
+              instance: "/v1/menu-categories"
+              traceId: "abc-123-xyz"
+              timestamp: "2024-01-01T14:32:00Z"
+              errors:
+                - field: "name"
+                  message: "A menu category with this name already exists."
+                  code: "DUPLICATE_CATEGORY_NAME"
+
+by-id:
+  parameters:
+    - name: id
+      in: path
+      required: true
+      schema:
+        type: string
+        example: "64f1a2b3c4d5e6f7a8b9c0d1"
+      description: MongoDB ObjectId of the menu category.
+
+  get:
+    tags:
+      - MenuCategories
+    summary: Get a menu category by ID
+    description: Returns a single menu category by ID. Accessible to ADMIN, CASHIER, and WAITER.
+    operationId: getMenuCategoryById
+    responses:
+      "200":
+        description: Menu category retrieved successfully.
+        content:
+          application/json:
+            schema:
+              allOf:
+                - $ref: "../components/schemas/EnvelopeResponse.yaml"
+                - type: object
+                  properties:
+                    data:
+                      $ref: "../components/schemas/MenuCategory.yaml"
+      "401":
+        $ref: "../components/responses/errors.yaml#/Unauthorized"
+      "403":
+        $ref: "../components/responses/errors.yaml#/Forbidden"
+      "404":
+        $ref: "../components/responses/errors.yaml#/NotFound"
+
+  patch:
+    tags:
+      - MenuCategories
+    summary: Update a menu category
+    description: Partially updates a menu category. Accessible to ADMIN only. Returns 409 on duplicate name.
+    operationId: updateMenuCategory
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              name:
+                type: string
+                example: "Signature Dishes"
+    responses:
+      "200":
+        description: Menu category updated successfully.
+        content:
+          application/json:
+            schema:
+              allOf:
+                - $ref: "../components/schemas/EnvelopeResponse.yaml"
+                - type: object
+                  properties:
+                    data:
+                      $ref: "../components/schemas/MenuCategory.yaml"
+      "400":
+        $ref: "../components/responses/errors.yaml#/ValidationError"
+      "401":
+        $ref: "../components/responses/errors.yaml#/Unauthorized"
+      "403":
+        $ref: "../components/responses/errors.yaml#/Forbidden"
+      "404":
+        $ref: "../components/responses/errors.yaml#/NotFound"
+      "409":
+        description: A menu category with the same name already exists.
+        content:
+          application/problem+json:
+            schema:
+              $ref: "../components/schemas/ProblemDetail.yaml"
+            example:
+              type: "https://srms.example.com/errors/conflict"
+              title: "Conflict"
+              status: 409
+              detail: "A menu category with this name already exists."
+              instance: "/v1/menu-categories/64f1a2b3c4d5e6f7a8b9c0d1"
+              traceId: "abc-123-xyz"
+              timestamp: "2024-01-01T14:32:00Z"
+              errors:
+                - field: "name"
+                  message: "A menu category with this name already exists."
+                  code: "DUPLICATE_CATEGORY_NAME"
+
+  delete:
+    tags:
+      - MenuCategories
+    summary: Delete a menu category
+    description: >
+      Permanently deletes a menu category.
+      Cannot be deleted if menu items are still assigned to it.
+      Returns 409 if item_count is greater than 0.
+      Accessible to ADMIN only.
+    operationId: deleteMenuCategory
+    responses:
+      "200":
+        description: Menu category deleted successfully.
+        content:
+          application/json:
+            schema:
+              allOf:
+                - $ref: "../components/schemas/EnvelopeResponse.yaml"
+                - type: object
+                  properties:
+                    data:
+                      nullable: true
+                      example: null
+      "401":
+        $ref: "../components/responses/errors.yaml#/Unauthorized"
+      "403":
+        $ref: "../components/responses/errors.yaml#/Forbidden"
+      "404":
+        $ref: "../components/responses/errors.yaml#/NotFound"
+      "409":
+        description: Cannot delete a category that still has menu items assigned.
+        content:
+          application/problem+json:
+            schema:
+              $ref: "../components/schemas/ProblemDetail.yaml"
+            example:
+              type: "https://srms.example.com/errors/conflict"
+              title: "Conflict"
+              status: 409
+              detail: "Cannot delete a category that still has menu items assigned."
+              instance: "/v1/menu-categories/64f1a2b3c4d5e6f7a8b9c0d1"
+              traceId: "abc-123-xyz"
+              timestamp: "2024-01-01T14:32:00Z"
+              errors:
+                - field: "id"
+                  message: "Cannot delete a category that still has menu items assigned."
+                  code: "CATEGORY_HAS_ITEMS"
