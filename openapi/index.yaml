@@ -50,31 +50,31 @@ tags:
       manual status updates, and moving tables between locations.
   - name: TableMergeGroups
     description: >
-      Manges table merge groups. Allows merging multiple tables or existing groups
+      Manages table merge groups. Allows merging multiple tables or existing groups
       into a single group, viewing group details with associated bills,
       and unmerging groups back to individual tables with bill reassignment.
   - name: Reservations
     description: >
-      Manages advanced table reservations made by phone.
-      Supports creating reservations with gust name, phone, party size, and time,
+      Manages advance table reservations made by phone.
+      Supports creating reservations with guest name, phone, party size, and time,
       confirming arrivals, and cancelling no-shows.
   - name: MenuCategories
     description: >
       Manages menu categories used to group menu items. 
       Admin-only. Supports creating, updating, and deleting categories.
-      categories cannot be deleted while menu items are assigned to them.
+      Categories cannot be deleted while menu items are assigned to them.
   - name: MenuItems
     description: >
       Manages individual menu items including name, price, image, and category.
       Admin-only for create, update, and delete.
-      Cashier can toggle availabbility and sold-out status,
+      Cashier can toggle availability and sold-out status,
       which broadcasts real-time updates to POS and Waiter App.
   - name: Bills
     description: >
       Manages the full bill lifecycle from creation to payment.
       Supports multiple bills per table, bill splitting, editing order items,
       cancellation with reason, and tracking partial and full payments.
-      Every edit requires a reson and is recorded in the audit log.
+      Every edit requires a reason and is recorded in the audit log.
   - name: Orders
     description: >
       Manages kitchen orders created by Waiter or Cashier.
@@ -89,16 +89,16 @@ tags:
       Mixed payments must cover the full bill amount in a single transaction.
   - name: AuditLogs
     description: >
-      Provides an immurale audit trail for all sensitive operations
+      Provides an immutable audit trail for all sensitive operations
       including bill edits, cancellations, and order item changes.
       Admin-only. Records actor, action, reason, and before/after state with timestamps for every entry.
   - name: Analytics
     description: >
       Provides sales and menu performance analytics.
       Available to Admin and Cashier.
-      Sales analytices include revenue summaries by period, period-over-period comparison,
+      Sales analytics include revenue summaries by period, period-over-period comparison,
       revenue breakdown by category, and peak hour data.
-      Menu analytices include best sellers, dead menu detection, and menu mix analysis.
+      Menu analytics include best sellers, dead menu detection, and menu mix analysis.
 
 components:
   securitySchemes:
@@ -134,8 +134,6 @@ components:
       $ref: "./components/responses/errors.yaml#/RateLimitExceeded"
     InternalServerError:
       $ref: "./components/responses/errors.yaml#/InternalServerError"
-    UnprocessableEntity:
-      $ref: "./components/responses/errors.yaml#/UnprocessableEntity"
 
   schemas:
     Pagination:
@@ -168,6 +166,7 @@ components:
       $ref: "./components/schemas/AuditLog.yaml"
 
 paths:
+  # Auth
   /auth/login:
     $ref: './paths/auth.yaml#/login'
   /auth/refresh:
@@ -176,10 +175,14 @@ paths:
     $ref: './paths/auth.yaml#/logout'
   /auth/ws-ticket:
     $ref: './paths/auth.yaml#/ws-ticket'
+
+  # Users
   /users:
     $ref: './paths/users.yaml#/list-create'
   /users/{id}:
     $ref: './paths/users.yaml#/by-id'
+
+  # Tables
   /tables:
     $ref: './paths/tables.yaml#/list-create'
   /tables/{id}:
@@ -188,28 +191,38 @@ paths:
     $ref: './paths/tables.yaml#/move'
   /tables/{id}/status:
     $ref: './paths/tables.yaml#/status'
+
+  # Table Merge Groups
   /table-merge-groups:
     $ref: './paths/table-merge-groups.yaml#/create'
   /table-merge-groups/{id}:
     $ref: './paths/table-merge-groups.yaml#/by-id'
   /table-merge-groups/{id}/unmerge:
     $ref: './paths/table-merge-groups.yaml#/unmerge'
+
+  # Reservations
   /reservations:
     $ref: './paths/reservations.yaml#/list-create'
   /reservations/{id}:
     $ref: './paths/reservations.yaml#/by-id'
   /reservations/{id}/status:
     $ref: './paths/reservations.yaml#/status'
+
+  # Menu Categories
   /menu-categories:
     $ref: './paths/menu-categories.yaml#/list-create'
   /menu-categories/{id}:
     $ref: './paths/menu-categories.yaml#/by-id'
+
+  # Menu Items
   /menu-items:
     $ref: './paths/menu-items.yaml#/list-create'
   /menu-items/{id}:
     $ref: './paths/menu-items.yaml#/by-id'
   /menu-items/{id}/availability:
     $ref: './paths/menu-items.yaml#/availability'
+
+  # Bills
   /bills:
     $ref: './paths/bills.yaml#/list-create'
   /bills/{id}:
@@ -218,22 +231,28 @@ paths:
     $ref: './paths/bills.yaml#/status'
   /bills/{id}/split:
     $ref: './paths/bills.yaml#/split'
+
+  # Orders
   /orders:
     $ref: './paths/orders.yaml#/list-create'
   /orders/{id}:
     $ref: './paths/orders.yaml#/by-id'
-  /orders/{id}/status:
-    $ref: './paths/orders.yaml#/status'
   /orders/{id}/items/{item_id}:
     $ref: './paths/orders.yaml#/item-by-id'
+
+  # Payments
   /payments:
     $ref: './paths/payments.yaml#/create'
   /payments/{id}:
     $ref: './paths/payments.yaml#/by-id'
+
+  # Audit Logs
   /audit-logs:
     $ref: './paths/audit-logs.yaml#/list'
   /audit-logs/{id}:
     $ref: './paths/audit-logs.yaml#/by-id'
+
+  # Analytics
   /analytics/sales/summary:
     $ref: './paths/analytics.yaml#/sales-summary'
   /analytics/sales/comparison:
