@@ -401,24 +401,56 @@ split:
                         - sub_bills
       "400":
         description: >
-          Validation error. Occurs when splits array has fewer than 2 entries
-          or order_item_ids contain items not belonging to this bill.
+          Validation error. Occurs when splits array has fewer than 2 entries,
+          order_item_ids contain items not belonging to this bill,
+          or one or more order items are not assigned to any sub-bill.
         content:
           application/problem+json:
             schema:
               $ref: "../components/schemas/ProblemDetail.yaml"
-            example:
-              type: "https://srms.example.com/errors/validation-error"
-              title: "Validation Error"
-              status: 400
-              detail: "One or more order items do not belong to this bill."
-              instance: "/v1/bills/64f1a2b3c4d5e6f7a8b9c0d1/split"
-              traceId: "abc-123-xyz"
-              timestamp: "2024-01-01T14:32:00Z"
-              errors:
-                - field: "splits[0].order_item_ids"
-                  message: "Order item does not belong to this bill."
-                  code: "INVALID_ORDER_ITEM"
+            examples:
+              too_few_splits:
+                summary: Fewer than 2 splits provided
+                value:
+                  type: "https://srms.example.com/errors/validation-error"
+                  title: "Validation Error"
+                  status: 400
+                  detail: "At least 2 sub-bills are required to split a bill."
+                  instance: "/v1/bills/64f1a2b3c4d5e6f7a8b9c0d1/split"
+                  traceId: "abc-123-xyz"
+                  timestamp: "2024-01-01T14:32:00Z"
+                  errors:
+                    - field: "splits"
+                      message: "At least 2 sub-bills are required."
+                      code: "TOO_FEW_SPLITS"
+              invalid_order_item:
+                summary: Order item does not belong to this bill
+                value:
+                  type: "https://srms.example.com/errors/validation-error"
+                  title: "Validation Error"
+                  status: 400
+                  detail: "One or more order items do not belong to this bill."
+                  instance: "/v1/bills/64f1a2b3c4d5e6f7a8b9c0d1/split"
+                  traceId: "abc-123-xyz"
+                  timestamp: "2024-01-01T14:32:00Z"
+                  errors:
+                    - field: "splits[0].order_item_ids"
+                      message: "Order item does not belong to this bill."
+                      code: "INVALID_ORDER_ITEM"
+              unassigned_items:
+                summary: One or more order items not assigned to any sub-bill
+                value:
+                  type: "https://srms.example.com/errors/validation-error"
+                  title: "Validation Error"
+                  status: 400
+                  detail: "All order items must be assigned to a sub-bill before splitting."
+                  instance: "/v1/bills/64f1a2b3c4d5e6f7a8b9c0d1/split"
+                  traceId: "abc-123-xyz"
+                  timestamp: "2024-01-01T14:32:00Z"
+                  errors:
+                    - field: "splits"
+                      message: "Order item '64f1a2b3c4d5e6f7a8b9c0d4' is not assigned to any sub-bill."
+                      code: "UNASSIGNED_ORDER_ITEMS"
       "401":
         $ref: "../components/responses/errors.yaml#/Unauthorized"
       "403":
