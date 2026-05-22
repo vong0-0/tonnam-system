@@ -53,6 +53,7 @@ list-create:
       - MenuItems
     summary: Create a new menu item
     description: >
+      New items are created with is_sold_out set to false by default. Use PATCH /menu-items/{id}/availability to update availability after creation.
       Creates a new menu item. Accessible to ADMIN only.
       Returns 404 if the specified category_id does not exist.
       Returns 409 on duplicate name within the same category.
