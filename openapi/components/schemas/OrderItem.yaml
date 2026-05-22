@@ -34,10 +34,9 @@ properties:
     description: Special instructions from the customer (e.g. no peanuts).
     example: "No peanuts please."
   status:
-    oneOf:
-      - type: string
-        enum: [COOKED, CANCELLED]
-      - type: null
+    type: string
+    nullable: true
+    enum: [COOKED, CANCELLED]
     description: >
       Null when the item is pending kitchen action.
       Set to COOKED by kitchen staff when prepared.
@@ -62,6 +61,5 @@ required:
   - name
   - unit_price
   - quantity
-  - status
   - created_at
   - updated_at
