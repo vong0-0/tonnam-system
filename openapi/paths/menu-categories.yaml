@@ -182,6 +182,8 @@ by-id:
     description: >
       Permanently deletes a menu category.
       Cannot be deleted if menu items are still assigned to it.
+      Check item_count in the category object before deleting —
+      a value greater than 0 means the delete will be rejected.
       Returns 409 if item_count is greater than 0.
       Accessible to ADMIN only.
     operationId: deleteMenuCategory
