@@ -1,4 +1,4 @@
-name: Deploy API Docs
+name: Deploy Swagger UI
 
 on:
   push:
@@ -13,10 +13,52 @@ jobs:
     steps:
       - uses: actions/checkout@v3
 
-      - name: Bundle OpenAPI
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: "18"
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Bundle OpenAPI spec
+        run: npm run bundle
+
+      - name: Create Swagger UI index.html
         run: |
-          npm install
-          npm run bundle
+          mkdir -p dist
+          cat > dist/index.html << 'EOF'
+          <!DOCTYPE html>w
+          <html>
+          <head>
+            <title>SRMS API Documentation</title>
+            <meta charset="utf-8"/>
+            <meta name="viewport" content="width=device-width, initial-scale=1">
+            <link rel="stylesheet" type="text/css"
+              href="https://unpkg.com/swagger-ui-dist/swagger-ui.css">
+          </head>
+          <body>
+            <div id="swagger-ui"></div>
+            <script src="https://unpkg.com/swagger-ui-dist/swagger-ui-bundle.js"></script>
+            <script>
+              window.onload = function() {
+                SwaggerUIBundle({
+                  url: "./openapi.yaml",
+                  dom_id: '#swagger-ui',
+                  presets: [
+                    SwaggerUIBundle.presets.apis,
+                    SwaggerUIBundle.SwaggerUIStandalonePreset
+                  ],
+                  layout: "StandaloneLayout",
+                  deepLinking: true,
+                  displayRequestDuration: true,
+                  filter: true
+                })
+              }
+            </script>
+          </body>
+          </html>
+          EOF
 
       - name: Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@v3
