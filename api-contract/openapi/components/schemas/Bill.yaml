@@ -1,0 +1,68 @@
+type: object
+description: >
+  A bill issued for a table session. A table may accumulate multiple bills
+  (e.g. after a split). Sub-bills use slash notation: B-0001/A, B-0001/B.
+properties:
+  id:
+    type: string
+    example: "64f1a2b3c4d5e6f7a8b9c0d1"
+  short_id:
+    type: string
+    description: Human-readable bill identifier. Sub-bills use parent number with suffix.
+    example: "B-0001"
+  name:
+    type: string
+    description: Display name of the bill.
+    example: "บิลโต๊ะ 5"
+  table_id:
+    type: string
+    description: The table this bill belongs to.
+    example: "64f1a2b3c4d5e6f7a8b9c0d2"
+  parent_bill_id:
+    type: string
+    nullable: true
+    description: Set when this bill was created by splitting a parent bill.
+    example: null
+  split_label:
+    type: string
+    nullable: true
+    description: Label suffix for this split bill (e.g. "A", "B").
+    example: "A"
+  status:
+    type: string
+    enum: [OPEN, PARTIALLY_PAID, PAID, CANCELLED]
+    description: >
+      Lifecycle: OPEN → PARTIALLY_PAID → PAID.
+      CANCELLED requires a reason and creates an AuditLog entry.
+  total_amount:
+    type: number
+    format: decimal
+    description: Sum of all order item prices.
+    example: 560.00
+  created_by:
+    type: string
+    description: ID of the cashier who opened this bill.
+    example: "64f1a2b3c4d5e6f7a8b9c0d3"
+  cancel_reason:
+    type: string
+    nullable: true
+    description: Required when status is CANCELLED.
+    example: null
+  created_at:
+    type: string
+    format: date-time
+    example: "2025-05-20T18:30:00Z"
+  updated_at:
+    type: string
+    format: date-time
+    example: "2025-05-20T21:00:00Z"
+required:
+  - id
+  - short_id
+  - name
+  - table_id
+  - status
+  - total_amount
+  - created_by
+  - created_at
+  - updated_at

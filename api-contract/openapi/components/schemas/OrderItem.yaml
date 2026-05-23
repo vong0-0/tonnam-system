@@ -1,0 +1,65 @@
+type: object
+description: >
+  A single menu item within an order. Price and name are snapshotted at order
+  time so menu changes do not affect existing records.
+properties:
+  id:
+    type: string
+    example: "64f1a2b3c4d5e6f7a8b9c0d1"
+  order_id:
+    type: string
+    description: The order this item belongs to.
+    example: "64f1a2b3c4d5e6f7a8b9c0d2"
+  menu_item_id:
+    type: string
+    description: Reference to the original MenuItem.
+    example: "64f1a2b3c4d5e6f7a8b9c0d3"
+  name:
+    type: string
+    description: Snapshot of the menu item name at the time the order was placed.
+    example: "Pad Thai"
+  unit_price:
+    type: number
+    format: decimal
+    description: Snapshot of the price at the time the order was placed.
+    example: 120.00
+  quantity:
+    type: integer
+    description: Number of units ordered.
+    minimum: 1
+    example: 2
+  notes:
+    type: string
+    nullable: true
+    description: Special instructions from the customer (e.g. no peanuts).
+    example: "No peanuts please."
+  status:
+    type: string
+    nullable: true
+    enum: [COOKED, CANCELLED]
+    description: >
+      Null when the item is pending kitchen action.
+      Set to COOKED by kitchen staff when prepared.
+      Set to CANCELLED with a required reason.
+  cancel_reason:
+    type: string
+    nullable: true
+    description: Required when status is CANCELLED.
+    example: null
+  created_at:
+    type: string
+    format: date-time
+    example: "2025-05-20T19:00:00Z"
+  updated_at:
+    type: string
+    format: date-time
+    example: "2025-05-20T19:25:00Z"
+required:
+  - id
+  - order_id
+  - menu_item_id
+  - name
+  - unit_price
+  - quantity
+  - created_at
+  - updated_at

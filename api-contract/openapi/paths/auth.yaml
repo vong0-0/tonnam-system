@@ -1,0 +1,215 @@
+login:
+  post:
+    tags:
+      - Auth
+    summary: Login with username and password
+    description: Authenticates a user and returns a short-lived access token. Sets an HttpOnly refresh token cookie.
+    operationId: loginUser
+    security: []
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              username:
+                type: string
+                example: "cashier01"
+              password:
+                type: string
+                format: password
+                example: "P@ssw0rd"
+            required:
+              - username
+              - password
+    responses:
+      "200":
+        description: Login successful.
+        headers:
+          Set-Cookie:
+            description: HttpOnly Secure SameSite=Strict refresh token cookie.
+            schema:
+              type: string
+              example: "refresh_token=eyJ...; HttpOnly; Secure; SameSite=Strict; Path=/"
+        content:
+          application/json:
+            schema:
+              allOf:
+                - $ref: "../components/schemas/EnvelopeResponse.yaml"
+                - type: object
+                  properties:
+                    data:
+                      type: object
+                      properties:
+                        access_token:
+                          type: string
+                          description: Short-lived JWT access token.
+                          example: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+                        user:
+                          type: object
+                          properties:
+                            id:
+                              type: string
+                              example: "64f1a2b3c4d5e6f7a8b9c0d1"
+                            username:
+                              type: string
+                              example: "cashier01"
+                            first_name:
+                              type: string
+                              example: "Somchai"
+                            last_name:
+                              type: string
+                              example: "Kongkiat"
+                            role:
+                              type: string
+                              enum: [ADMIN, CASHIER, WAITER, KITCHEN]
+                              example: "CASHIER"
+                          required:
+                            - id
+                            - username
+                            - first_name
+                            - last_name
+                            - role
+                      required:
+                        - access_token
+                        - user
+      "400":
+        $ref: "../components/responses/errors.yaml#/ValidationError"
+      "401":
+        $ref: "../components/responses/errors.yaml#/Unauthorized"
+      "403":
+        $ref: "../components/responses/errors.yaml#/Forbidden"
+      "429":
+        $ref: "../components/responses/errors.yaml#/RateLimitExceeded"
+
+refresh:
+  post:
+    tags:
+      - Auth
+    summary: Refresh access token using refresh token cookie
+    description: Issues a new access token using the HttpOnly refresh token cookie. Rotates the refresh token on each call.
+    operationId: refreshToken
+    security: []
+    parameters:
+      - in: cookie
+        name: refresh_token
+        required: true
+        schema:
+          type: string
+        description: >
+          HttpOnly refresh token cookie set at login.
+          Browsers send this cookie automatically with every request.
+          Backend reads it directly from the Cookie header.
+          Client code does not need to handle this manually.
+    responses:
+      "200":
+        description: Token refreshed successfully.
+        headers:
+          Set-Cookie:
+            description: Rotated HttpOnly Secure SameSite=Strict refresh token cookie.
+            schema:
+              type: string
+              example: "refresh_token=eyJ...; HttpOnly; Secure; SameSite=Strict; Path=/"
+        content:
+          application/json:
+            schema:
+              allOf:
+                - $ref: "../components/schemas/EnvelopeResponse.yaml"
+                - type: object
+                  properties:
+                    data:
+                      type: object
+                      properties:
+                        access_token:
+                          type: string
+                          description: New short-lived JWT access token.
+                          example: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+                      required:
+                        - access_token
+      "401":
+        $ref: "../components/responses/errors.yaml#/Unauthorized"
+      "429":
+        $ref: "../components/responses/errors.yaml#/RateLimitExceeded"
+
+logout:
+  post:
+    tags:
+      - Auth
+    summary: Logout and invalidate refresh token
+    description: Invalidates the current session's refresh token server-side and clears the cookie.
+    operationId: logoutUser
+    security:
+      - BearerAuth: []
+    parameters:
+      - in: cookie
+        name: refresh_token
+        required: true
+        schema:
+          type: string
+        description: >
+          HttpOnly refresh token cookie to invalidate.
+          Browsers send this cookie automatically with every request.
+          Backend reads it directly from the Cookie header.
+          Client code does not need to handle this manually.
+    responses:
+      "200":
+        description: Logged out successfully.
+        headers:
+          Set-Cookie:
+            description: Clears the refresh token cookie by setting Max-Age=0.
+            schema:
+              type: string
+              example: "refresh_token=; Max-Age=0; HttpOnly; Secure; SameSite=Strict; Path=/"
+        content:
+          application/json:
+            schema:
+              allOf:
+                - $ref: "../components/schemas/EnvelopeResponse.yaml"
+                - type: object
+                  properties:
+                    data:
+                      nullable: true
+                      example: null
+      "401":
+        $ref: "../components/responses/errors.yaml#/Unauthorized"
+
+ws-ticket:
+  post:
+    tags:
+      - Auth
+    summary: Issue a short-lived WebSocket connection ticket
+    description: Issues a one-time ticket used to authenticate a WebSocket connection. Expires in 30 seconds.
+    operationId: issueWsTicket
+    security:
+      - BearerAuth: []
+    responses:
+      "201":
+        description: WebSocket ticket issued successfully.
+        content:
+          application/json:
+            schema:
+              allOf:
+                - $ref: "../components/schemas/EnvelopeResponse.yaml"
+                - type: object
+                  properties:
+                    data:
+                      type: object
+                      properties:
+                        ticket:
+                          type: string
+                          description: One-time ticket for authenticating a WebSocket connection.
+                          example: "wst_64f1a2b3c4d5e6f7a8b9c0d1"
+                        expires_in:
+                          type: integer
+                          description: Ticket validity period in seconds.
+                          example: 30
+                      required:
+                        - ticket
+                        - expires_in
+      "401":
+        $ref: "../components/responses/errors.yaml#/Unauthorized"
+      "403":
+        $ref: "../components/responses/errors.yaml#/Forbidden"
+      "429":
+        $ref: "../components/responses/errors.yaml#/RateLimitExceeded"

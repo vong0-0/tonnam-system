@@ -1,0 +1,47 @@
+type: object
+description: >
+  A batch of items sent to the kitchen by a waiter.
+  One bill can have multiple orders (e.g. additional rounds).
+properties:
+  id:
+    type: string
+    example: "64f1a2b3c4d5e6f7a8b9c0d1"
+  short_id:
+    type: string
+    description: Human-readable order identifier.
+    example: "O-0001"
+  bill_id:
+    type: string
+    description: The bill this order is charged to.
+    example: "64f1a2b3c4d5e6f7a8b9c0d2"
+  status:
+    type: string
+    enum: [SENT_TO_KITCHEN, COOKED, CANCELLED]
+    description: >
+      Lifecycle: SENT_TO_KITCHEN → COOKED or CANCELLED.
+      CANCELLED requires a reason and creates an AuditLog entry.
+  created_by:
+    type: string
+    description: ID of the waiter who submitted this order.
+    example: "64f1a2b3c4d5e6f7a8b9c0d3"
+  cancel_reason:
+    type: string
+    nullable: true
+    description: Required when status is CANCELLED.
+    example: null
+  created_at:
+    type: string
+    format: date-time
+    example: "2025-05-20T19:00:00Z"
+  updated_at:
+    type: string
+    format: date-time
+    example: "2025-05-20T19:30:00Z"
+required:
+  - id
+  - short_id
+  - bill_id
+  - status
+  - created_by
+  - created_at
+  - updated_at

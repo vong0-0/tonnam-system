@@ -1,0 +1,234 @@
+list-create:
+  get:
+    tags:
+      - Users
+    summary: List all staff accounts
+    description: Returns a paginated list of staff accounts. Accessible to ADMIN only.
+    operationId: listUsers
+    parameters:
+      - $ref: '../components/parameters/common.yaml#/page'
+      - $ref: '../components/parameters/common.yaml#/limit'
+      - $ref: '../components/parameters/common.yaml#/search'
+      - name: role
+        in: query
+        required: false
+        schema:
+          type: string
+          enum: [ADMIN, CASHIER, WAITER, KITCHEN]
+        description: Filter by role.
+      - name: is_active
+        in: query
+        required: false
+        schema:
+          type: boolean
+        description: Filter by account active status.
+    responses:
+      '200':
+        description: Staff accounts retrieved successfully.
+        content:
+          application/json:
+            schema:
+              allOf:
+                - $ref: '../components/schemas/EnvelopeResponse.yaml'
+                - type: object
+                  properties:
+                    data:
+                      type: array
+                      items:
+                        $ref: '../components/schemas/User.yaml'
+                    pagination:
+                      $ref: '../components/schemas/Pagination.yaml'
+      '401':
+        $ref: '../components/responses/errors.yaml#/Unauthorized'
+      '403':
+        $ref: '../components/responses/errors.yaml#/Forbidden'
+
+  post:
+    tags:
+      - Users
+    summary: Create a new staff account
+    description: Creates a new staff account. Accessible to ADMIN only. Returns 409 on duplicate username, phone, or email.
+    operationId: createUser
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              username:
+                type: string
+                example: "waiter02"
+              first_name:
+                type: string
+                example: "Malee"
+              last_name:
+                type: string
+                example: "Srisuk"
+              phone:
+                type: string
+                example: "0898765432"
+              email:
+                type: string
+                format: email
+                example: "malee@srms.example.com"
+              password:
+                type: string
+                format: password
+                example: "P@ssw0rd"
+              role:
+                type: string
+                enum: [ADMIN, CASHIER, WAITER, KITCHEN]
+                example: "WAITER"
+            required:
+              - username
+              - first_name
+              - last_name
+              - phone
+              - password
+              - role
+    responses:
+      '201':
+        description: Staff account created successfully.
+        content:
+          application/json:
+            schema:
+              allOf:
+                - $ref: '../components/schemas/EnvelopeResponse.yaml'
+                - type: object
+                  properties:
+                    data:
+                      $ref: '../components/schemas/User.yaml'
+      '400':
+        $ref: '../components/responses/errors.yaml#/ValidationError'
+      '401':
+        $ref: '../components/responses/errors.yaml#/Unauthorized'
+      '403':
+        $ref: '../components/responses/errors.yaml#/Forbidden'
+      '409':
+        $ref: '../components/responses/errors.yaml#/Conflict'
+
+by-id:
+  parameters:
+    - name: id
+      in: path
+      required: true
+      schema:
+        type: string
+        example: "64f1a2b3c4d5e6f7a8b9c0d1"
+      description: MongoDB ObjectId of the staff account.
+
+  get:
+    tags:
+      - Users
+    summary: Get a staff account by ID
+    description: Returns a single staff account by ID. Accessible to ADMIN only.
+    operationId: getUserById
+    responses:
+      '200':
+        description: Staff account retrieved successfully.
+        content:
+          application/json:
+            schema:
+              allOf:
+                - $ref: '../components/schemas/EnvelopeResponse.yaml'
+                - type: object
+                  properties:
+                    data:
+                      $ref: '../components/schemas/User.yaml'
+      '401':
+        $ref: '../components/responses/errors.yaml#/Unauthorized'
+      '403':
+        $ref: '../components/responses/errors.yaml#/Forbidden'
+      '404':
+        $ref: '../components/responses/errors.yaml#/NotFound'
+
+  patch:
+    tags:
+      - Users
+    summary: Update a staff account
+    description: Partially updates a staff account. Send only the fields to change. Accessible to ADMIN only. Returns 409 on duplicate phone or email.
+    operationId: updateUser
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              first_name:
+                type: string
+                example: "Malee"
+              last_name:
+                type: string
+                example: "Srisuk"
+              phone:
+                type: string
+                example: "0898765432"
+              email:
+                type: string
+                format: email
+                nullable: true
+                example: "malee@srms.example.com"
+              role:
+                type: string
+                enum: [ADMIN, CASHIER, WAITER, KITCHEN]
+                example: "CASHIER"
+              is_active:
+                type: boolean
+                example: false
+    responses:
+      '200':
+        description: Staff account updated successfully.
+        content:
+          application/json:
+            schema:
+              allOf:
+                - $ref: '../components/schemas/EnvelopeResponse.yaml'
+                - type: object
+                  properties:
+                    data:
+                      $ref: '../components/schemas/User.yaml'
+      '400':
+        $ref: '../components/responses/errors.yaml#/ValidationError'
+      '401':
+        $ref: '../components/responses/errors.yaml#/Unauthorized'
+      '403':
+        $ref: '../components/responses/errors.yaml#/Forbidden'
+      '404':
+        $ref: '../components/responses/errors.yaml#/NotFound'
+      '409':
+        $ref: '../components/responses/errors.yaml#/Conflict'
+
+  delete:
+    tags:
+      - Users
+    summary: Deactivate a staff account
+    description: >
+      Deactivates a staff account by setting is_active to false.
+      The account is not permanently deleted and can be reactivated
+      by updating is_active via PATCH /users/{id}.
+      Returns 409 if the user has an active session.
+      Note: Password change via POST /users/{id}/change-password
+      is out of MVP scope and will be implemented in a future phase.
+    operationId: deactivateUser
+    responses:
+      '200':
+        description: Staff account deactivated successfully.
+        content:
+          application/json:
+            schema:
+              allOf:
+                - $ref: '../components/schemas/EnvelopeResponse.yaml'
+                - type: object
+                  properties:
+                    data:
+                      $ref: '../components/schemas/User.yaml'
+      '401':
+        $ref: '../components/responses/errors.yaml#/Unauthorized'
+      '403':
+        $ref: '../components/responses/errors.yaml#/Forbidden'
+      '404':
+        $ref: '../components/responses/errors.yaml#/NotFound'
+      '409':
+        $ref: '../components/responses/errors.yaml#/Conflict'

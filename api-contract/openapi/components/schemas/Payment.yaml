@@ -1,0 +1,72 @@
+type: object
+description: >
+  A payment transaction applied to a bill.
+  Supports CASH, QR_PROMPTPAY, and MIXED methods.
+  A bill may receive multiple partial payments until total_amount is fully covered.
+properties:
+  id:
+    type: string
+    example: "64f1a2b3c4d5e6f7a8b9c0d1"
+  bill_id:
+    type: string
+    description: The bill this payment is applied to.
+    example: "64f1a2b3c4d5e6f7a8b9c0d2"
+  method:
+    type: string
+    enum: [CASH, QR_PROMPTPAY, MIXED]
+    description: Payment method used for this transaction.
+  amount:
+    type: number
+    format: decimal
+    description: Total amount of this payment transaction.
+    minimum: 0.01
+    example: 560.00
+  cash:
+    type: object
+    nullable: true
+    description: Required when method is CASH or MIXED.
+    properties:
+      amount:
+        type: number
+        format: decimal
+        example: 600.00
+      received_amount:
+        type: number
+        format: decimal
+        example: 600.00
+      change_amount:
+        type: number
+        format: decimal
+        example: 40.00
+  qr_promptpay:
+    type: object
+    nullable: true
+    description: Required when method is QR_PROMPTPAY or MIXED.
+    properties:
+      amount:
+        type: number
+        format: decimal
+        example: 560.00
+      received_amount:
+        type: number
+        format: decimal
+        example: 560.00
+      change_amount:
+        type: number
+        format: decimal
+        example: 0.00
+  confirmed_by:
+    type: string
+    description: ID of the cashier who processed this payment.
+    example: "64f1a2b3c4d5e6f7a8b9c0d3"
+  created_at:
+    type: string
+    format: date-time
+    example: "2025-05-20T21:00:00Z"
+required:
+  - id
+  - bill_id
+  - method
+  - amount
+  - confirmed_by
+  - created_at

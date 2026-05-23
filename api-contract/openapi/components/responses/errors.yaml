@@ -1,0 +1,142 @@
+ValidationError:
+  description: Occurs when the request body or query parameters are invalid.
+  content:
+    application/problem+json:
+      schema:
+        allOf:
+          - $ref: "../schemas/ProblemDetail.yaml"
+          - type: object
+            properties:
+              errors:
+                type: array
+                description: Field-level validation errors.
+                items:
+                  type: object
+                  properties:
+                    field:
+                      type: string
+                      example: "price"
+                    message:
+                      type: string
+                      example: "must be greater than 0"
+                    code:
+                      type: string
+                      example: "INVALID_VALUE"
+                  required:
+                    - field
+                    - message
+                    - code
+      example:
+        type: "https://srms.example.com/errors/validation-error"
+        title: "Validation Error"
+        status: 400
+        detail: "One or more fields failed validation."
+        instance: "/v1/menu-items"
+        traceId: "abc-123-xyz"
+        timestamp: "2024-06-01T12:34:56Z"
+        errors:
+          - field: "price"
+            message: "must be greater than 0"
+            code: "INVALID_VALUE"
+
+Unauthorized:
+  description: Occurs when the request is missing a valid access token or the token has expired.
+  content:
+    application/problem+json:
+      schema:
+        $ref: "../schemas/ProblemDetail.yaml"
+      example:
+        type: "https://srms.example.com/errors/unauthorized"
+        title: "Unauthorized"
+        status: 401
+        detail: "Authentication credentials are missing or the token is invalid."
+        instance: "/v1/users"
+        traceId: "abc-123-xyz"
+        timestamp: "2024-06-01T12:34:56Z"
+        errors: null
+
+Forbidden:
+  description: The authenticated user does not have permission to perform this action.
+  content:
+    application/problem+json:
+      schema:
+        $ref: "../schemas/ProblemDetail.yaml"
+      example:
+        type: "https://srms.example.com/errors/forbidden"
+        title: "Forbidden"
+        status: 403
+        detail: "You do not have permission to perform this action."
+        instance: "/v1/resource"
+        traceId: "abc-123-xyz"
+        timestamp: "2024-01-01T14:32:00Z"
+        errors: null
+
+NotFound:
+  description: The requested resource does not exist.
+  content:
+    application/problem+json:
+      schema:
+        $ref: "../schemas/ProblemDetail.yaml"
+      example:
+        type: "https://srms.example.com/errors/not-found"
+        title: "Not Found"
+        status: 404
+        detail: "The requested resource was not found."
+        instance: "/v1/resource"
+        traceId: "abc-123-xyz"
+        timestamp: "2024-01-01T14:32:00Z"
+        errors: null
+
+Conflict:
+  description: The request conflicts with the current state of the resource.
+  content:
+    application/problem+json:
+      schema:
+        $ref: "../schemas/ProblemDetail.yaml"
+      example:
+        type: "https://srms.example.com/errors/conflict"
+        title: "Conflict"
+        status: 409
+        detail: "The request conflicts with the current state of the resource."
+        instance: "/v1/resource"
+        traceId: "abc-123-xyz"
+        timestamp: "2024-01-01T14:32:00Z"
+        errors: null
+
+RateLimitExceeded:
+  description: Too many requests — rate limit exceeded.
+  headers:
+    Retry-After:
+      description: Number of seconds to wait before retrying.
+      schema:
+        type: integer
+        example: 60
+  content:
+    application/problem+json:
+      schema:
+        $ref: "../schemas/ProblemDetail.yaml"
+      example:
+        type: "https://srms.example.com/errors/rate-limit-exceeded"
+        title: "Rate Limit Exceeded"
+        status: 429
+        detail: "Too many requests. Please wait before retrying."
+        instance: "/v1/resource"
+        traceId: "abc-123-xyz"
+        timestamp: "2024-01-01T14:32:00Z"
+        errors: null
+
+InternalServerError:
+  description: An unexpected error occurred on the server.
+  content:
+    application/problem+json:
+      schema:
+        $ref: "../schemas/ProblemDetail.yaml"
+      example:
+        type: "about:blank"
+        title: "Internal Server Error"
+        status: 500
+        detail: "An unexpected error occurred. Please try again later."
+        instance: "/v1/resource"
+        traceId: "abc-123-xyz"
+        timestamp: "2024-01-01T14:32:00Z"
+        errors: null

@@ -1,0 +1,74 @@
+type: object
+description: >
+  An immutable record of a sensitive operation. Created whenever a user
+  performs an action that requires justification (e.g. cancelling a bill,
+  cancelling an order item, applying a discount).
+properties:
+  id:
+    type: string
+    example: "64f1a2b3c4d5e6f7a8b9c0d1"
+  actor:
+    type: object
+    description: The user who performed the action.
+    properties:
+      id:
+        type: string
+        example: "64f1a2b3c4d5e6f7a8b9c0d5"
+      username:
+        type: string
+        example: "cashier01"
+      role:
+        type: string
+        example: "CASHIER"
+    required:
+      - id
+      - username
+      - role
+  action:
+    type: string
+    description: >
+      Identifier for the operation performed.
+      Examples: CANCEL_BILL, CANCEL_ORDER, CANCEL_ORDER_ITEM,
+      APPLY_DISCOUNT, MERGE_TABLES, UNMERGE_TABLES, SPLIT_BILL.
+    example: "CANCEL_BILL"
+  entity_name:
+    type: string
+    description: The type of resource that was affected.
+    enum: [Bill, Order, OrderItem, Table, TableMergeGroup, Payment]
+    example: "Bill"
+  entity_id:
+    type: string
+    description: ID of the affected resource.
+    example: "64f1a2b3c4d5e6f7a8b9c0d2"
+  reason:
+    type: string
+    description: Mandatory justification provided by the user at the time of the action.
+    example: "Customer changed mind and left before payment."
+  before_state:
+    type: object
+    nullable: true
+    additionalProperties: true
+    description: Snapshot of the resource before the change.
+    example:
+      status: "OPEN"
+      total_amount: 560.00
+  after_state:
+    type: object
+    nullable: true
+    additionalProperties: true
+    description: Snapshot of the resource after the change.
+    example:
+      status: "CANCELLED"
+      total_amount: 560.00
+  created_at:
+    type: string
+    format: date-time
+    example: "2025-05-20T21:05:00Z"
+required:
+  - id
+  - actor
+  - action
+  - entity_name
+  - entity_id
+  - reason
+  - created_at

@@ -1,0 +1,24 @@
+type: object
+description: Pagination metadata included in list responses.
+properties:
+  page:
+    type: integer
+    description: Current page number.
+    example: 1
+  limit:
+    type: integer
+    description: Number of items per page.
+    example: 20
+  total:
+    type: integer
+    description: Total number of items across all pages.
+    example: 100
+  totalPages:
+    type: integer
+    description: Total number of pages.
+    example: 5
+required:
+  - page
+  - limit
+  - total
+  - totalPages

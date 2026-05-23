@@ -1,0 +1,319 @@
+list-create:
+  get:
+    tags:
+      - Orders
+    summary: List all orders
+    description: Returns a paginated list of orders. Accessible to ADMIN, CASHIER, WAITER, and KITCHEN.
+    operationId: listOrders
+    parameters:
+      - $ref: "../components/parameters/common.yaml#/page"
+      - $ref: "../components/parameters/common.yaml#/limit"
+      - name: bill_id
+        in: query
+        required: false
+        schema:
+          type: string
+        description: Filter by bill ID.
+      - name: status
+        in: query
+        required: false
+        schema:
+          type: string
+          enum: [SENT_TO_KITCHEN, COOKED, CANCELLED]
+        description: Filter by order status.
+    responses:
+      "200":
+        description: Orders retrieved successfully.
+        content:
+          application/json:
+            schema:
+              allOf:
+                - $ref: "../components/schemas/EnvelopeResponse.yaml"
+                - type: object
+                  properties:
+                    data:
+                      type: array
+                      items:
+                        $ref: "../components/schemas/Order.yaml"
+                    pagination:
+                      $ref: "../components/schemas/Pagination.yaml"
+      "401":
+        $ref: "../components/responses/errors.yaml#/Unauthorized"
+      "403":
+        $ref: "../components/responses/errors.yaml#/Forbidden"
+
+  post:
+    tags:
+      - Orders
+    summary: Create a new order
+    description: >
+      Creates a new order and immediately sends it to the kitchen.
+      Accessible to ADMIN, CASHIER, and WAITER.
+      Order status is set to SENT_TO_KITCHEN automatically.
+      short_id is auto-generated in format O-XXXX.
+      The bill must be OPEN to accept new orders.
+      Returns 404 if bill_id does not exist.
+      Returns 409 if the bill is not OPEN.
+    operationId: createOrder
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              bill_id:
+                type: string
+                example: "64f1a2b3c4d5e6f7a8b9c0d2"
+              items:
+                type: array
+                minItems: 1
+                description: List of menu items to order. Minimum 1 item required.
+                items:
+                  type: object
+                  properties:
+                    menu_item_id:
+                      type: string
+                      example: "64f1a2b3c4d5e6f7a8b9c0d3"
+                    quantity:
+                      type: integer
+                      minimum: 1
+                      example: 2
+                    note:
+                      type: string
+                      nullable: true
+                      example: "No peanuts please."
+                  required:
+                    - menu_item_id
+                    - quantity
+            required:
+              - bill_id
+              - items
+    responses:
+      "201":
+        description: Order created and sent to kitchen successfully.
+        content:
+          application/json:
+            schema:
+              allOf:
+                - $ref: "../components/schemas/EnvelopeResponse.yaml"
+                - type: object
+                  properties:
+                    data:
+                      allOf:
+                        - $ref: "../components/schemas/Order.yaml"
+                        - type: object
+                          properties:
+                            items:
+                              type: array
+                              description: Order items included in this order.
+                              items:
+                                $ref: "../components/schemas/OrderItem.yaml"
+      "400":
+        $ref: "../components/responses/errors.yaml#/ValidationError"
+      "401":
+        $ref: "../components/responses/errors.yaml#/Unauthorized"
+      "403":
+        $ref: "../components/responses/errors.yaml#/Forbidden"
+      "404":
+        description: The specified bill_id does not exist.
+        content:
+          application/problem+json:
+            schema:
+              $ref: "../components/schemas/ProblemDetail.yaml"
+            example:
+              type: "https://srms.example.com/errors/not-found"
+              title: "Not Found"
+              status: 404
+              detail: "The specified bill was not found."
+              instance: "/v1/orders"
+              traceId: "abc-123-xyz"
+              timestamp: "2024-01-01T14:32:00Z"
+              errors:
+                - field: "bill_id"
+                  message: "Bill with the given ID was not found."
+                  code: "BILL_NOT_FOUND"
+      "409":
+        description: The bill is not OPEN and cannot accept new orders.
+        content:
+          application/problem+json:
+            schema:
+              $ref: "../components/schemas/ProblemDetail.yaml"
+            example:
+              type: "https://srms.example.com/errors/conflict"
+              title: "Conflict"
+              status: 409
+              detail: "Orders can only be added to a bill that is currently OPEN."
+              instance: "/v1/orders"
+              traceId: "abc-123-xyz"
+              timestamp: "2024-01-01T14:32:00Z"
+              errors:
+                - field: "bill_id"
+                  message: "The bill is not in OPEN status."
+                  code: "BILL_NOT_OPEN"
+
+by-id:
+  parameters:
+    - name: id
+      in: path
+      required: true
+      schema:
+        type: string
+        example: "64f1a2b3c4d5e6f7a8b9c0d1"
+      description: MongoDB ObjectId of the order.
+
+  get:
+    tags:
+      - Orders
+    summary: Get an order by ID
+    description: >
+      Returns a single order by ID with its items embedded.
+      Accessible to ADMIN, CASHIER, WAITER, and KITCHEN.
+    operationId: getOrderById
+    responses:
+      "200":
+        description: Order retrieved successfully.
+        content:
+          application/json:
+            schema:
+              allOf:
+                - $ref: "../components/schemas/EnvelopeResponse.yaml"
+                - type: object
+                  properties:
+                    data:
+                      allOf:
+                        - $ref: "../components/schemas/Order.yaml"
+                        - type: object
+                          properties:
+                            items:
+                              type: array
+                              description: Order items included in this order.
+                              items:
+                                $ref: "../components/schemas/OrderItem.yaml"
+      "401":
+        $ref: "../components/responses/errors.yaml#/Unauthorized"
+      "403":
+        $ref: "../components/responses/errors.yaml#/Forbidden"
+      "404":
+        $ref: "../components/responses/errors.yaml#/NotFound"
+
+item-by-id:
+  parameters:
+    - name: id
+      in: path
+      required: true
+      schema:
+        type: string
+        example: "64f1a2b3c4d5e6f7a8b9c0d1"
+      description: MongoDB ObjectId of the order.
+    - name: item_id
+      in: path
+      required: true
+      schema:
+        type: string
+        example: "64f1a2b3c4d5e6f7a8b9c0d4"
+      description: MongoDB ObjectId of the order item.
+
+  patch:
+    tags:
+      - Orders
+    summary: Update an order item status
+    description: >
+      Updates the status of a single order item.
+      KITCHEN can mark items as COOKED.
+      ADMIN and CASHIER can mark items as CANCELLED with a required reason.
+      Cancelling a COOKED item requires a reason and creates an AuditLog entry.
+      When all items in an order are COOKED or CANCELLED,
+      the order status automatically transitions to COOKED.
+      When all items are CANCELLED, the order status transitions to CANCELLED.
+    operationId: updateOrderItem
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              status:
+                type: string
+                enum: [COOKED, CANCELLED]
+                description: >
+                  Target status for the order item.
+                  COOKED is set by KITCHEN. CANCELLED requires a reason.
+                example: "COOKED"
+              reason:
+                type: string
+                nullable: true
+                description: >
+                  Required when status is CANCELLED.
+                  Also required when cancelling an item already marked as COOKED.
+                  Recorded in AuditLog.
+                example: "Customer changed their mind."
+            required:
+              - status
+    responses:
+      "200":
+        description: Order item updated successfully.
+        content:
+          application/json:
+            schema:
+              allOf:
+                - $ref: "../components/schemas/EnvelopeResponse.yaml"
+                - type: object
+                  properties:
+                    data:
+                      allOf:
+                        - $ref: "../components/schemas/Order.yaml"
+                        - type: object
+                          properties:
+                            items:
+                              type: array
+                              description: All items in the order after the update.
+                              items:
+                                $ref: "../components/schemas/OrderItem.yaml"
+      "400":
+        description: >
+          Validation error. Occurs when reason is missing for a CANCELLED status
+          or when cancelling a COOKED item without a reason.
+        content:
+          application/problem+json:
+            schema:
+              $ref: "../components/schemas/ProblemDetail.yaml"
+            example:
+              type: "https://srms.example.com/errors/validation-error"
+              title: "Validation Error"
+              status: 400
+              detail: "A reason is required when cancelling an order item."
+              instance: "/v1/orders/64f1a2b3c4d5e6f7a8b9c0d1/items/64f1a2b3c4d5e6f7a8b9c0d4"
+              traceId: "abc-123-xyz"
+              timestamp: "2024-01-01T14:32:00Z"
+              errors:
+                - field: "reason"
+                  message: "Reason is required when cancelling an order item."
+                  code: "REASON_REQUIRED"
+      "401":
+        $ref: "../components/responses/errors.yaml#/Unauthorized"
+      "403":
+        $ref: "../components/responses/errors.yaml#/Forbidden"
+      "404":
+        $ref: "../components/responses/errors.yaml#/NotFound"
+      "409":
+        description: >
+          Conflict. Occurs when attempting to cancel an item
+          that is already COOKED without explicit confirmation.
+        content:
+          application/problem+json:
+            schema:
+              $ref: "../components/schemas/ProblemDetail.yaml"
+            example:
+              type: "https://srms.example.com/errors/conflict"
+              title: "Conflict"
+              status: 409
+              detail: "This item is already COOKED. Provide a reason to confirm cancellation."
+              instance: "/v1/orders/64f1a2b3c4d5e6f7a8b9c0d1/items/64f1a2b3c4d5e6f7a8b9c0d4"
+              traceId: "abc-123-xyz"
+              timestamp: "2024-01-01T14:32:00Z"
+              errors:
+                - field: "status"
+                  message: "Item is already COOKED. Cancellation requires a reason."
+                  code: "ITEM_ALREADY_COOKED"

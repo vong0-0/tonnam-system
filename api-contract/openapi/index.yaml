@@ -1,0 +1,268 @@
+openapi: 3.0.3
+
+info:
+  title: SRMS API
+  version: 1.0.0
+  description: >
+    REST API for the **Smart Restaurant Management System (SRMS)**.
+
+    SRMS consists of four subsystems:
+
+    - **POS System** (Cashier) — table management, bill creation, payment processing, daily summary
+    - **Waiter App** (Waiter) — order taking, sending orders to kitchen, receiving notifications
+    - **Kitchen System** (Kitchen) — view incoming orders, mark items as cooked, send WhatsApp notifications
+    - **Admin Backend** (Admin) — master data, order history, audit logs, analytics
+
+    All endpoints require Bearer JWT authentication except `POST /auth/login`.
+
+  license:
+    name: ISC
+  contact:
+    name: Vongsouvan Chanthasone
+    email: vongsouvan@gmail.com
+
+servers:
+  - url: http://localhost:3000
+    description: Development
+  - url: https://staging-api.srms.example.com
+    description: Staging
+  - url: https://api.srms.example.com
+    description: Production
+
+security:
+  - BearerAuth: []
+
+tags:
+  - name: Auth
+    description: >
+      Handles authentication flows including login with username and password, 
+      access token refresh, logout, and issuing short-lived WebSocket tickets
+      for real-time connections.
+  - name: Users
+    description: >
+      Manages staff accounts across all roles (Admin, Waiter, Kitchen, Cashier).
+      Admin-only. Supports creating, updating, deactivating accounts,
+      and searching by name, username, phone, or email.
+  - name: Tables
+    description: >
+      Manages restaurant tables including regular and temporary extension tables.
+      Covers status transitions (Available, Reserved, Occupied, Partially Paid, Paid),
+      manual status updates, and moving tables between locations.
+  - name: TableMergeGroups
+    description: >
+      Manages table merge groups. Allows merging multiple tables or existing groups
+      into a single group, viewing group details with associated bills,
+      and unmerging groups back to individual tables with bill reassignment.
+  - name: Reservations
+    description: >
+      Manages advance table reservations made by phone.
+      Supports creating reservations with guest name, phone, party size, and time,
+      confirming arrivals, and cancelling no-shows.
+  - name: MenuCategories
+    description: >
+      Manages menu categories used to group menu items. 
+      Admin-only. Supports creating, updating, and deleting categories.
+      Categories cannot be deleted while menu items are assigned to them.
+  - name: MenuItems
+    description: >
+      Manages individual menu items including name, price, image, and category.
+      Admin-only for create, update, and delete.
+      Cashier can toggle availability and sold-out status,
+      which broadcasts real-time updates to POS and Waiter App.
+  - name: Bills
+    description: >
+      Manages the full bill lifecycle from creation to payment.
+      Supports multiple bills per table, bill splitting, editing order items,
+      cancellation with reason, and tracking partial and full payments.
+      Every edit requires a reason and is recorded in the audit log.
+  - name: Orders
+    description: >
+      Manages kitchen orders created by Waiter or Cashier.
+      Each order is immediately sent to the Kitchen upon creation.
+      Supports viewing orders by status, and cancelling individual order items
+      with a required reason logged to the audit trail.
+  - name: Payments
+    description: >
+      Processes bill payments supporting three methods:
+      Cash (with automatic change calculation),
+      QR PromptPay (Cashier-confirmed). and Mixed (cash and QR combined).
+      Mixed payments must cover the full bill amount in a single transaction.
+  - name: AuditLogs
+    description: >
+      Provides an immutable audit trail for all sensitive operations
+      including bill edits, cancellations, and order item changes.
+      Admin-only. Records actor, action, reason, and before/after state with timestamps for every entry.
+  - name: Analytics
+    description: >
+      Provides sales and menu performance analytics.
+      Available to Admin and Cashier.
+      Sales analytics include revenue summaries by period, period-over-period comparison,
+      revenue breakdown by category, and peak hour data.
+      Menu analytics include best sellers, dead menu detection, and menu mix analysis.
+
+components:
+  securitySchemes:
+    BearerAuth:
+      $ref: "./components/security/bearer.yaml"
+
+  parameters:
+    page:
+      $ref: "./components/parameters/common.yaml#/page"
+    limit:
+      $ref: "./components/parameters/common.yaml#/limit"
+    search:
+      $ref: "./components/parameters/common.yaml#/search"
+    date:
+      $ref: "./components/parameters/common.yaml#/date"
+    status:
+      $ref: "./components/parameters/common.yaml#/status"
+    period:
+      $ref: "./components/parameters/common.yaml#/period"
+
+  responses:
+    ValidationError:
+      $ref: "./components/responses/errors.yaml#/ValidationError"
+    Unauthorized:
+      $ref: "./components/responses/errors.yaml#/Unauthorized"
+    Forbidden:
+      $ref: "./components/responses/errors.yaml#/Forbidden"
+    NotFound:
+      $ref: "./components/responses/errors.yaml#/NotFound"
+    Conflict:
+      $ref: "./components/responses/errors.yaml#/Conflict"
+    RateLimitExceeded:
+      $ref: "./components/responses/errors.yaml#/RateLimitExceeded"
+    InternalServerError:
+      $ref: "./components/responses/errors.yaml#/InternalServerError"
+
+  schemas:
+    Pagination:
+      $ref: "./components/schemas/Pagination.yaml"
+    EnvelopeResponse:
+      $ref: "./components/schemas/EnvelopeResponse.yaml"
+    ProblemDetail:
+      $ref: "./components/schemas/ProblemDetail.yaml"
+    User:
+      $ref: "./components/schemas/User.yaml"
+    Table:
+      $ref: "./components/schemas/Table.yaml"
+    TableMergeGroup:
+      $ref: "./components/schemas/TableMergeGroup.yaml"
+    Reservation:
+      $ref: "./components/schemas/Reservation.yaml"
+    MenuCategory:
+      $ref: "./components/schemas/MenuCategory.yaml"
+    MenuItem:
+      $ref: "./components/schemas/MenuItem.yaml"
+    Bill:
+      $ref: "./components/schemas/Bill.yaml"
+    Order:
+      $ref: "./components/schemas/Order.yaml"
+    OrderItem:
+      $ref: "./components/schemas/OrderItem.yaml"
+    Payment:
+      $ref: "./components/schemas/Payment.yaml"
+    AuditLog:
+      $ref: "./components/schemas/AuditLog.yaml"
+
+paths:
+  # Auth
+  /auth/login:
+    $ref: './paths/auth.yaml#/login'
+  /auth/refresh:
+    $ref: './paths/auth.yaml#/refresh'
+  /auth/logout:
+    $ref: './paths/auth.yaml#/logout'
+  /auth/ws-ticket:
+    $ref: './paths/auth.yaml#/ws-ticket'
+
+  # Users
+  /users:
+    $ref: './paths/users.yaml#/list-create'
+  /users/{id}:
+    $ref: './paths/users.yaml#/by-id'
+
+  # Tables
+  /tables:
+    $ref: './paths/tables.yaml#/list-create'
+  /tables/{id}:
+    $ref: './paths/tables.yaml#/by-id'
+  /tables/{id}/move:
+    $ref: './paths/tables.yaml#/move'
+  /tables/{id}/status:
+    $ref: './paths/tables.yaml#/status'
+
+  # Table Merge Groups
+  /table-merge-groups:
+    $ref: './paths/table-merge-groups.yaml#/create'
+  /table-merge-groups/{id}:
+    $ref: './paths/table-merge-groups.yaml#/by-id'
+  /table-merge-groups/{id}/unmerge:
+    $ref: './paths/table-merge-groups.yaml#/unmerge'
+
+  # Reservations
+  /reservations:
+    $ref: './paths/reservations.yaml#/list-create'
+  /reservations/{id}:
+    $ref: './paths/reservations.yaml#/by-id'
+  /reservations/{id}/status:
+    $ref: './paths/reservations.yaml#/status'
+
+  # Menu Categories
+  /menu-categories:
+    $ref: './paths/menu-categories.yaml#/list-create'
+  /menu-categories/{id}:
+    $ref: './paths/menu-categories.yaml#/by-id'
+
+  # Menu Items
+  /menu-items:
+    $ref: './paths/menu-items.yaml#/list-create'
+  /menu-items/{id}:
+    $ref: './paths/menu-items.yaml#/by-id'
+  /menu-items/{id}/availability:
+    $ref: './paths/menu-items.yaml#/availability'
+
+  # Bills
+  /bills:
+    $ref: './paths/bills.yaml#/list-create'
+  /bills/{id}:
+    $ref: './paths/bills.yaml#/by-id'
+  /bills/{id}/status:
+    $ref: './paths/bills.yaml#/status'
+  /bills/{id}/split:
+    $ref: './paths/bills.yaml#/split'
+
+  # Orders
+  /orders:
+    $ref: './paths/orders.yaml#/list-create'
+  /orders/{id}:
+    $ref: './paths/orders.yaml#/by-id'
+  /orders/{id}/items/{item_id}:
+    $ref: './paths/orders.yaml#/item-by-id'
+
+  # Payments
+  /payments:
+    $ref: './paths/payments.yaml#/create'
+  /payments/{id}:
+    $ref: './paths/payments.yaml#/by-id'
+
+  # Audit Logs
+  /audit-logs:
+    $ref: './paths/audit-logs.yaml#/list'
+  /audit-logs/{id}:
+    $ref: './paths/audit-logs.yaml#/by-id'
+
+  # Analytics
+  /analytics/sales/summary:
+    $ref: './paths/analytics.yaml#/sales-summary'
+  /analytics/sales/comparison:
+    $ref: './paths/analytics.yaml#/sales-comparison'
+  /analytics/sales/by-category:
+    $ref: './paths/analytics.yaml#/sales-by-category'
+  /analytics/menu/best-sellers:
+    $ref: './paths/analytics.yaml#/menu-best-sellers'
+  /analytics/menu/dead-items:
+    $ref: './paths/analytics.yaml#/menu-dead-items'
+  /analytics/menu/mix:
+    $ref: './paths/analytics.yaml#/menu-mix'
+

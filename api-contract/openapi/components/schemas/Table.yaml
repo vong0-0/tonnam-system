@@ -1,0 +1,54 @@
+type: object
+description: A physical restaurant table. Status reflects current occupancy and billing state.
+properties:
+  id:
+    type: string
+    example: "64f1a2b3c4d5e6f7a8b9c0d1"
+  table_name:
+    type: string
+    description: Human-readable table identifier displayed to staff.
+    example: "T01"
+  capacity:
+    type: integer
+    description: Maximum number of guests the table can seat.
+    minimum: 1
+    example: 4
+  status:
+    type: string
+    enum: [AVAILABLE, RESERVED, OCCUPIED, PARTIALLY_PAID, PAID]
+    description: >
+      Lifecycle: AVAILABLE → RESERVED → OCCUPIED → PARTIALLY_PAID → PAID.
+      Returns to AVAILABLE after checkout is complete.
+  is_temporary:
+    type: boolean
+    description: Whether this is a temporary extension table.
+    default: false
+  merge_group_id:
+    type: string
+    nullable: true
+    description: ID of the TableMergeGroup this table belongs to, if any.
+    example: null
+  bill_ids:
+    type: array
+    nullable: true
+    description: IDs of bills associated with this table.
+    items:
+      type: string
+    example:
+      - "64f1a2b3c4d5e6f7a8b9c0d2"
+  created_at:
+    type: string
+    format: date-time
+    example: "2025-01-01T08:00:00Z"
+  updated_at:
+    type: string
+    format: date-time
+    example: "2025-05-20T12:00:00Z"
+required:
+  - id
+  - table_name
+  - capacity
+  - status
+  - is_temporary
+  - created_at
+  - updated_at

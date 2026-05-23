@@ -1,0 +1,434 @@
+create:
+  post:
+    tags:
+      - TableMergeGroups
+    summary: Merge tables into a group
+    description: >
+      Creates a new merge group from two or more tables.
+      Supports merging individual tables or existing merge groups together.
+      When merging groups, all tables from both groups are dissolved
+      into a single new group.
+      The merge_bills field controls whether existing bills are merged
+      into one combined bill or kept separate.
+      Minimum two tables required.
+      Returns 409 if any table is in RESERVED status.
+    operationId: createTableMergeGroup
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              table_ids:
+                type: array
+                minItems: 2
+                items:
+                  type: string
+                description: IDs of the tables (or tables within existing merge groups) to merge.
+                example:
+                  - "64f1a2b3c4d5e6f7a8b9c0d2"
+                  - "64f1a2b3c4d5e6f7a8b9c0d3"
+              merge_bills:
+                type: boolean
+                default: false
+                description: >
+                  When true, all existing bills from the selected tables are merged
+                  into one combined group bill.
+                  When false, existing bills are kept separate and new orders are
+                  assigned to a new group bill.
+            required:
+              - table_ids
+              - merge_bills
+    responses:
+      '201':
+        description: Merge group created successfully.
+        content:
+          application/json:
+            schema:
+              allOf:
+                - $ref: '../components/schemas/EnvelopeResponse.yaml'
+                - type: object
+                  properties:
+                    data:
+                      type: object
+                      properties:
+                        id:
+                          type: string
+                          description: ID of the newly created merge group.
+                          example: "64f1a2b3c4d5e6f7a8b9c0d1"
+                        merge_group_bill:
+                          type: object
+                          nullable: true
+                          description: >
+                            The combined bill when merge_bills was true.
+                            Null when merge_bills was false.
+                          properties:
+                            id:
+                              type: string
+                              example: "64f1a2b3c4d5e6f7a8b9c0e1"
+                            short_id:
+                              type: string
+                              example: "B-0010"
+                            name:
+                              type: string
+                              example: "บิลรวม T01+T02"
+                            status:
+                              type: string
+                              enum: [OPEN, PARTIALLY_PAID, PAID, CANCELLED]
+                              example: "OPEN"
+                            total_amount:
+                              type: number
+                              format: decimal
+                              example: 560.00
+                          required:
+                            - id
+                            - short_id
+                            - name
+                            - status
+                            - total_amount
+                        tables:
+                          type: array
+                          items:
+                            type: object
+                            properties:
+                              id:
+                                type: string
+                                example: "64f1a2b3c4d5e6f7a8b9c0d2"
+                              table_name:
+                                type: string
+                                example: "T01"
+                              status:
+                                type: string
+                                example: "OCCUPIED"
+                            required:
+                              - id
+                              - table_name
+                              - status
+                        created_by:
+                          type: string
+                          description: ID of the cashier or admin who created this merge group.
+                          example: "64f1a2b3c4d5e6f7a8b9c0d4"
+                        created_at:
+                          type: string
+                          format: date-time
+                          example: "2025-05-20T18:00:00Z"
+                      required:
+                        - id
+                        - merge_group_bill
+                        - tables
+                        - created_by
+                        - created_at
+      '400':
+        $ref: '../components/responses/errors.yaml#/ValidationError'
+      '401':
+        $ref: '../components/responses/errors.yaml#/Unauthorized'
+      '403':
+        $ref: '../components/responses/errors.yaml#/Forbidden'
+      '404':
+        description: One or more table IDs not found.
+        content:
+          application/problem+json:
+            schema:
+              $ref: '../components/schemas/ProblemDetail.yaml'
+            example:
+              type: "https://srms.example.com/errors/not-found"
+              title: "Not Found"
+              status: 404
+              detail: "One or more table IDs were not found."
+              instance: "/v1/table-merge-groups"
+              traceId: "abc-123-xyz"
+              timestamp: "2024-01-01T14:32:00Z"
+              errors:
+                - field: "table_ids"
+                  message: "Table with ID '64f1a2b3c4d5e6f7a8b9c0d9' not found."
+                  code: "TABLE_NOT_FOUND"
+      '409':
+        description: Conflict. One or more tables are in RESERVED status and cannot be merged.
+        content:
+          application/problem+json:
+            schema:
+              $ref: '../components/schemas/ProblemDetail.yaml'
+            example:
+              type: "https://srms.example.com/errors/conflict"
+              title: "Conflict"
+              status: 409
+              detail: "Cannot merge a table that is in RESERVED status."
+              instance: "/v1/table-merge-groups"
+              traceId: "abc-123-xyz"
+              timestamp: "2024-01-01T14:32:00Z"
+              errors:
+                - field: "table_ids"
+                  message: "Table T01 is RESERVED and cannot be merged."
+                  code: "INVALID_TABLE_STATUS"
+
+by-id:
+  parameters:
+    - name: id
+      in: path
+      required: true
+      schema:
+        type: string
+        example: "64f1a2b3c4d5e6f7a8b9c0d1"
+      description: MongoDB ObjectId of the merge group.
+
+  get:
+    tags:
+      - TableMergeGroups
+    summary: Get a merge group by ID
+    description: >
+      Returns a merge group by ID. Accessible to ADMIN, CASHIER, and WAITER.
+      Use the include query parameter to control whether bill details are embedded.
+    operationId: getTableMergeGroupById
+    parameters:
+      - name: include
+        in: query
+        required: false
+        schema:
+          type: string
+          enum: [bills, none]
+          default: bills
+        description: >
+          Controls detail level of the response.
+          bills (default) = embed full bill details including orders for each table
+          and merge_group_bill if present.
+          none = return table list only without bill details.
+    responses:
+      '200':
+        description: Merge group retrieved successfully.
+        content:
+          application/json:
+            schema:
+              allOf:
+                - $ref: '../components/schemas/EnvelopeResponse.yaml'
+                - type: object
+                  properties:
+                    data:
+                      type: object
+                      properties:
+                        id:
+                          type: string
+                          example: "64f1a2b3c4d5e6f7a8b9c0d1"
+                        merge_group_bill:
+                          type: object
+                          nullable: true
+                          description: >
+                            When include=bills: full bill object with orders array if a group bill exists.
+                            When include=none: null.
+                          properties:
+                            id:
+                              type: string
+                              example: "64f1a2b3c4d5e6f7a8b9c0e1"
+                            short_id:
+                              type: string
+                              example: "B-0010"
+                            name:
+                              type: string
+                              example: "บิลรวม T01+T02"
+                            status:
+                              type: string
+                              enum: [OPEN, PARTIALLY_PAID, PAID, CANCELLED]
+                              example: "OPEN"
+                            total_amount:
+                              type: number
+                              format: decimal
+                              example: 560.00
+                            orders:
+                              type: array
+                              description: Present when include=bills.
+                              items:
+                                $ref: '../components/schemas/Order.yaml'
+                          required:
+                            - id
+                            - short_id
+                            - name
+                            - status
+                            - total_amount
+                        tables:
+                          type: array
+                          items:
+                            type: object
+                            properties:
+                              id:
+                                type: string
+                                example: "64f1a2b3c4d5e6f7a8b9c0d2"
+                              table_name:
+                                type: string
+                                example: "T01"
+                              status:
+                                type: string
+                                example: "OCCUPIED"
+                              bills:
+                                type: array
+                                nullable: true
+                                description: >
+                                  Array of bill objects with orders when include=bills.
+                                  Null when include=none.
+                                items:
+                                  allOf:
+                                    - $ref: '../components/schemas/Bill.yaml'
+                                    - type: object
+                                      properties:
+                                        orders:
+                                          type: array
+                                          items:
+                                            $ref: '../components/schemas/Order.yaml'
+                            required:
+                              - id
+                              - table_name
+                              - status
+                        created_by:
+                          type: string
+                          example: "64f1a2b3c4d5e6f7a8b9c0d4"
+                        created_at:
+                          type: string
+                          format: date-time
+                          example: "2025-05-20T18:00:00Z"
+                      required:
+                        - id
+                        - merge_group_bill
+                        - tables
+                        - created_by
+                        - created_at
+      '401':
+        $ref: '../components/responses/errors.yaml#/Unauthorized'
+      '403':
+        $ref: '../components/responses/errors.yaml#/Forbidden'
+      '404':
+        $ref: '../components/responses/errors.yaml#/NotFound'
+
+unmerge:
+  parameters:
+    - name: id
+      in: path
+      required: true
+      schema:
+        type: string
+        example: "64f1a2b3c4d5e6f7a8b9c0d1"
+      description: MongoDB ObjectId of the merge group to dissolve.
+
+  post:
+    tags:
+      - TableMergeGroups
+    summary: Unmerge a table group
+    description: >
+      Dissolves the merge group and reassigns all bills to individual tables.
+      All bills (including PAID bills) must be assigned to a target table.
+      Bills cannot be auto-merged when assigned to the same table.
+      If the group was formed by merging two existing groups,
+      it splits back into the original groups.
+      Returns 400 if any pending bill is not assigned.
+      Returns 400 if any bill is assigned to a table outside the group.
+      Accessible to ADMIN and CASHIER.
+    operationId: unmergeTableGroup
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              bill_assignments:
+                type: array
+                description: >
+                  Each bill in the group must be explicitly assigned to a table.
+                  All bills (including PAID) must appear in this list.
+                items:
+                  type: object
+                  properties:
+                    bill_id:
+                      type: string
+                      description: ID of the bill to reassign.
+                      example: "64f1a2b3c4d5e6f7a8b9c0e1"
+                    table_id:
+                      type: string
+                      description: ID of the target table within the group.
+                      example: "64f1a2b3c4d5e6f7a8b9c0d2"
+                  required:
+                    - bill_id
+                    - table_id
+            required:
+              - bill_assignments
+    responses:
+      '200':
+        description: Merge group dissolved and bills reassigned successfully.
+        content:
+          application/json:
+            schema:
+              allOf:
+                - $ref: '../components/schemas/EnvelopeResponse.yaml'
+                - type: object
+                  properties:
+                    data:
+                      type: object
+                      properties:
+                        unmerged_tables:
+                          type: array
+                          items:
+                            type: object
+                            properties:
+                              id:
+                                type: string
+                                example: "64f1a2b3c4d5e6f7a8b9c0d2"
+                              table_name:
+                                type: string
+                                example: "T01"
+                              status:
+                                type: string
+                                example: "OCCUPIED"
+                              bill_ids:
+                                type: array
+                                items:
+                                  type: string
+                                example:
+                                  - "64f1a2b3c4d5e6f7a8b9c0e1"
+                            required:
+                              - id
+                              - table_name
+                              - status
+                              - bill_ids
+                      required:
+                        - unmerged_tables
+      '400':
+        description: >
+          Validation error. Occurs when bill_assignments is incomplete
+          or a bill is assigned to a table outside the group.
+        content:
+          application/problem+json:
+            schema:
+              $ref: '../components/schemas/ProblemDetail.yaml'
+            examples:
+              incomplete_assignments:
+                summary: One or more bills not assigned
+                value:
+                  type: "https://srms.example.com/errors/incomplete-bill-assignments"
+                  title: "Incomplete Bill Assignments"
+                  status: 400
+                  detail: "All bills in the group must be assigned to a table before unmerging."
+                  instance: "/v1/table-merge-groups/64f1a2b3c4d5e6f7a8b9c0d1/unmerge"
+                  traceId: "abc-123-xyz"
+                  timestamp: "2024-01-01T14:32:00Z"
+                  errors:
+                    - field: "bill_assignments"
+                      message: "Bill '64f1a2b3c4d5e6f7a8b9c0e2' has not been assigned to a table."
+                      code: "UNASSIGNED_BILL"
+              invalid_table:
+                summary: Bill assigned to a table outside the group
+                value:
+                  type: "https://srms.example.com/errors/invalid-bill-assignment"
+                  title: "Invalid Bill Assignment"
+                  status: 400
+                  detail: "Bill cannot be assigned to a table that is not part of this merge group."
+                  instance: "/v1/table-merge-groups/64f1a2b3c4d5e6f7a8b9c0d1/unmerge"
+                  traceId: "abc-123-xyz"
+                  timestamp: "2024-01-01T14:32:00Z"
+                  errors:
+                    - field: "bill_assignments[0].table_id"
+                      message: "Table '64f1a2b3c4d5e6f7a8b9c0d9' is not part of this merge group."
+                      code: "TABLE_NOT_IN_GROUP"
+      '401':
+        $ref: '../components/responses/errors.yaml#/Unauthorized'
+      '403':
+        $ref: '../components/responses/errors.yaml#/Forbidden'
+      '404':
+        $ref: '../components/responses/errors.yaml#/NotFound'

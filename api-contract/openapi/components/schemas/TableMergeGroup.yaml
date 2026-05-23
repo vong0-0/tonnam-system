@@ -1,0 +1,31 @@
+type: object
+description: >
+  Represents a set of physical tables merged into a single logical unit.
+  A merged group allows one Bill to span multiple tables.
+  Minimum two tables required to form a group.
+properties:
+  id:
+    type: string
+    example: "64f1a2b3c4d5e6f7a8b9c0d1"
+  table_ids:
+    type: array
+    description: IDs of all tables belonging to this merge group.
+    minItems: 2
+    items:
+      type: string
+    example:
+      - "64f1a2b3c4d5e6f7a8b9c0d2"
+      - "64f1a2b3c4d5e6f7a8b9c0d3"
+  created_by:
+    type: string
+    description: ID of the cashier or admin who created this merge group.
+    example: "64f1a2b3c4d5e6f7a8b9c0d4"
+  created_at:
+    type: string
+    format: date-time
+    example: "2025-05-20T18:00:00Z"
+required:
+  - id
+  - table_ids
+  - created_by
+  - created_at

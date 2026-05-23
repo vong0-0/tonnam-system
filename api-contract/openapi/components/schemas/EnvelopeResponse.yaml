@@ -1,0 +1,25 @@
+type: object
+description: Standard response envelope wrapping all successful API responses.
+properties:
+  success:
+    type: boolean
+    description: Whether the request was successful.
+    example: true
+  message:
+    type: string
+    description: Human-readable status message.
+    example: "OK"
+  data:
+    description: Response payload. Type varies per endpoint.
+  pagination:
+    $ref: './Pagination.yaml'
+  timestamp:
+    type: string
+    format: date-time
+    description: Time the response was generated.
+    example: "2024-01-01T14:32:00Z"
+required:
+  - success
+  - message
+  - data
+  - timestamp
