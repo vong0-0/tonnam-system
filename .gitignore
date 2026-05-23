@@ -75,3 +75,6 @@ wheels/
 *.lock
 .turbo/
 .next/
+
+# Local assets
+tonnam favicons
