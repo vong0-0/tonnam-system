@@ -30,10 +30,11 @@ properties:
     example: "A"
   status:
     type: string
-    enum: [OPEN, PARTIALLY_PAID, PAID, CANCELLED]
+    enum: [OPEN, PAID, CANCELLED]
     description: >
-      Lifecycle: OPEN → PARTIALLY_PAID → PAID.
-      CANCELLED requires a reason and creates an AuditLog entry.
+      Lifecycle: OPEN → PAID or OPEN → CANCELLED.
+      A bill must be paid in full in a single transaction.
+      Partial payments are not allowed (BR-P02).
   total_amount:
     type: number
     format: decimal

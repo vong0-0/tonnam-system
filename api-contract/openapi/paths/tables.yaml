@@ -14,7 +14,7 @@ list-create:
         required: false
         schema:
           type: string
-          enum: [AVAILABLE, RESERVED, OCCUPIED, PARTIALLY_PAID, PAID]
+          enum: [AVAILABLE, RESERVED, OCCUPIED, PAID]
         description: Filter by table status.
       - name: is_temporary
         in: query
@@ -358,9 +358,9 @@ status:
       - PAID → AVAILABLE (clears all bill_ids from the table)
 
       All other status transitions are handled automatically by the system.
-      RESERVED, PARTIALLY_PAID, and PAID are intentionally excluded from the manual
+      RESERVED and PAID are intentionally excluded from the manual
       transition enum — RESERVED is managed by the Reservation system,
-      and PARTIALLY_PAID and PAID are managed by the Payment system.
+      and PAID is managed by the Payment system.
       Manual override for these statuses is out of scope by design.
       Returns 400 with problem type `invalid-status-transition` on disallowed transitions.
       Returns 409 when trying to set AVAILABLE but the table has pending bills.

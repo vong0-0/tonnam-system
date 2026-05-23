@@ -5,20 +5,20 @@ create:
     summary: Process a payment
     description: >
       Creates a payment transaction for a bill.
-      
+
       Supports three methods: CASH, QR_PROMPTPAY, and MIXED.
-      A bill may receive multiple partial payments until fully paid.
       MIXED method must cover the full bill amount in a single transaction.
       For CASH: cashAmount is required, change_amount is auto-calculated.
       For QR_PROMPTPAY: qr_amount is required.
       For MIXED: both cash.amount and qr_promptpay.amount are required
-      and must together equal the remaining bill amount.
-      
+      and must together equal the bill total_amount.
+
       Bill status auto-transitions:
-        - OPEN → PARTIALLY_PAID (when partial payment received)
-        - PARTIALLY_PAID → PAID (when remaining amount covered)
-        - OPEN → PAID (when full amount paid in one transaction)
-        
+        - OPEN → PAID (bill is fully paid in a single transaction)
+
+      BR-P02: Payment amount must equal the bill total_amount.
+      Partial payments are not allowed.
+
       Returns 404 if bill_id not found.
       Returns 409 if bill is already PAID or CANCELLED.
     operationId: createPayment
@@ -42,7 +42,9 @@ create:
                 type: number
                 format: decimal
                 minimum: 0.01
-                description: Total amount of this payment transaction.
+                description: >
+                  Must equal the bill's total_amount.
+                  Partial payments are not allowed (BR-P02).
                 example: 560.00
               cash:
                 type: object
@@ -116,20 +118,20 @@ create:
                     - field: "cash"
                       message: "cash is required when method is CASH or MIXED."
                       code: "REQUIRED_FIELD"
-              mixed_amount_mismatch:
-                summary: MIXED payment amounts do not cover remaining bill amount
+              amount_mismatch:
+                summary: Payment amount does not equal bill total
                 value:
                   type: "https://srms.example.com/errors/validation-error"
                   title: "Validation Error"
                   status: 400
-                  detail: "MIXED payment must cover the full remaining bill amount."
+                  detail: "Payment amount must equal the bill total amount."
                   instance: "/v1/payments"
                   traceId: "abc-123-xyz"
                   timestamp: "2024-01-01T14:32:00Z"
                   errors:
                     - field: "amount"
-                      message: "Cash and QR amounts must together equal the remaining bill amount."
-                      code: "MIXED_AMOUNT_MISMATCH"
+                      message: "Payment amount must equal the bill total_amount. Partial payments are not allowed."
+                      code: "PARTIAL_PAYMENT_NOT_ALLOWED"
       "401":
         $ref: "../components/responses/errors.yaml#/Unauthorized"
       "403":

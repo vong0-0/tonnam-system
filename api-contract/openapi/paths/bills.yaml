@@ -20,7 +20,7 @@ list-create:
         required: false
         schema:
           type: string
-          enum: [OPEN, PARTIALLY_PAID, PAID, CANCELLED]
+          enum: [OPEN, PAID, CANCELLED]
         description: Filter by bill status.
     responses:
       "200":
@@ -284,7 +284,7 @@ status:
     description: >
       Manually cancel a bill. Accessible to ADMIN and CASHIER.
       Only OPEN bills can be cancelled manually.
-      PARTIALLY_PAID and PAID transitions are handled automatically by the Payment system.
+      PAID transitions are handled automatically by the Payment system.
       Cancelling a bill sets all PENDING order items to CANCELLED.
       COOKED order items remain COOKED.
       Requires a reason field. Creates an AuditLog entry automatically.

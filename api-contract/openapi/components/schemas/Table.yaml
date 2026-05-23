@@ -15,9 +15,9 @@ properties:
     example: 4
   status:
     type: string
-    enum: [AVAILABLE, RESERVED, OCCUPIED, PARTIALLY_PAID, PAID]
+    enum: [AVAILABLE, RESERVED, OCCUPIED, PAID]
     description: >
-      Lifecycle: AVAILABLE → RESERVED → OCCUPIED → PARTIALLY_PAID → PAID.
+      Lifecycle: AVAILABLE → RESERVED → OCCUPIED → PAID.
       Returns to AVAILABLE after checkout is complete.
   is_temporary:
     type: boolean

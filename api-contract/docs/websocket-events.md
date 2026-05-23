@@ -340,7 +340,7 @@ All event messages share a common envelope:
 
 | Field | Value |
 |---|---|
-| **Trigger** | A bill's status changes (OPEN → PARTIALLY_PAID, PARTIALLY_PAID → PAID, OPEN → CANCELLED) |
+| **Trigger** | A bill's status changes (OPEN → PAID, OPEN → CANCELLED) |
 | **Channels** | `bill:{bill_id}`, `table:{table_id}` |
 | **Subscribers** | ADMIN, CASHIER, WAITER |
 
@@ -352,7 +352,7 @@ All event messages share a common envelope:
     "bill_id": "64f1a2b3c4d5e6f7a8b9c0e1",
     "short_id": "B-0042",
     "table_id": "64f1a2b3c4d5e6f7a8b9c0d1",
-    "status": "PARTIALLY_PAID",
+    "status": "PAID",
     "previous_status": "OPEN"
   },
   "timestamp": "2025-05-20T20:10:00Z"
