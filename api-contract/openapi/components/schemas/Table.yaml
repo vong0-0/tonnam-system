@@ -18,7 +18,10 @@ properties:
     enum: [AVAILABLE, RESERVED, OCCUPIED, PAID]
     description: >
       Lifecycle: AVAILABLE → RESERVED → OCCUPIED → PAID.
-      Returns to AVAILABLE after checkout is complete.
+      Special case: PAID → OCCUPIED when a new bill
+      is opened on the table while customers remain seated.
+      Table returns to AVAILABLE only when Cashier
+      manually clears the table.
   is_temporary:
     type: boolean
     description: Whether this is a temporary extension table.

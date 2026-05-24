@@ -49,11 +49,16 @@ list-create:
     summary: Create a new bill
     description: >
       Creates a new bill for a table. Accessible to ADMIN and CASHIER.
-      The table must be in OCCUPIED status.
+      The table must be in OCCUPIED or PAID status.
+      When creating a new bill on a PAID table,
+      the table status automatically transitions
+      back to OCCUPIED because there is now
+      an OPEN bill on the table.
+      Table returns to PAID only when all bills are paid.
       short_id is auto-generated in format B-XXXX.
       name defaults to "บิล" + table_name if not provided.
       Returns 404 if table_id does not exist.
-      Returns 409 if the table is not OCCUPIED.
+      Returns 409 if the table is not OCCUPIED or PAID.
     operationId: createBill
     requestBody:
       required: true
@@ -73,7 +78,14 @@ list-create:
               - table_id
     responses:
       "201":
-        description: Bill created successfully.
+        description: >
+          Bill created successfully.
+          On success:
+          - New bill created with status OPEN
+          - If table was PAID, table status transitions
+            to OCCUPIED automatically
+          - WebSocket event table:status_updated broadcast
+            to all subscribers
         content:
           application/json:
             schema:
