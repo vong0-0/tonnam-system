@@ -1,34 +1,35 @@
 {
   "compilerOptions": {
     // File layout
-    "rootDir": "./src",
+    // "rootDir": "./src",
     "outDir": "./dist",
     "paths": {
-      "@/*": ["./src/*"]
+      "@/*": [
+        "./src/*"
+      ]
     },
-
     // Environment
     "module": "nodenext",
     "moduleResolution": "nodenext",
     "target": "es2022",
-    "lib": ["es2022"],
-    "types": ["node"],
-
+    "lib": [
+      "es2022"
+    ],
+    "types": [
+      "node"
+    ],
     // Output
     "sourceMap": true,
-
     // Strict typechecking
     "strict": true,
     "noUncheckedIndexedAccess": true,
     "exactOptionalPropertyTypes": true,
-
     // Style
     "noImplicitReturns": true,
     "noImplicitOverride": true,
     "noUnusedLocals": true,
     "noUnusedParameters": true,
     "noFallthroughCasesInSwitch": true,
-
     // Module interop
     "esModuleInterop": true,
     "verbatimModuleSyntax": true,
@@ -37,6 +38,12 @@
     "forceConsistentCasingInFileNames": true,
     "skipLibCheck": true
   },
-  "include": ["src/**/*", "tests/**/*"],
-  "exclude": ["node_modules", "dist"]
+  "include": [
+    "src/**/*",
+    "tests/**/*"
+  ],
+  "exclude": [
+    "node_modules",
+    "dist"
+  ]
 }
