@@ -33,7 +33,6 @@
     "esModuleInterop": true,
     "verbatimModuleSyntax": true,
     "isolatedModules": true,
-    "noUncheckedSideEffectImports": true,
     "moduleDetection": "force",
     "forceConsistentCasingInFileNames": true,
     "skipLibCheck": true
