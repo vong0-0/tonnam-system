@@ -1,13 +1,13 @@
 import type { NextFunction, Request, Response } from 'express'
 import jwt from 'jsonwebtoken'
 import type { AuthRequest, UserPayload } from '@/types/common.types.js'
-import { Role } from '@/types/user.types.js'
+import { ROLES } from '@/types/user.types.js'
 import { PROBLEM_CONTENT_TYPE, problem } from '@/utils/problem.js'
 
 function isUserPayload(value: unknown): value is UserPayload {
   if (typeof value !== 'object' || value === null) return false
   const obj = value as Record<string, unknown>
-  const roleValues = Object.values(Role) as string[]
+  const roleValues = Object.values(ROLES) as string[]
   return (
     typeof obj['userId'] === 'string' &&
     typeof obj['name'] === 'string' &&
