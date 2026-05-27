@@ -22,6 +22,26 @@ list-create:
           type: string
           enum: [OPEN, PAID, CANCELLED]
         description: Filter by bill status.
+      - name: date_from
+        in: query
+        required: false
+        schema:
+          type: string
+          format: date
+          example: "2025-05-01"
+        description: >
+          Filter bills created on or after this date (inclusive).
+          Format: YYYY-MM-DD
+      - name: date_to
+        in: query
+        required: false
+        schema:
+          type: string
+          format: date
+          example: "2025-05-20"
+        description: >
+          Filter bills created on or before this date (inclusive).
+          Format: YYYY-MM-DD
     responses:
       "200":
         description: Bills retrieved successfully.
