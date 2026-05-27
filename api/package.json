@@ -5,7 +5,7 @@
   "main": "dist/index.js",
   "type": "module",
   "scripts": {
-    "dev": "nodemon --exec tsx src/index.ts --ext ts",
+    "dev": "cross-env NODE_ENV=development nodemon --exec \"tsx --env-file=.env.development src/index.ts\" --ext ts",
     "build": "tsc && tsc-alias",
     "test": "jest",
     "test:watch": "jest --watch",
@@ -21,6 +21,7 @@
     "@tsconfig/node22": "^22.0.5",
     "@types/express": "^5.0.6",
     "@types/node": "^25.9.1",
+    "cross-env": "^10.1.0",
     "nodemon": "^3.1.9",
     "tsc-alias": "^1.8.16",
     "tsx": "^4.19.4",
