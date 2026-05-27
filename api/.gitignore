@@ -6,6 +6,9 @@ dist/
 
 # Environment — only .env.example should be committed
 .env
+.env.development
+.env.production
+.env.staging
 .env.local
 .env.*.local
 
