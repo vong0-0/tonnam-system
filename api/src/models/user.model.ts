@@ -1,5 +1,5 @@
 import { Schema, model, type Document } from 'mongoose'
-import { type Role, ROLES } from '../types/index.js'
+import { type Role, ROLES } from '@/types/index.js'
 
 export interface IUser extends Document {
   username: string

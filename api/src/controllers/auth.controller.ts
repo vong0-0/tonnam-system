@@ -1,8 +1,8 @@
 import type { NextFunction, Request, Response } from 'express'
-import * as authService from '../services/auth.service.js'
-import { type AuthRequest } from '../types/index.js'
-import { PROBLEM_CONTENT_TYPE, problem } from '../utils/problem.js'
-import { success } from '../utils/response.js'
+import * as authService from '@/services/auth.service.js'
+import { type AuthRequest } from '@/types/index.js'
+import { PROBLEM_CONTENT_TYPE, problem } from '@/utils/problem.js'
+import { success } from '@/utils/response.js'
 
 function asAuth(req: Request): AuthRequest {
   return req as AuthRequest

@@ -1,9 +1,10 @@
 import { randomUUID } from 'node:crypto'
 import bcrypt from 'bcrypt'
 import jwt, { type JwtPayload as LibJwtPayload } from 'jsonwebtoken'
-import { UserModel } from '../models/user.model.js'
-import { type JwtPayload, type WsTicketPayload, type Role } from '../types/index.js'
-import logger from '../utils/logger.js'
+import { UserModel } from '@/models/user.model.js'
+import { type JwtPayload, type WsTicketPayload, type Role } from '@/types/index.js'
+import { createHttpError } from '@/utils/errors.js'
+import logger from '@/utils/logger.js'
 
 interface TicketEntry {
   userId: string
@@ -15,10 +16,6 @@ interface TicketEntry {
 type TokenPair = { accessToken: string; refreshToken: string }
 
 export const ticketStore = new Map<string, TicketEntry>()
-
-function createHttpError(status: number, message: string): Error {
-  return Object.assign(new Error(message), { status })
-}
 
 function requireEnv(key: string): string {
   const value = process.env[key]
