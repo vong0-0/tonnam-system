@@ -2,7 +2,7 @@ import { randomUUID } from 'node:crypto'
 
 export const PROBLEM_CONTENT_TYPE = 'application/problem+json'
 
-const BASE_TYPE_URI = 'https://srms.example.com/errors/'
+const BASE_TYPE_URI = `${process.env['API_BASE_URL'] ?? 'http://localhost:3000'}/errors/`
 
 export interface FieldError {
   field: string

@@ -4,6 +4,6 @@ import logger from '@/utils/logger.js'
 const PORT = Number(process.env['PORT'] ?? 3000)
 
 app.listen(PORT, () => {
-  logger.info(`Server running at http://localhost:${PORT}`)
+  logger.info(`Server listening on port ${PORT}`)
 })
 
