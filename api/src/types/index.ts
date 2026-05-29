@@ -1,3 +1,5 @@
 export type * from '@/types/common.types.js'
 export type * from '@/types/auth.types.js'
 export * from '@/types/user.types.js'
+export * from '@/types/table.types.js'
+export * from '@/types/reservation.types.js'
