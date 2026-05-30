@@ -1,10 +1,10 @@
-import type { NextFunction, Response } from 'express'
+import type { NextFunction, Request, Response } from 'express'
 import * as reservationService from '@/services/reservation.service.js'
 import { type AuthRequest } from '@/types/index.js'
 import { success } from '@/utils/response.js'
 
 export async function listReservations(
-  req: AuthRequest,
+  req: Request,
   res: Response,
   next: NextFunction,
 ): Promise<void> {
@@ -31,7 +31,7 @@ export async function listReservations(
 }
 
 export async function getReservationById(
-  req: AuthRequest,
+  req: Request,
   res: Response,
   next: NextFunction,
 ): Promise<void> {
@@ -44,12 +44,13 @@ export async function getReservationById(
 }
 
 export async function createReservation(
-  req: AuthRequest,
+  req: Request,
   res: Response,
   next: NextFunction,
 ): Promise<void> {
   try {
-    const reservation = await reservationService.createReservation(req.body, req.user.userId)
+    const { user } = req as AuthRequest
+    const reservation = await reservationService.createReservation(req.body, user.userId)
     res.status(201).json(success(reservation, 'Reservation created'))
   } catch (err) {
     next(err)
@@ -57,7 +58,7 @@ export async function createReservation(
 }
 
 export async function updateReservation(
-  req: AuthRequest,
+  req: Request,
   res: Response,
   next: NextFunction,
 ): Promise<void> {
@@ -73,15 +74,16 @@ export async function updateReservation(
 }
 
 export async function updateReservationStatus(
-  req: AuthRequest,
+  req: Request,
   res: Response,
   next: NextFunction,
 ): Promise<void> {
   try {
+    const { user } = req as AuthRequest
     const reservation = await reservationService.updateReservationStatus(
       req.params['id'] as string,
       req.body,
-      req.user.role,
+      user.role,
     )
     res.json(success(reservation, 'Reservation status updated'))
   } catch (err) {
@@ -90,7 +92,7 @@ export async function updateReservationStatus(
 }
 
 export async function deleteReservation(
-  req: AuthRequest,
+  req: Request,
   res: Response,
   next: NextFunction,
 ): Promise<void> {
