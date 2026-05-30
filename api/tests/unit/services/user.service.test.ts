@@ -201,7 +201,7 @@ describe('getUserById()', () => {
 
     await expect(getUserById('invalid-id')).rejects.toMatchObject({
       status: 400,
-      message: 'Invalid user ID format',
+      detail: 'Invalid user ID format.',
     })
     expect(mockFindById).not.toHaveBeenCalled()
   })
@@ -213,7 +213,7 @@ describe('getUserById()', () => {
 
     await expect(getUserById('64f1a2b3c4d5e6f7a8b9c0d1')).rejects.toMatchObject({
       status: 404,
-      message: 'User not found',
+      detail: 'User not found.',
     })
   })
 })
@@ -250,7 +250,7 @@ describe('createUser()', () => {
 
     await expect(createUser(createInput)).rejects.toMatchObject({
       status: 409,
-      message: 'Username already taken',
+      detail: 'Username already taken.',
     })
     expect(mockHash).not.toHaveBeenCalled()
   })
@@ -260,7 +260,7 @@ describe('createUser()', () => {
 
     await expect(createUser(createInput)).rejects.toMatchObject({
       status: 409,
-      message: 'Phone number already registered',
+      detail: 'Phone number already registered.',
     })
   })
 
@@ -272,7 +272,7 @@ describe('createUser()', () => {
 
     await expect(createUser(createInput)).rejects.toMatchObject({
       status: 409,
-      message: 'Email already registered',
+      detail: 'Email already registered.',
     })
   })
 })
@@ -306,7 +306,7 @@ describe('updateUser()', () => {
 
     await expect(updateUser(userId, { phone: '0899999999' })).rejects.toMatchObject({
       status: 409,
-      message: 'Phone number already registered',
+      detail: 'Phone number already registered.',
     })
   })
 
@@ -316,7 +316,7 @@ describe('updateUser()', () => {
 
     await expect(updateUser(userId, { first_name: 'Mali' })).rejects.toMatchObject({
       status: 404,
-      message: 'User not found',
+      detail: 'User not found.',
     })
   })
 })
@@ -348,7 +348,7 @@ describe('deactivateUser()', () => {
 
     await expect(deactivateUser(userId)).rejects.toMatchObject({
       status: 409,
-      message: 'User is already deactivated',
+      detail: 'User is already deactivated.',
     })
   })
 
@@ -358,7 +358,7 @@ describe('deactivateUser()', () => {
 
     await expect(deactivateUser(userId)).rejects.toMatchObject({
       status: 404,
-      message: 'User not found',
+      detail: 'User not found.',
     })
   })
 })

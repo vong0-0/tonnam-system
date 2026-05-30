@@ -3,8 +3,8 @@ import mongoose from 'mongoose'
 import { type IUser, UserModel } from '@/models/user.model.js'
 import { type CreateUserInput, type UpdateUserInput } from '@/schemas/user.schema.js'
 import { type Pagination, type Role } from '@/types/index.js'
-import { createHttpError } from '@/utils/errors.js'
 import logger from '@/utils/logger.js'
+import { problem } from '@/utils/problem.js'
 
 interface ListUsersParams {
   page: number
@@ -47,25 +47,63 @@ export async function listUsers(
 
 export async function getUserById(id: string): Promise<IUser> {
   if (!mongoose.Types.ObjectId.isValid(id)) {
-    throw createHttpError(400, 'Invalid user ID format')
+    throw problem({
+      type: 'validation-error',
+      title: 'Validation Error',
+      status: 400,
+      detail: 'Invalid user ID format.',
+      instance: `/v1/users/${id}`,
+    })
   }
 
   const user = (await UserModel.findById(id).lean()) as IUser | null
-  if (!user) throw createHttpError(404, 'User not found')
+  if (!user) {
+    throw problem({
+      type: 'not-found',
+      title: 'Not Found',
+      status: 404,
+      detail: 'User not found.',
+      instance: `/v1/users/${id}`,
+    })
+  }
 
   return user
 }
 
 export async function createUser(input: CreateUserInput): Promise<IUser> {
   const existingUsername = await UserModel.findOne({ username: input.username })
-  if (existingUsername) throw createHttpError(409, 'Username already taken')
+  if (existingUsername) {
+    throw problem({
+      type: 'conflict',
+      title: 'Conflict',
+      status: 409,
+      detail: 'Username already taken.',
+      instance: '/v1/users',
+    })
+  }
 
   const existingPhone = await UserModel.findOne({ phone: input.phone })
-  if (existingPhone) throw createHttpError(409, 'Phone number already registered')
+  if (existingPhone) {
+    throw problem({
+      type: 'conflict',
+      title: 'Conflict',
+      status: 409,
+      detail: 'Phone number already registered.',
+      instance: '/v1/users',
+    })
+  }
 
   if (input.email !== undefined) {
     const existingEmail = await UserModel.findOne({ email: input.email })
-    if (existingEmail) throw createHttpError(409, 'Email already registered')
+    if (existingEmail) {
+      throw problem({
+        type: 'conflict',
+        title: 'Conflict',
+        status: 409,
+        detail: 'Email already registered.',
+        instance: '/v1/users',
+      })
+    }
   }
 
   const hashedPassword = await bcrypt.hash(input.password, 10)
@@ -85,40 +123,108 @@ export async function createUser(input: CreateUserInput): Promise<IUser> {
 
 export async function updateUser(id: string, input: UpdateUserInput): Promise<IUser> {
   if (!mongoose.Types.ObjectId.isValid(id)) {
-    throw createHttpError(400, 'Invalid user ID format')
+    throw problem({
+      type: 'validation-error',
+      title: 'Validation Error',
+      status: 400,
+      detail: 'Invalid user ID format.',
+      instance: `/v1/users/${id}`,
+    })
   }
 
   const existing = await UserModel.findById(id)
-  if (!existing) throw createHttpError(404, 'User not found')
+  if (!existing) {
+    throw problem({
+      type: 'not-found',
+      title: 'Not Found',
+      status: 404,
+      detail: 'User not found.',
+      instance: `/v1/users/${id}`,
+    })
+  }
 
   if (input.phone !== undefined) {
     const dup = await UserModel.findOne({ phone: input.phone, _id: { $ne: id } })
-    if (dup) throw createHttpError(409, 'Phone number already registered')
+    if (dup) {
+      throw problem({
+        type: 'conflict',
+        title: 'Conflict',
+        status: 409,
+        detail: 'Phone number already registered.',
+        instance: `/v1/users/${id}`,
+      })
+    }
   }
 
   if (input.email !== undefined) {
     const dup = await UserModel.findOne({ email: input.email, _id: { $ne: id } })
-    if (dup) throw createHttpError(409, 'Email already registered')
+    if (dup) {
+      throw problem({
+        type: 'conflict',
+        title: 'Conflict',
+        status: 409,
+        detail: 'Email already registered.',
+        instance: `/v1/users/${id}`,
+      })
+    }
   }
 
   const updated = await UserModel.findByIdAndUpdate(id, input, { new: true, runValidators: true })
-  if (!updated) throw createHttpError(404, 'User not found')
+  if (!updated) {
+    throw problem({
+      type: 'not-found',
+      title: 'Not Found',
+      status: 404,
+      detail: 'User not found.',
+      instance: `/v1/users/${id}`,
+    })
+  }
 
   return updated
 }
 
 export async function deactivateUser(id: string): Promise<IUser> {
   if (!mongoose.Types.ObjectId.isValid(id)) {
-    throw createHttpError(400, 'Invalid user ID format')
+    throw problem({
+      type: 'validation-error',
+      title: 'Validation Error',
+      status: 400,
+      detail: 'Invalid user ID format.',
+      instance: `/v1/users/${id}`,
+    })
   }
 
   const user = await UserModel.findById(id)
-  if (!user) throw createHttpError(404, 'User not found')
+  if (!user) {
+    throw problem({
+      type: 'not-found',
+      title: 'Not Found',
+      status: 404,
+      detail: 'User not found.',
+      instance: `/v1/users/${id}`,
+    })
+  }
 
-  if (!user.is_active) throw createHttpError(409, 'User is already deactivated')
+  if (!user.is_active) {
+    throw problem({
+      type: 'conflict',
+      title: 'Conflict',
+      status: 409,
+      detail: 'User is already deactivated.',
+      instance: `/v1/users/${id}`,
+    })
+  }
 
   const updated = await UserModel.findByIdAndUpdate(id, { is_active: false }, { new: true })
-  if (!updated) throw createHttpError(404, 'User not found')
+  if (!updated) {
+    throw problem({
+      type: 'not-found',
+      title: 'Not Found',
+      status: 404,
+      detail: 'User not found.',
+      instance: `/v1/users/${id}`,
+    })
+  }
 
   return updated
 }

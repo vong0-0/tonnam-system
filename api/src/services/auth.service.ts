@@ -3,8 +3,8 @@ import bcrypt from 'bcrypt'
 import jwt, { type JwtPayload as LibJwtPayload } from 'jsonwebtoken'
 import { UserModel } from '@/models/user.model.js'
 import { type JwtPayload, type WsTicketPayload, type Role } from '@/types/index.js'
-import { createHttpError } from '@/utils/errors.js'
 import logger from '@/utils/logger.js'
+import { problem } from '@/utils/problem.js'
 
 interface TicketEntry {
   userId: string
@@ -38,13 +38,29 @@ function signRefreshToken(userId: string): string {
 }
 
 export async function login(username: string, password: string): Promise<TokenPair> {
-  const INVALID = 'Invalid username or password'
+  const INVALID = 'Invalid username or password.'
 
   const user = await UserModel.findOne({ username, is_active: true })
-  if (!user) throw createHttpError(401, INVALID)
+  if (!user) {
+    throw problem({
+      type: 'unauthorized',
+      title: 'Unauthorized',
+      status: 401,
+      detail: INVALID,
+      instance: '/v1/auth/login',
+    })
+  }
 
   const match = await bcrypt.compare(password, user.password)
-  if (!match) throw createHttpError(401, INVALID)
+  if (!match) {
+    throw problem({
+      type: 'unauthorized',
+      title: 'Unauthorized',
+      status: 401,
+      detail: INVALID,
+      instance: '/v1/auth/login',
+    })
+  }
 
   const userId = String(user._id)
   const name = `${user.first_name} ${user.last_name}`
@@ -62,16 +78,46 @@ export async function refreshAccessToken(refreshToken: string): Promise<TokenPai
   try {
     decoded = jwt.verify(refreshToken, requireEnv('JWT_REFRESH_SECRET'))
   } catch {
-    throw createHttpError(401, 'Invalid or expired refresh token')
+    throw problem({
+      type: 'unauthorized',
+      title: 'Unauthorized',
+      status: 401,
+      detail: 'Invalid or expired refresh token.',
+      instance: '/v1/auth/refresh',
+    })
   }
 
-  if (typeof decoded === 'string') throw createHttpError(401, 'Invalid or expired refresh token')
+  if (typeof decoded === 'string') {
+    throw problem({
+      type: 'unauthorized',
+      title: 'Unauthorized',
+      status: 401,
+      detail: 'Invalid or expired refresh token.',
+      instance: '/v1/auth/refresh',
+    })
+  }
 
   const userId = decoded['userId']
-  if (typeof userId !== 'string') throw createHttpError(401, 'Invalid or expired refresh token')
+  if (typeof userId !== 'string') {
+    throw problem({
+      type: 'unauthorized',
+      title: 'Unauthorized',
+      status: 401,
+      detail: 'Invalid or expired refresh token.',
+      instance: '/v1/auth/refresh',
+    })
+  }
 
   const user = await UserModel.findOne({ _id: userId, is_active: true })
-  if (!user) throw createHttpError(401, 'Invalid or expired refresh token')
+  if (!user) {
+    throw problem({
+      type: 'unauthorized',
+      title: 'Unauthorized',
+      status: 401,
+      detail: 'Invalid or expired refresh token.',
+      instance: '/v1/auth/refresh',
+    })
+  }
 
   const name = `${user.first_name} ${user.last_name}`
   const payload: JwtPayload = { userId, role: user.role, name }
