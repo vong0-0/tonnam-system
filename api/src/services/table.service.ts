@@ -5,7 +5,7 @@ import {
   type UpdateTableInput,
   type UpdateTableStatusInput,
 } from '@/schemas/table.schema.js'
-import { type Pagination, type TableStatus } from '@/types/index.js'
+import { type Pagination, type TableStatus, type Role } from '@/types/index.js'
 import logger from '@/utils/logger.js'
 import { problem } from '@/utils/problem.js'
 import { successList, type SuccessListResponse } from '@/utils/response.js'
@@ -144,10 +144,21 @@ export async function deleteTable(id: string): Promise<null> {
 export async function updateTableStatus(
   id: string,
   input: UpdateTableStatusInput,
+  role: Role,
 ): Promise<ITable> {
   const table = await getTableById(id)
   const currentStatus = table.status
   const targetStatus = input.status
+
+  if (role === 'WAITER' && !(currentStatus === 'PAID' && targetStatus === 'AVAILABLE')) {
+    throw problem({
+      type: 'forbidden',
+      title: 'Forbidden',
+      status: 403,
+      detail: 'Waiters can only transition table status from PAID to AVAILABLE.',
+      instance: `/v1/tables/${id}/status`,
+    })
+  }
 
   const allowed =
     (currentStatus === 'AVAILABLE' && targetStatus === 'OCCUPIED') ||

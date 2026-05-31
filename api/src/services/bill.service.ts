@@ -119,10 +119,13 @@ export async function createBill(input: CreateBillInput): Promise<IBill> {
     created_by: new mongoose.Types.ObjectId(input.created_by),
   })
 
+  table.bill_ids.push(bill._id)
+
   if (table.status === 'PAID') {
     table.status = 'OCCUPIED'
-    await table.save()
   }
+
+  await table.save()
 
   logger.info('Bill created', { billId: String(bill._id), shortId: short_id, tableId: input.table_id })
 

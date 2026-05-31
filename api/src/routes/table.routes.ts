@@ -16,7 +16,7 @@ router.post('/', authenticate, authorize(['ADMIN', 'CASHIER']), validate(createT
 router.get('/:id', authenticate, authorize(['ADMIN', 'CASHIER', 'WAITER']), tableController.getTableById)
 router.patch('/:id', authenticate, authorize(['ADMIN', 'CASHIER']), validate(updateTableSchema), tableController.updateTable)
 router.delete('/:id', authenticate, authorize(['ADMIN', 'CASHIER']), tableController.deleteTable)
-router.patch('/:id/status', authenticate, authorize(['ADMIN', 'CASHIER']), validate(updateTableStatusSchema), tableController.updateTableStatus)
+router.patch('/:id/status', authenticate, authorize(['ADMIN', 'CASHIER', 'WAITER']), validate(updateTableStatusSchema), tableController.updateTableStatus)
 router.post('/:id/move', authenticate, authorize(['ADMIN', 'CASHIER']), tableController.moveTable)
 
 export default router

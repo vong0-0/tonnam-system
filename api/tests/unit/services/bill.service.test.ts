@@ -200,7 +200,7 @@ describe('createBill()', () => {
   const input = { table_id: tableId, name: 'บิลโต๊ะ 5', created_by: userId }
 
   it('creates bill when table is OCCUPIED', async () => {
-    const tableDoc = { _id: tableId, table_name: 'โต๊ะ 5', status: 'OCCUPIED', save: jest.fn() }
+    const tableDoc = { _id: tableId, table_name: 'โต๊ะ 5', status: 'OCCUPIED', bill_ids: [], save: jest.fn() }
     mockTableFindById.mockResolvedValue(tableDoc)
     mockBillCreate.mockResolvedValue({
       _id: billId, short_id: 'B-0001', name: input.name, status: 'OPEN', total_amount: 0,
@@ -210,17 +210,19 @@ describe('createBill()', () => {
 
     expect(result.short_id).toBe('B-0001')
     expect(result.status).toBe('OPEN')
-    expect(tableDoc.save).not.toHaveBeenCalled()
+    expect(tableDoc.bill_ids).toContain(billId)
+    expect(tableDoc.save).toHaveBeenCalled()
   })
 
   it('sets table to OCCUPIED when table is PAID', async () => {
-    const tableDoc = { _id: tableId, table_name: 'โต๊ะ 5', status: 'PAID', save: jest.fn() }
+    const tableDoc = { _id: tableId, table_name: 'โต๊ะ 5', status: 'PAID', bill_ids: [], save: jest.fn() }
     mockTableFindById.mockResolvedValue(tableDoc)
     mockBillCreate.mockResolvedValue({ _id: billId, short_id: 'B-0001', status: 'OPEN', total_amount: 0 })
 
     await createBill(input)
 
     expect(tableDoc.status).toBe('OCCUPIED')
+    expect(tableDoc.bill_ids).toContain(billId)
     expect(tableDoc.save).toHaveBeenCalled()
   })
 

@@ -1,6 +1,6 @@
 import type { NextFunction, Request, Response } from 'express'
 import * as tableService from '@/services/table.service.js'
-import { type TableStatus } from '@/types/index.js'
+import { type AuthRequest, type TableStatus } from '@/types/index.js'
 import { success } from '@/utils/response.js'
 
 export async function listTables(req: Request, res: Response, next: NextFunction): Promise<void> {
@@ -72,7 +72,8 @@ export async function updateTableStatus(
   next: NextFunction,
 ): Promise<void> {
   try {
-    const table = await tableService.updateTableStatus(req.params['id'] as string, req.body)
+    const { user } = req as AuthRequest
+    const table = await tableService.updateTableStatus(req.params['id'] as string, req.body, user.role)
     res.json(success(table, 'Table status updated'))
   } catch (err) {
     next(err)
