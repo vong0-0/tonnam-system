@@ -3,7 +3,7 @@ import {
   createOrderController,
   getOrderByIdController,
   listOrdersController,
-  updateOrderItemStatusController,
+  updateOrderItemController,
 } from '@/controllers/order.controller.js'
 import { authenticate } from '@/middleware/authenticate.js'
 import { authorize } from '@/middleware/authorize.js'
@@ -15,6 +15,6 @@ const router = Router()
 router.post('/', authenticate, authorize(['ADMIN', 'CASHIER', 'WAITER']), validate(createOrderSchema), createOrderController)
 router.get('/', authenticate, authorize(['ADMIN', 'CASHIER', 'WAITER', 'KITCHEN']), listOrdersController)
 router.get('/:id', authenticate, authorize(['ADMIN', 'CASHIER', 'WAITER', 'KITCHEN']), getOrderByIdController)
-router.patch('/:id/items/:item_id', authenticate, authorize(['ADMIN', 'CASHIER', 'KITCHEN']), validate(updateOrderItemSchema), updateOrderItemStatusController)
+router.patch('/:id/items/:item_id', authenticate, authorize(['ADMIN', 'CASHIER', 'KITCHEN']), validate(updateOrderItemSchema), updateOrderItemController)
 
 export default router

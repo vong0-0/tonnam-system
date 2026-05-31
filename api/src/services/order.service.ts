@@ -53,6 +53,14 @@ interface UpdateOrderItemStatusInput {
   actor: ActorInput
 }
 
+interface UpdateOrderItemQuantityInput {
+  order_id: string
+  item_id: string
+  quantity: number
+  reason: string
+  actor: ActorInput
+}
+
 async function generateOrderShortId(): Promise<string> {
   const result = await mongoose.connection
     .collection<CounterDoc>('counters')
@@ -126,6 +134,16 @@ export async function createOrder(input: CreateOrderInput): Promise<OrderWithIte
           title: 'Conflict',
           status: 409,
           detail: `Menu item "${menuItem.name}" is not available.`,
+          instance: '/v1/orders',
+        })
+      }
+
+      if (menuItem.is_sold_out) {
+        throw problem({
+          type: 'MENU_ITEM_SOLD_OUT',
+          title: 'Conflict',
+          status: 409,
+          detail: `Menu item "${menuItem.name}" is sold out.`,
           instance: '/v1/orders',
         })
       }
@@ -268,16 +286,6 @@ export async function updateOrderItemStatus(
     })
   }
 
-  if (item.status === OrderItemStatus.CANCELLED) {
-    throw problem({
-      type: 'ORDER_ITEM_ALREADY_CANCELLED',
-      title: 'Conflict',
-      status: 409,
-      detail: 'Order item is already cancelled.',
-      instance: `/v1/orders/${input.order_id}/items/${input.item_id}`,
-    })
-  }
-
   if (input.status === OrderItemStatus.CANCELLED && !input.reason) {
     throw problem({
       type: 'validation-error',
@@ -328,6 +336,89 @@ export async function updateOrderItemStatus(
     orderId: input.order_id,
     itemId: input.item_id,
     status: input.status,
+  })
+
+  const updatedItems = (await OrderItemModel.find({ order_id: order._id }).lean()) as IOrderItem[]
+
+  return { order, items: updatedItems }
+}
+
+export async function updateOrderItemQuantity(
+  input: UpdateOrderItemQuantityInput,
+): Promise<OrderWithItems> {
+  if (!mongoose.Types.ObjectId.isValid(input.order_id)) {
+    throw problem({
+      type: 'not-found',
+      title: 'Not Found',
+      status: 404,
+      detail: 'Order not found.',
+      instance: `/v1/orders/${input.order_id}/items/${input.item_id}`,
+    })
+  }
+
+  const order = await OrderModel.findById(input.order_id)
+  if (!order) {
+    throw problem({
+      type: 'not-found',
+      title: 'Not Found',
+      status: 404,
+      detail: 'Order not found.',
+      instance: `/v1/orders/${input.order_id}/items/${input.item_id}`,
+    })
+  }
+
+  if (!mongoose.Types.ObjectId.isValid(input.item_id)) {
+    throw problem({
+      type: 'not-found',
+      title: 'Not Found',
+      status: 404,
+      detail: 'Order item not found.',
+      instance: `/v1/orders/${input.order_id}/items/${input.item_id}`,
+    })
+  }
+
+  const item = await OrderItemModel.findOne({ _id: input.item_id, order_id: input.order_id })
+  if (!item) {
+    throw problem({
+      type: 'not-found',
+      title: 'Not Found',
+      status: 404,
+      detail: 'Order item not found.',
+      instance: `/v1/orders/${input.order_id}/items/${input.item_id}`,
+    })
+  }
+
+  if (item.status === OrderItemStatus.CANCELLED) {
+    throw problem({
+      type: 'ORDER_ITEM_ALREADY_CANCELLED',
+      title: 'Conflict',
+      status: 409,
+      detail: 'Cannot update quantity of a cancelled order item.',
+      instance: `/v1/orders/${input.order_id}/items/${input.item_id}`,
+    })
+  }
+
+  const oldQuantity = item.quantity
+  item.quantity = input.quantity
+  item.quantity_change_reason = input.reason
+  await item.save()
+
+  await createAuditLog({
+    actor: input.actor,
+    action: 'UPDATE_ORDER_ITEM_QUANTITY',
+    entity_name: 'OrderItem',
+    entity_id: String(item._id),
+    reason: input.reason,
+    before_state: { quantity: oldQuantity },
+    after_state: { quantity: input.quantity },
+  })
+
+  await recalculateBillTotal(String(order.bill_id))
+
+  logger.info('Order item quantity updated', {
+    orderId: input.order_id,
+    itemId: input.item_id,
+    quantity: input.quantity,
   })
 
   const updatedItems = (await OrderItemModel.find({ order_id: order._id }).lean()) as IOrderItem[]

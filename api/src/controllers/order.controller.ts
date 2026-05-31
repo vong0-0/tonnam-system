@@ -57,21 +57,37 @@ export async function listOrdersController(
   }
 }
 
-export async function updateOrderItemStatusController(
+export async function updateOrderItemController(
   req: Request,
   res: Response,
   next: NextFunction,
 ): Promise<void> {
   try {
     const { user } = req as AuthRequest
-    const result = await orderService.updateOrderItemStatus({
-      order_id: req.params['id'] as string,
-      item_id: req.params['item_id'] as string,
-      status: req.body.status,
-      reason: req.body.reason,
-      actor: { id: user.userId, username: user.name, role: user.role },
-    })
-    res.json(success(result, 'Order item status updated'))
+    const orderId = req.params['id'] as string
+    const itemId = req.params['item_id'] as string
+    const actor = { id: user.userId, username: user.name, role: user.role }
+
+    let result: orderService.OrderWithItems
+    if ('quantity' in req.body) {
+      result = await orderService.updateOrderItemQuantity({
+        order_id: orderId,
+        item_id: itemId,
+        quantity: req.body.quantity as number,
+        reason: req.body.reason as string,
+        actor,
+      })
+    } else {
+      result = await orderService.updateOrderItemStatus({
+        order_id: orderId,
+        item_id: itemId,
+        status: req.body.status,
+        reason: req.body.reason,
+        actor,
+      })
+    }
+
+    res.json(success(result, 'Order item updated'))
   } catch (err) {
     next(err)
   }

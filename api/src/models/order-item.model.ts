@@ -9,6 +9,7 @@ export interface IOrderItem extends Document {
   note: string | null
   status: OrderItemStatus | null
   cancel_reason: string | null
+  quantity_change_reason: string | null
   created_at: Date
   updated_at: Date
 }
@@ -26,6 +27,7 @@ const orderItemSchema = new Schema<IOrderItem>(
       default: null,
     },
     cancel_reason: { type: String, default: null },
+    quantity_change_reason: { type: String, default: null },
   },
   {
     timestamps: { createdAt: 'created_at', updatedAt: 'updated_at' },

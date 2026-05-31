@@ -14,14 +14,10 @@ export const createOrderSchema = z.object({
     .min(1),
 })
 
-export const updateOrderItemSchema = z.discriminatedUnion('status', [
-  z.object({
-    status: z.literal(OrderItemStatus.COOKED),
-  }),
-  z.object({
-    status: z.literal(OrderItemStatus.CANCELLED),
-    reason: z.string().min(1),
-  }),
+export const updateOrderItemSchema = z.union([
+  z.object({ status: z.literal(OrderItemStatus.COOKED) }),
+  z.object({ status: z.literal(OrderItemStatus.CANCELLED), reason: z.string().min(1) }),
+  z.object({ quantity: z.number().int().min(1), reason: z.string().min(1) }),
 ])
 
 export type CreateOrderInput = z.infer<typeof createOrderSchema>
