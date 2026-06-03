@@ -9,12 +9,17 @@ export const cancelBillSchema = z.object({
   reason: z.string().min(1),
 })
 
+export const updateBillSchema = z.object({
+  name: z.string().min(1).optional(),
+  reason: z.string().min(1),
+})
+
 export const splitBillSchema = z.object({
-  bills: z
+  splits: z
     .array(
       z.object({
-        label: z.string().min(1),
-        item_ids: z.array(z.string().min(1)).min(1),
+        name: z.string().min(1).optional(),
+        order_item_ids: z.array(z.string().min(1)).min(1),
       }),
     )
     .min(2),
@@ -22,4 +27,5 @@ export const splitBillSchema = z.object({
 
 export type CreateBillInput = z.infer<typeof createBillSchema>
 export type CancelBillInput = z.infer<typeof cancelBillSchema>
+export type UpdateBillInput = z.infer<typeof updateBillSchema>
 export type SplitBillInput = z.infer<typeof splitBillSchema>

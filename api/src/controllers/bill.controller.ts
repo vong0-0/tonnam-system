@@ -44,14 +44,37 @@ export async function listBillsController(
     const limit = Number(req.query['limit']) || 20
     const table_id = req.query['table_id'] as string | undefined
     const status = req.query['status'] as string | undefined
+    const date_from = req.query['date_from'] as string | undefined
+    const date_to = req.query['date_to'] as string | undefined
 
     const result = await billService.listBills({
       page,
       limit,
       ...(table_id !== undefined ? { table_id } : {}),
       ...(status !== undefined ? { status } : {}),
+      ...(date_from !== undefined ? { date_from } : {}),
+      ...(date_to !== undefined ? { date_to } : {}),
     })
     res.json(result)
+  } catch (err) {
+    next(err)
+  }
+}
+
+export async function updateBillController(
+  req: Request,
+  res: Response,
+  next: NextFunction,
+): Promise<void> {
+  try {
+    const { user } = req as AuthRequest
+    const bill = await billService.updateBill({
+      id: req.params['id'] as string,
+      name: req.body.name,
+      reason: req.body.reason,
+      actor: { id: user.userId, username: user.name, role: user.role },
+    })
+    res.json(success(bill, 'Bill updated'))
   } catch (err) {
     next(err)
   }
@@ -84,7 +107,7 @@ export async function splitBillController(
     const { user } = req as AuthRequest
     const result = await billService.splitBill({
       id: req.params['id'] as string,
-      bills: req.body.bills,
+      splits: req.body.splits,
       actor: { id: user.userId, username: user.name, role: user.role },
     })
     res.status(201).json(success(result, 'Bill split successfully'))

@@ -10,6 +10,8 @@ import { type Pagination } from '@/types/index.js'
 import logger from '@/utils/logger.js'
 import { problem } from '@/utils/problem.js'
 import { successList, type SuccessListResponse } from '@/utils/response.js'
+import { io } from '@/websocket/handlers.js'
+import { WS_EVENTS } from '@/websocket/events.js'
 
 interface ListMenuItemsQuery {
   page?: number
@@ -181,7 +183,16 @@ export async function updateMenuItemAvailability(
     })
   }
 
-  // TODO: emit WebSocket event 'menu:item_availability_updated' with updated item (Phase 4)
+  io.to('menu').emit('message', JSON.stringify({
+    event: WS_EVENTS.MENU_ITEM_AVAILABILITY_UPDATED,
+    channel: 'menu',
+    data: {
+      item_id: id,
+      is_available: updated.is_available,
+      is_sold_out: updated.is_sold_out,
+    },
+    timestamp: new Date().toISOString(),
+  }))
 
   logger.info('Menu item availability updated', {
     itemId: id,

@@ -10,7 +10,8 @@ export async function createTableMergeGroup(
 ): Promise<void> {
   try {
     const { user } = req as AuthRequest
-    const result = await tableMergeGroupService.createTableMergeGroup(req.body, user.userId)
+    const actor = { id: user.userId, username: user.name, role: user.role }
+    const result = await tableMergeGroupService.createTableMergeGroup(req.body, user.userId, actor)
     res.status(201).json(success(result, 'Table merge group created'))
   } catch (err) {
     next(err)
@@ -40,9 +41,12 @@ export async function unmergeTableMergeGroup(
   next: NextFunction,
 ): Promise<void> {
   try {
+    const { user } = req as AuthRequest
+    const actor = { id: user.userId, username: user.name, role: user.role }
     const result = await tableMergeGroupService.unmergeTableMergeGroup(
       req.params['id'] as string,
       req.body,
+      actor,
     )
     res.json(success(result, 'Table merge group unmerged'))
   } catch (err) {

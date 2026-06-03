@@ -1,21 +1,12 @@
-import { randomUUID } from 'node:crypto'
 import bcrypt from 'bcrypt'
 import jwt, { type JwtPayload as LibJwtPayload } from 'jsonwebtoken'
 import { UserModel } from '@/models/user.model.js'
 import { type JwtPayload, type WsTicketPayload, type Role } from '@/types/index.js'
 import logger from '@/utils/logger.js'
 import { problem } from '@/utils/problem.js'
-
-interface TicketEntry {
-  userId: string
-  role: Role
-  name: string
-  expiresAt: number
-}
+import { createTicket, consumeTicket } from '@/websocket/ticket-store.js'
 
 type TokenPair = { accessToken: string; refreshToken: string }
-
-export const ticketStore = new Map<string, TicketEntry>()
 
 function requireEnv(key: string): string {
   const value = process.env[key]
@@ -137,26 +128,17 @@ export async function generateWsTicket(
   role: Role,
   name: string,
 ): Promise<WsTicketPayload> {
-  const ticket = randomUUID()
-  const raw = Number(process.env['WS_TICKET_EXPIRES_IN'])
-  const expiresIn = isNaN(raw) || raw <= 0 ? 30 : raw
-
-  ticketStore.set(ticket, { userId, role, name, expiresAt: Date.now() + expiresIn * 1000 })
-
-  return { ticket, expiresIn }
+  const ticket = createTicket(userId, name, role)
+  return { ticket, expiresIn: 30 }
 }
 
 export function validateWsTicket(
   ticket: string,
 ): { userId: string; role: Role; name: string } | null {
-  const entry = ticketStore.get(ticket)
-  if (!entry) return null
-
-  if (Date.now() > entry.expiresAt) {
-    ticketStore.delete(ticket)
+  try {
+    const entry = consumeTicket(ticket)
+    return { userId: entry.userId, role: entry.role as Role, name: entry.username }
+  } catch {
     return null
   }
-
-  ticketStore.delete(ticket)
-  return { userId: entry.userId, role: entry.role, name: entry.name }
 }

@@ -9,6 +9,8 @@ import { BillStatus, OrderItemStatus, type TableStatus, type Pagination } from '
 import logger from '@/utils/logger.js'
 import { problem } from '@/utils/problem.js'
 import { successList, type SuccessListResponse } from '@/utils/response.js'
+import { io } from '@/websocket/handlers.js'
+import { WS_EVENTS } from '@/websocket/events.js'
 
 interface CounterDoc {
   _id: string
@@ -44,6 +46,15 @@ interface ListBillsQuery {
   limit?: number
   table_id?: string
   status?: string
+  date_from?: string
+  date_to?: string
+}
+
+interface UpdateBillInput {
+  id: string
+  name?: string
+  reason: string
+  actor: ActorInput
 }
 
 interface CancelBillInput {
@@ -53,13 +64,13 @@ interface CancelBillInput {
 }
 
 interface SplitBillEntry {
-  label: string
-  item_ids: string[]
+  name?: string
+  order_item_ids: string[]
 }
 
 interface SplitBillInput {
   id: string
-  bills: SplitBillEntry[]
+  splits: SplitBillEntry[]
   actor: ActorInput
 }
 
@@ -129,6 +140,21 @@ export async function createBill(input: CreateBillInput): Promise<IBill> {
 
   logger.info('Bill created', { billId: String(bill._id), shortId: short_id, tableId: input.table_id })
 
+  const billChannel = `bill:${String(bill._id)}`
+  const tableChannel = `table:${String(bill.table_id)}`
+  io.to(billChannel).emit('message', JSON.stringify({
+    event: WS_EVENTS.BILL_CREATED,
+    channel: billChannel,
+    data: { bill },
+    timestamp: new Date().toISOString(),
+  }))
+  io.to(tableChannel).emit('message', JSON.stringify({
+    event: WS_EVENTS.BILL_CREATED,
+    channel: tableChannel,
+    data: { bill },
+    timestamp: new Date().toISOString(),
+  }))
+
   return bill
 }
 
@@ -180,11 +206,21 @@ export async function getBillById(id: string): Promise<BillDetail> {
 export async function listBills(query: ListBillsQuery): Promise<SuccessListResponse<IBill>> {
   const page = query.page ?? 1
   const limit = query.limit ?? 20
-  const { table_id, status } = query
+  const { table_id, status, date_from, date_to } = query
 
   const filter: Record<string, unknown> = {}
   if (table_id !== undefined) filter['table_id'] = table_id
   if (status !== undefined) filter['status'] = status
+  if (date_from !== undefined || date_to !== undefined) {
+    const createdAtFilter: Record<string, Date> = {}
+    if (date_from !== undefined) createdAtFilter['$gte'] = new Date(date_from)
+    if (date_to !== undefined) {
+      const to = new Date(date_to)
+      to.setUTCHours(23, 59, 59, 999)
+      createdAtFilter['$lte'] = to
+    }
+    filter['createdAt'] = createdAtFilter
+  }
 
   const skip = (page - 1) * limit
   const [rawItems, total] = await Promise.all([
@@ -197,6 +233,68 @@ export async function listBills(query: ListBillsQuery): Promise<SuccessListRespo
   const pagination: Pagination = { page, limit, total, totalPages }
 
   return successList(items, pagination, 'Bills retrieved successfully')
+}
+
+export async function updateBill(input: UpdateBillInput): Promise<IBill> {
+  if (!mongoose.Types.ObjectId.isValid(input.id)) {
+    throw problem({
+      type: 'not-found',
+      title: 'Not Found',
+      status: 404,
+      detail: 'Bill not found.',
+      instance: `/v1/bills/${input.id}`,
+    })
+  }
+
+  const bill = await BillModel.findById(input.id)
+  if (!bill) {
+    throw problem({
+      type: 'not-found',
+      title: 'Not Found',
+      status: 404,
+      detail: 'Bill not found.',
+      instance: `/v1/bills/${input.id}`,
+    })
+  }
+
+  if (bill.status === BillStatus.CANCELLED) {
+    throw problem({
+      type: 'BILL_CANCELLED',
+      title: 'Conflict',
+      status: 409,
+      detail: 'Cannot edit a cancelled bill.',
+      instance: `/v1/bills/${input.id}`,
+    })
+  }
+
+  const beforeState = { name: bill.name }
+
+  if (input.name !== undefined) {
+    bill.name = input.name
+  }
+  await bill.save()
+
+  await createAuditLog({
+    actor: input.actor,
+    action: 'UPDATE_BILL',
+    entity_name: 'Bill',
+    entity_id: bill._id as Types.ObjectId,
+    reason: input.reason,
+    before_state: beforeState,
+    after_state: { name: bill.name },
+  })
+
+  logger.info('Bill updated', { billId: input.id, reason: input.reason })
+
+  const billChannel = `bill:${String(bill._id)}`
+  io.to(billChannel).emit('message', JSON.stringify({
+    event: WS_EVENTS.BILL_UPDATED,
+    channel: billChannel,
+    data: { bill },
+    timestamp: new Date().toISOString(),
+  }))
+
+  return bill
 }
 
 export async function cancelBill(input: CancelBillInput): Promise<IBill> {
@@ -235,6 +333,13 @@ export async function cancelBill(input: CancelBillInput): Promise<IBill> {
   bill.cancel_reason = input.reason
   await bill.save()
 
+  const orders = await OrderModel.find({ bill_id: bill._id }).lean() as IOrder[]
+  const orderIds = orders.map((o) => o._id)
+  await OrderItemModel.updateMany(
+    { order_id: { $in: orderIds }, status: null },
+    { $set: { status: OrderItemStatus.CANCELLED } },
+  )
+
   const openBillCount = await BillModel.countDocuments({
     table_id: bill.table_id,
     status: BillStatus.OPEN,
@@ -254,6 +359,21 @@ export async function cancelBill(input: CancelBillInput): Promise<IBill> {
   })
 
   logger.info('Bill cancelled', { billId: input.id, reason: input.reason })
+
+  const billChannel = `bill:${String(bill._id)}`
+  const tableChannel = `table:${String(bill.table_id)}`
+  io.to(billChannel).emit('message', JSON.stringify({
+    event: WS_EVENTS.BILL_STATUS_UPDATED,
+    channel: billChannel,
+    data: { bill_id: String(bill._id), status: bill.status },
+    timestamp: new Date().toISOString(),
+  }))
+  io.to(tableChannel).emit('message', JSON.stringify({
+    event: WS_EVENTS.BILL_STATUS_UPDATED,
+    channel: tableChannel,
+    data: { bill_id: String(bill._id), status: bill.status },
+    timestamp: new Date().toISOString(),
+  }))
 
   return bill
 }
@@ -300,8 +420,8 @@ export async function splitBill(input: SplitBillInput): Promise<SplitBillResult>
   const activeItemIdSet = new Set(allActiveItems.map((item) => String(item._id)))
 
   const seenItemIds = new Set<string>()
-  for (const entry of input.bills) {
-    for (const itemId of entry.item_ids) {
+  for (const entry of input.splits) {
+    for (const itemId of entry.order_item_ids) {
       if (seenItemIds.has(itemId)) {
         throw problem({
           type: 'validation-error',
@@ -336,9 +456,10 @@ export async function splitBill(input: SplitBillInput): Promise<SplitBillResult>
     session.startTransaction()
 
     subBills = await Promise.all(
-      input.bills.map(async (entry) => {
-        const subShortId = `${parentBill.short_id}/${entry.label}`
-        const totalAmount = entry.item_ids.reduce((sum, itemId) => {
+      input.splits.map(async (entry, index) => {
+        const label = entry.name ?? String.fromCharCode(65 + index) // A, B, C…
+        const subShortId = `${parentBill.short_id}/${label}`
+        const totalAmount = entry.order_item_ids.reduce((sum, itemId) => {
           const item = itemMap.get(itemId)
           return item !== undefined ? sum + item.unit_price * item.quantity : sum
         }, 0)
@@ -347,10 +468,10 @@ export async function splitBill(input: SplitBillInput): Promise<SplitBillResult>
           [
             {
               short_id: subShortId,
-              name: `${parentBill.name}/${entry.label}`,
+              name: entry.name ?? `${parentBill.name}/${label}`,
               table_id: parentBill.table_id,
               parent_bill_id: parentBill._id,
-              split_label: entry.label,
+              split_label: label,
               status: BillStatus.OPEN,
               total_amount: totalAmount,
               created_by: new mongoose.Types.ObjectId(input.actor.id),
@@ -391,6 +512,21 @@ export async function splitBill(input: SplitBillInput): Promise<SplitBillResult>
   })
 
   logger.info('Bill split', { parentBillId: input.id, subBillCount: subBills.length })
+
+  const billChannel = `bill:${String(parentBill._id)}`
+  const tableChannel = `table:${String(parentBill.table_id)}`
+  io.to(billChannel).emit('message', JSON.stringify({
+    event: WS_EVENTS.BILL_STATUS_UPDATED,
+    channel: billChannel,
+    data: { bill_id: String(parentBill._id), status: parentBill.status },
+    timestamp: new Date().toISOString(),
+  }))
+  io.to(tableChannel).emit('message', JSON.stringify({
+    event: WS_EVENTS.BILL_STATUS_UPDATED,
+    channel: tableChannel,
+    data: { bill_id: String(parentBill._id), status: parentBill.status },
+    timestamp: new Date().toISOString(),
+  }))
 
   return { parent_bill: parentBill, sub_bills: subBills }
 }

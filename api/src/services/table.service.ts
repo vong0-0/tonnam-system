@@ -9,6 +9,8 @@ import { type Pagination, type TableStatus, type Role } from '@/types/index.js'
 import logger from '@/utils/logger.js'
 import { problem } from '@/utils/problem.js'
 import { successList, type SuccessListResponse } from '@/utils/response.js'
+import { io } from '@/websocket/handlers.js'
+import { WS_EVENTS } from '@/websocket/events.js'
 
 interface ListTablesQuery {
   page?: number
@@ -201,6 +203,20 @@ export async function updateTableStatus(
     })
   }
 
+  io.to('tables').emit('message', JSON.stringify({
+    event: WS_EVENTS.TABLE_STATUS_UPDATED,
+    channel: 'tables',
+    data: { table_id: id, status: targetStatus },
+    timestamp: new Date().toISOString(),
+  }))
+  const tableSpecificChannel = `table:${id}`
+  io.to(tableSpecificChannel).emit('message', JSON.stringify({
+    event: WS_EVENTS.TABLE_STATUS_UPDATED,
+    channel: tableSpecificChannel,
+    data: { table_id: id, status: targetStatus },
+    timestamp: new Date().toISOString(),
+  }))
+
   return updated
 }
 
@@ -261,6 +277,17 @@ export async function moveTable(
     to: target_table_id,
     bills: source.bill_ids.map(String),
   })
+
+  io.to('tables').emit('message', JSON.stringify({
+    event: WS_EVENTS.TABLE_MOVED,
+    channel: 'tables',
+    data: {
+      from_table_id: sourceId,
+      to_table_id: target_table_id,
+      bill_ids: source.bill_ids.map(String),
+    },
+    timestamp: new Date().toISOString(),
+  }))
 
   return {
     from_table: { id: String(source._id), table_name: source.table_name, status: 'AVAILABLE' },

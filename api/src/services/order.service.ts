@@ -9,6 +9,8 @@ import { OrderStatus, OrderItemStatus, BillStatus, type Pagination } from '@/typ
 import logger from '@/utils/logger.js'
 import { problem } from '@/utils/problem.js'
 import { successList, type SuccessListResponse } from '@/utils/response.js'
+import { io } from '@/websocket/handlers.js'
+import { WS_EVENTS } from '@/websocket/events.js'
 
 interface CounterDoc {
   _id: string
@@ -181,7 +183,18 @@ export async function createOrder(input: CreateOrderInput): Promise<OrderWithIte
 
   await recalculateBillTotal(input.bill_id)
 
-  // TODO: emit WebSocket 'order:new_order_received' (Phase 4)
+  io.to('orders').emit('message', JSON.stringify({
+    event: WS_EVENTS.ORDER_NEW_ORDER_RECEIVED,
+    channel: 'orders',
+    data: { order, items },
+    timestamp: new Date().toISOString(),
+  }))
+  io.to('kitchen').emit('message', JSON.stringify({
+    event: WS_EVENTS.ORDER_NEW_ORDER_RECEIVED,
+    channel: 'kitchen',
+    data: { order, items },
+    timestamp: new Date().toISOString(),
+  }))
 
   logger.info('Order created', {
     orderId: String(order._id),
@@ -330,7 +343,46 @@ export async function updateOrderItemStatus(
 
   await recalculateBillTotal(String(order.bill_id))
 
-  // TODO: emit WebSocket 'order:item_status_updated' (Phase 4)
+  const orderChannel = `order:${input.order_id}`
+  io.to('orders').emit('message', JSON.stringify({
+    event: WS_EVENTS.ORDER_ITEM_STATUS_UPDATED,
+    channel: 'orders',
+    data: { order_id: input.order_id, item_id: input.item_id, status: input.status },
+    timestamp: new Date().toISOString(),
+  }))
+  io.to(orderChannel).emit('message', JSON.stringify({
+    event: WS_EVENTS.ORDER_ITEM_STATUS_UPDATED,
+    channel: orderChannel,
+    data: { order_id: input.order_id, item_id: input.item_id, status: input.status },
+    timestamp: new Date().toISOString(),
+  }))
+  io.to('kitchen').emit('message', JSON.stringify({
+    event: WS_EVENTS.ORDER_ITEM_STATUS_UPDATED,
+    channel: 'kitchen',
+    data: { order_id: input.order_id, item_id: input.item_id, status: input.status },
+    timestamp: new Date().toISOString(),
+  }))
+
+  if (order.status === OrderStatus.COOKED || order.status === OrderStatus.CANCELLED) {
+    io.to('orders').emit('message', JSON.stringify({
+      event: WS_EVENTS.ORDER_STATUS_UPDATED,
+      channel: 'orders',
+      data: { order_id: input.order_id, status: order.status },
+      timestamp: new Date().toISOString(),
+    }))
+    io.to(orderChannel).emit('message', JSON.stringify({
+      event: WS_EVENTS.ORDER_STATUS_UPDATED,
+      channel: orderChannel,
+      data: { order_id: input.order_id, status: order.status },
+      timestamp: new Date().toISOString(),
+    }))
+    io.to('kitchen').emit('message', JSON.stringify({
+      event: WS_EVENTS.ORDER_STATUS_UPDATED,
+      channel: 'kitchen',
+      data: { order_id: input.order_id, status: order.status },
+      timestamp: new Date().toISOString(),
+    }))
+  }
 
   logger.info('Order item status updated', {
     orderId: input.order_id,

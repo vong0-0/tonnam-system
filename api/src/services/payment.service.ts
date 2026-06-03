@@ -5,6 +5,8 @@ import { TableModel } from '@/models/table.model.js'
 import { BillStatus, PaymentMethod, type TableStatus } from '@/types/index.js'
 import logger from '@/utils/logger.js'
 import { problem } from '@/utils/problem.js'
+import { io } from '@/websocket/handlers.js'
+import { WS_EVENTS } from '@/websocket/events.js'
 
 interface CreatePaymentInput {
   bill_id: string
@@ -139,7 +141,32 @@ export async function createPayment(input: CreatePaymentInput): Promise<CreatePa
     await table.save()
   }
 
-  // TODO: emit WebSocket 'bill:payment_confirmed' (Phase 4)
+  const billChannel = `bill:${input.bill_id}`
+  const tableChannel = `table:${String(bill.table_id)}`
+  io.to(billChannel).emit('message', JSON.stringify({
+    event: WS_EVENTS.BILL_PAYMENT_CONFIRMED,
+    channel: billChannel,
+    data: { bill_id: input.bill_id, payment_id: String(payment._id), method: payment.method, amount: payment.amount },
+    timestamp: new Date().toISOString(),
+  }))
+  io.to(billChannel).emit('message', JSON.stringify({
+    event: WS_EVENTS.BILL_STATUS_UPDATED,
+    channel: billChannel,
+    data: { bill_id: input.bill_id, status: bill.status },
+    timestamp: new Date().toISOString(),
+  }))
+  io.to(tableChannel).emit('message', JSON.stringify({
+    event: WS_EVENTS.BILL_STATUS_UPDATED,
+    channel: tableChannel,
+    data: { bill_id: input.bill_id, status: bill.status },
+    timestamp: new Date().toISOString(),
+  }))
+  io.to('tables').emit('message', JSON.stringify({
+    event: WS_EVENTS.TABLE_STATUS_UPDATED,
+    channel: 'tables',
+    data: { table_id: String(bill.table_id), status: 'PAID' },
+    timestamp: new Date().toISOString(),
+  }))
 
   logger.info('Payment confirmed', {
     paymentId: String(payment._id),
