@@ -7,9 +7,9 @@
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-sans);
-  --font-mono: var(--font-geist-mono);
-  --font-heading: var(--font-sans);
+  --font-sans: var(--font-body);
+  --font-mono: var(--font-mono);
+  --font-heading: var(--font-display);
   --color-sidebar-ring: var(--sidebar-ring);
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
@@ -46,6 +46,151 @@
   --radius-2xl: calc(var(--radius) * 1.8);
   --radius-3xl: calc(var(--radius) * 2.2);
   --radius-4xl: calc(var(--radius) * 2.6);
+}
+
+@theme {
+
+  /* ─── COLORS — Brand ─────────────────────────── */
+
+  /* Primary — Forest Green */
+  --color-green: #1B4332;
+  --color-green-light: #2D6A4F;
+  --color-green-pale: #D8EDDF;
+
+  /* Secondary — Warm Gold */
+  --color-gold: #C9A84C;
+  --color-gold-dark: #8B6A1A;
+  --color-gold-pale: #F5EDCE;
+
+  /* Tertiary — Terracotta */
+  --color-terra: #C4623A;
+  --color-terra-dark: #8B3A1F;
+  --color-terra-pale: #F2D5C4;
+
+  /* Neutral — Public Track */
+  --color-cream: #FAF6F0;
+  --color-cream-dark: #EDE8DC;
+  --color-brown: #2C1810;
+  --color-brown-soft: #4A3528;
+
+  /* Neutral — Internal Track (Ink Scale) */
+  --color-ink-900: #1F2326;
+  --color-ink-700: #495057;
+  --color-ink-500: #6C757D;
+  --color-ink-300: #ADB5BD;
+  --color-ink-100: #DEE2E6;
+  --color-ink-50: #F1F3F5;
+  --color-paper: #FFFFFF;
+
+  /* Semantic */
+  --color-success: #0F9B8E;
+  --color-warning: #F5A623;
+  --color-danger: #C0392B;
+  --color-info: #2980B9;
+
+  /* Status — Table Cards & Badges */
+  --color-status-available-bg: rgba(15, 155, 142, 0.08);
+  --color-status-available-border: rgba(15, 155, 142, 0.30);
+  --color-status-available-fg: #0F9B8E;
+
+  --color-status-occupied-bg: #1B4332;
+  --color-status-occupied-border: #1B4332;
+  --color-status-occupied-fg: #FAF6F0;
+
+  --color-status-reserved-bg: rgba(245, 166, 35, 0.10);
+  --color-status-reserved-border: rgba(245, 166, 35, 0.40);
+  --color-status-reserved-fg: #B37D00;
+
+  --color-status-paid-bg: #D8EDDF;
+  --color-status-paid-border: #2D6A4F;
+  --color-status-paid-fg: #2D6A4F;
+
+  /* ─── FONT SIZES ─────────────────────────────── */
+
+  --text-2xs: 0.625rem;
+  /* 10px — eyebrow, swatch-role */
+  --text-xs: 0.75rem;
+  /* 12px — caption, badge, mono */
+  --text-sm: 0.8125rem;
+  /* 13px — small body, tags */
+  --text-base: 0.875rem;
+  /* 14px — label, button text */
+  --text-md: 0.9375rem;
+  /* 15px — body default */
+  --text-lg: 1rem;
+  /* 16px — body large, tagline */
+  --text-xl: 1.125rem;
+  /* 18px — h4, subheading */
+  --text-2xl: 1.5rem;
+  /* 24px — h3 */
+  --text-3xl: 1.75rem;
+  /* 28px — large numbers */
+  --text-4xl: 2rem;
+  /* 32px — h2 mobile */
+  --text-5xl: 2.5rem;
+  /* 40px — h2 desktop */
+  --text-6xl: 3.25rem;
+  /* 52px — h1 medium */
+  --text-7xl: 4rem;
+  /* 64px — h1 large */
+  --text-8xl: 5rem;
+  /* 80px — hero display */
+
+  /* ─── BORDER RADIUS ──────────────────────────── */
+
+  --radius-xs: 0.125rem;
+  /* 2px */
+  --radius-sm: 0.25rem;
+  /* 4px  — tags, internal badges */
+  --radius-md: 0.5rem;
+  /* 8px  — inputs, buttons, small cards */
+  --radius-lg: 0.625rem;
+  /* 10px — standard cards */
+  --radius-xl: 0.75rem;
+  /* 12px — large cards, modals */
+  --radius-2xl: 1rem;
+  /* 16px — bottom sheets, drawers */
+  --radius-pill: 999px;
+  /* pills, badges, round buttons */
+
+  /* ─── SHADOWS — Warm brown tinted (never neutral grey) ── */
+
+  --shadow-sm: 0 1px 2px rgba(44, 24, 16, 0.06);
+  --shadow-md: 0 2px 8px rgba(44, 24, 16, 0.08), 0 1px 2px rgba(44, 24, 16, 0.05);
+  --shadow-lg: 0 8px 24px rgba(44, 24, 16, 0.12), 0 2px 6px rgba(44, 24, 16, 0.06);
+  --shadow-hero: 0 24px 60px rgba(27, 67, 50, 0.22);
+
+  /* Focus ring — Forest Green tinted */
+  --shadow-focus: 0 0 0 3px rgba(27, 67, 50, 0.20);
+
+  /* ─── SPACING — 4px base grid ────────────────── */
+  /* Tailwind v4 uses rem — 1 spacing unit = 0.25rem = 4px */
+  /* Default scale is sufficient. Override only if needed.  */
+
+  /* ─── ANIMATION ──────────────────────────────── */
+
+  --ease-out: cubic-bezier(0.22, 0.61, 0.36, 1);
+  --ease-in-out: cubic-bezier(0.65, 0.00, 0.35, 1);
+
+  --duration-quick: 120ms;
+  --duration-base: 200ms;
+  --duration-slow: 360ms;
+
+  /* ─── LAYOUT ─────────────────────────────────── */
+
+  --width-sidebar: 220px;
+  --height-topbar: 64px;
+  --height-topbar-mobile: 56px;
+  --height-filter-bar: 52px;
+  --height-bottom-nav: 64px;
+  --size-fab: 56px;
+
+  /* ─── BREAKPOINTS ────────────────────────────── */
+
+  --breakpoint-mobile: 375px;
+  --breakpoint-tablet: 768px;
+  /* 'sm', 'md', 'lg', 'xl' — keep Tailwind defaults */
+
 }
 
 :root {
@@ -117,14 +262,253 @@
   --sidebar-ring: oklch(0.556 0 0);
 }
 
+/* ─────────────────────────────────────────────────
+   BASE LAYER
+───────────────────────────────────────────────── */
+
 @layer base {
-  * {
-    @apply border-border outline-ring/50;
-  }
-  body {
-    @apply bg-background text-foreground;
-  }
+
   html {
-    @apply font-sans;
+    font-family: var(--font-body);
+    color: var(--color-ink-900);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
   }
+
+  body {
+    background-color: var(--color-cream);
+    color: var(--color-brown);
+    font-family: var(--font-body);
+  }
+
+  body h1,
+  body h2,
+  body h3,
+  body h4 {
+    font-family: var(--font-display), var(--font-body), sans-serif;
+    text-wrap: balance;
+  }
+
+  body h1 em,
+  body h2 em,
+  body h3 em {
+    color: var(--color-gold);
+    font-style: italic;
+  }
+
+  code,
+  pre,
+  kbd {
+    font-family: var(--font-mono);
+    font-variant-numeric: tabular-nums;
+  }
+
+  .mono {
+    font-family: var(--font-mono);
+    font-variant-numeric: tabular-nums;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      transition-duration: 0.01ms !important;
+    }
+  }
+
+}
+
+/* ─────────────────────────────────────────────────
+   COMPONENTS
+───────────────────────────────────────────────── */
+
+@layer components {
+
+  /* ── Eyebrow / Section Label ── */
+  .eyebrow {
+    font-family: var(--font-body);
+    font-size: var(--text-2xs);
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.2em;
+    color: var(--color-terra);
+  }
+
+  /* ── Buttons ── */
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    height: 2.5rem;
+    padding: 0 1rem;
+    border-radius: var(--radius-md);
+    font-family: var(--font-body);
+    font-size: var(--text-base);
+    font-weight: 600;
+    cursor: pointer;
+    border: none;
+    transition: all 180ms ease;
+    white-space: nowrap;
+    text-decoration: none;
+  }
+
+  .btn:active {
+    transform: scale(0.97);
+  }
+
+  .btn:focus-visible {
+    outline: none;
+    box-shadow: var(--shadow-focus);
+  }
+
+  .btn-primary {
+    background-color: var(--color-green);
+    color: var(--color-paper);
+  }
+
+  .btn-primary:hover {
+    background-color: var(--color-green-light);
+  }
+
+  .btn-secondary {
+    background-color: transparent;
+    color: var(--color-green);
+    border: 2px solid var(--color-green);
+  }
+
+  .btn-secondary:hover {
+    background-color: rgba(27, 67, 50, 0.08);
+  }
+
+  .btn-danger {
+    background-color: var(--color-danger);
+    color: var(--color-paper);
+  }
+
+  .btn-danger:hover {
+    background-color: #a93226;
+  }
+
+  .btn-ghost {
+    background-color: transparent;
+    color: var(--color-brown-soft);
+  }
+
+  .btn-ghost:hover {
+    background-color: var(--color-cream-dark);
+  }
+
+  .btn-cta {
+    height: 3rem;
+    padding: 0 2rem;
+    background-color: var(--color-gold);
+    color: var(--color-brown);
+    font-family: var(--font-display);
+    font-style: italic;
+    font-size: var(--text-lg);
+  }
+
+  .btn-cta:hover {
+    background-color: #b8962e;
+  }
+
+  /* ── Badges ── */
+  .badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.375rem;
+    height: 1.375rem;
+    padding: 0 0.5rem;
+    border-radius: var(--radius-pill);
+    font-family: var(--font-body);
+    font-size: var(--text-xs);
+    font-weight: 600;
+  }
+
+  .badge::before {
+    content: '';
+    display: inline-block;
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+
+  .badge-available {
+    background-color: var(--color-status-available-bg);
+    color: var(--color-status-available-fg);
+  }
+
+  .badge-available::before {
+    background-color: var(--color-status-available-fg);
+  }
+
+  .badge-occupied {
+    background-color: var(--color-status-occupied-bg);
+    color: var(--color-status-occupied-fg);
+  }
+
+  .badge-occupied::before {
+    background-color: var(--color-status-occupied-fg);
+  }
+
+  .badge-reserved {
+    background-color: var(--color-status-reserved-bg);
+    color: var(--color-status-reserved-fg);
+  }
+
+  .badge-reserved::before {
+    background-color: var(--color-warning);
+  }
+
+  .badge-paid {
+    background-color: var(--color-status-paid-bg);
+    color: var(--color-status-paid-fg);
+  }
+
+  .badge-paid::before {
+    background-color: var(--color-status-paid-fg);
+  }
+
+  /* ── Cards ── */
+  .card {
+    background-color: var(--color-paper);
+    border-radius: var(--radius-lg);
+    padding: 1rem;
+    border: 0.5px solid rgba(44, 24, 16, 0.10);
+    box-shadow: var(--shadow-md);
+  }
+
+  /* ── Inputs ── */
+  .input {
+    height: 2.5rem;
+    padding: 0 0.75rem;
+    border-radius: var(--radius-md);
+    border: 1px solid var(--color-ink-100);
+    background-color: var(--color-paper);
+    color: var(--color-ink-900);
+    font-family: var(--font-body);
+    font-size: var(--text-md);
+    width: 100%;
+    transition: border-color 150ms ease, box-shadow 150ms ease;
+  }
+
+  .input:focus {
+    outline: none;
+    border-color: var(--color-green);
+    box-shadow: var(--shadow-focus);
+  }
+
+  .input-error {
+    border-color: var(--color-danger);
+  }
+
+  .input:disabled {
+    background-color: var(--color-ink-50);
+    color: var(--color-ink-300);
+    cursor: not-allowed;
+  }
+
 }
