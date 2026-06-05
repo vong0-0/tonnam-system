@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Playfair_Display, Noto_Sans_Lao, JetBrains_Mono } from "next/font/google";
+import SiteNavbar from "@/components/common/site-navbar";
 import "./globals.css";
 
 const playfairDisplay = Playfair_Display({
@@ -39,7 +40,10 @@ export default function RootLayout({
       lang="lo"
       className={`${playfairDisplay.variable} ${notoSansLao.variable} ${jetbrainsMono.variable} h-full antialiased`}
     >
-      <body className="min-h-full flex flex-col">{children}</body>
+      <body className="min-h-full flex flex-col">
+          <SiteNavbar />
+          {children}
+        </body>
     </html>
   );
 }
