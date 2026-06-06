@@ -17,9 +17,9 @@ function TonNamLogo() {
 }
 
 const NAV_LINKS = [
-  { href: "/menu", label: "ເມນູ" },
-  { href: "/about", label: "ກ່ຽວກັບເຮົາ" },
-  { href: "/contact", label: "ຕິດຕໍ່" },
+  { href: "/#about", label: "ກ່ຽວກັບເຮົາ" },
+  { href: "/#menu-preview", label: "ເມນູ" },
+  { href: "/#contact", label: "ຕິດຕໍ່" },
 ]
 
 export default function SiteNavbar() {

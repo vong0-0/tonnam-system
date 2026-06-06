@@ -5,6 +5,7 @@ import Link from "next/link"
 import { MapPin, Clock, Phone } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { cn } from "@/lib/utils"
+import { Reveal } from "@/components/ui/reveal"
 
 const MAP_SRC =
   "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d1753.3925670244014!2d104.74649566573785!3d16.56763890605049!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x313dc601f3314091%3A0x620bf33304456a29!2z4Lqu4LuJ4Lqy4LqZIOC6leC6u-C7ieC6meC6meC7ieC6syjguKPguYnguLLguJnguJXguYnguJnguJnguYnguLMp!5e0!3m2!1sth!2sla!4v1780723816672!5m2!1sth!2sla"
@@ -33,28 +34,33 @@ export default function ContactSection() {
       <div className="max-w-7xl mx-auto px-6 lg:px-8 grid grid-cols-1 lg:grid-cols-2 gap-16 lg:gap-20 items-center">
 
         {/* Left: Info */}
-        <div>
-          <p className="eyebrow mb-5 text-sm">ມາຫາເຮົາ · Visit Us</p>
+        <Reveal direction="right" duration={700}>
+          <div>
+            <p className="eyebrow mb-5 text-sm">ມາຫາເຮົາ · Visit Us</p>
 
-          <h2 className="font-sans font-bold text-green leading-[1.2] text-[2rem] md:text-[2.625rem] mb-4">
-            ຍິນດີຕ້ອນຮັບ{" "}
-            <em className="italic text-gold">ທຸກທ່ານ</em>
-          </h2>
+            <h2 className="font-sans font-bold text-green leading-[1.2] text-[2rem] md:text-[2.625rem] mb-4">
+              ຍິນດີຕ້ອນຮັບ{" "}
+              <em className="italic text-gold">ທຸກທ່ານ</em>
+            </h2>
 
-          <div className="w-12 h-0.5 bg-gold mb-8" />
+            <div className="w-12 h-0.5 bg-gold mb-8" />
 
-          <div className="flex flex-col gap-3 mb-8">
-            {INFO_ITEMS.map((item) => (
-              <InfoCard key={item.label} {...item} />
-            ))}
+            <div className="flex flex-col gap-3 mb-8">
+              {INFO_ITEMS.map((item, i) => (
+                <Reveal key={item.label} direction="up" delay={i * 120} duration={500}>
+                  <InfoCard {...item} />
+                </Reveal>
+              ))}
+            </div>
           </div>
-
-        </div>
+        </Reveal>
 
         {/* Right: Map */}
-        <div className="relative h-[420px] lg:h-[500px] rounded-2xl overflow-hidden shadow-md">
-          <MapEmbed />
-        </div>
+        <Reveal direction="left" delay={200} duration={700}>
+          <div className="relative h-[420px] lg:h-[500px] rounded-2xl overflow-hidden shadow-md">
+            <MapEmbed />
+          </div>
+        </Reveal>
 
       </div>
     </section>

@@ -16,7 +16,7 @@ export function DishCard({ dish }: { dish: Dish }) {
   const initial = dish.name.lao.charAt(0)
 
   return (
-    <div className="rounded-xl overflow-hidden shadow-md bg-white flex flex-col">
+    <div className="h-full rounded-xl overflow-hidden shadow-md bg-white flex flex-col">
 
       {/* Image / placeholder */}
       <div className={`relative h-52 flex items-center justify-center ${dish.cardColor}`}>

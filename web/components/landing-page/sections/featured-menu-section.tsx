@@ -1,6 +1,7 @@
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { type Dish, DishCard, Line, Gem } from "@/components/landing-page/commons"
+import { Reveal } from "@/components/ui/reveal"
 import PadThaiWithRiverPrawns from "@/public/Pad-thai-with-river-prawns.jpg"
 import TomYum from "@/public/tom-yum.jpg"
 import FriedChickenWings from "@/public/fried-chicken-wings.jpg"
@@ -41,23 +42,27 @@ export default function FeaturedMenuSection() {
       <div className="max-w-7xl mx-auto px-6 lg:px-8">
 
         {/* Header */}
-        <div className="flex flex-col items-center text-center mb-14">
-          <p className="eyebrow mb-5 text-sm">ເມນູແນະນຳ · Signature Dishes</p>
-          <h2 className="font-sans font-bold text-green text-[2rem] md:text-[2.625rem] leading-tight mb-5">
-            ລົດຊາດທີ່ເຮົາພາກພູມໃຈ{" "}
-            <em className="italic text-gold">ນຳສະເໜີ</em>
-          </h2>
-          <div className="flex items-center gap-4 w-full max-w-xs">
-            <Line />
-            <Gem />
-            <Line />
+        <Reveal direction="up" duration={700}>
+          <div className="flex flex-col items-center text-center mb-14">
+            <p className="eyebrow mb-5 text-sm">ເມນູແນະນຳ · Signature Dishes</p>
+            <h2 className="font-sans font-bold text-green text-[2rem] md:text-[2.625rem] leading-tight mb-5">
+              ລົດຊາດທີ່ເຮົາພາກພູມໃຈ{" "}
+              <em className="italic text-gold">ນຳສະເໜີ</em>
+            </h2>
+            <div className="flex items-center gap-4 w-full max-w-xs">
+              <Line />
+              <Gem />
+              <Line />
+            </div>
           </div>
-        </div>
+        </Reveal>
 
         {/* Dish cards */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
-          {FEATURED_DISHES.map((dish) => (
-            <DishCard key={dish.id} dish={dish} />
+          {FEATURED_DISHES.map((dish, i) => (
+            <Reveal key={dish.id} direction="up-scale" delay={i * 130} duration={600}>
+              <DishCard dish={dish} />
+            </Reveal>
           ))}
         </div>
 

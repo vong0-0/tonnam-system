@@ -1,4 +1,5 @@
 import Image from "next/image"
+import { Reveal } from "@/components/ui/reveal"
 
 interface AboutSectionProps {
   imageSrc?: string
@@ -28,6 +29,7 @@ export default function AboutSection({ imageSrc, imageAlt }: AboutSectionProps) 
       <div className="max-w-7xl mx-auto px-6 lg:px-8 grid grid-cols-1 lg:grid-cols-2 gap-16 lg:gap-20 items-center">
 
         {/* Left: Text content */}
+        <Reveal direction="right" duration={700}>
         <div>
           <p className="eyebrow mb-5 text-sm">ກ່ຽວກັບເຮົາ · Our Story</p>
 
@@ -62,8 +64,10 @@ export default function AboutSection({ imageSrc, imageAlt }: AboutSectionProps) 
             ))}
           </div>
         </div>
+        </Reveal>
 
         {/* Right: Card — image if provided, branded placeholder otherwise */}
+        <Reveal direction="left" delay={200} duration={700}>
         <div className="relative  aspect-video lg:aspect-4/5 rounded-2xl overflow-hidden shadow-lg">
           {imageSrc ? (
             <Image
@@ -76,6 +80,7 @@ export default function AboutSection({ imageSrc, imageAlt }: AboutSectionProps) 
             <BrandCard />
           )}
         </div>
+        </Reveal>
 
       </div>
     </section>

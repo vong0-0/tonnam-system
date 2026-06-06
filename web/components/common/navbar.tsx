@@ -246,7 +246,8 @@ export function NavItems({ align = "start", children, className }: NavItemsProps
 export function NavItem({ href, icon, matchPrefix, children, className }: NavItemProps) {
   const pathname = usePathname()
   const { mode, mobileVariant, colorScheme, closeMobile } = useContext(NavbarCtx)
-  const active = matchPrefix ? pathname.startsWith(href) : pathname === href
+  const isAnchor = href.startsWith("#") || href.startsWith("/#")
+  const active = isAnchor ? false : matchPrefix ? pathname.startsWith(href) : pathname === href
   const isDark = colorScheme === "dark"
 
   if (mode === "mobile" && mobileVariant === "overlay") {

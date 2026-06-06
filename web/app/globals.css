@@ -273,6 +273,12 @@
     color: var(--color-ink-900);
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
+    scroll-behavior: smooth;
+  }
+
+  /* offset for fixed navbar when scrolling to anchor links */
+  [id] {
+    scroll-margin-top: 4rem;
   }
 
   body {
