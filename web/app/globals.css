@@ -173,7 +173,7 @@
   --ease-in-out: cubic-bezier(0.65, 0.00, 0.35, 1);
 
   --duration-quick: 120ms;
-  --duration-base: 200ms;
+  --duration-base: 200;
   --duration-slow: 360ms;
 
   /* ─── LAYOUT ─────────────────────────────────── */
@@ -273,6 +273,12 @@
     color: var(--color-ink-900);
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
+    scroll-behavior: smooth;
+  }
+
+  /* offset for fixed navbar when scrolling to anchor links */
+  [id] {
+    scroll-margin-top: 4rem;
   }
 
   body {
@@ -511,4 +517,12 @@
     cursor: not-allowed;
   }
 
+  .crosshatch-pattern-overlay {
+    position: absolute;
+    inset: 0;
+    background-image:
+      repeating-linear-gradient(45deg, color-mix(in srgb, var(--color-gold) 7%, transparent) 0px, color-mix(in srgb, var(--color-gold) 7%, transparent) 1px, transparent 1px, transparent 28px),
+      repeating-linear-gradient(-45deg, color-mix(in srgb, var(--color-gold) 7%, transparent) 0px, color-mix(in srgb, var(--color-gold) 7%, transparent) 1px, transparent 1px, transparent 28px);
+    pointer-events: none;
+  }
 }
