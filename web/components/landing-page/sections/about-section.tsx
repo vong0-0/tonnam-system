@@ -29,7 +29,7 @@ export default function AboutSection({ imageSrc, imageAlt }: AboutSectionProps) 
 
         {/* Left: Text content */}
         <div>
-          <p className="eyebrow mb-5">ກ່ຽວກັບເຮົາ · Our Story</p>
+          <p className="eyebrow mb-5 text-sm">ກ່ຽວກັບເຮົາ · Our Story</p>
 
           <h2 className="font-sans font-bold text-green leading-[1.2] text-[2rem] md:text-[2.625rem] mb-4">
             ຕົ້ນນ້ຳ, ຈຸດເລີ່ມຕົ້ນ{" "}
