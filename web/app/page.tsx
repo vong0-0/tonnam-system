@@ -1,7 +1,9 @@
+import HeroSection from "@/components/landing-page/sections/hero-section";
+
 export default function Page() {
   return (
-    <section className="w-full h-screen flex items-center justify-center">
-      <p className="font-bold text-lg">Hello world</p>
-    </section>
+    <>
+      <HeroSection />
+    </>
   )
 }

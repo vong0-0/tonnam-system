@@ -40,10 +40,10 @@ export default function RootLayout({
       lang="lo"
       className={`${playfairDisplay.variable} ${notoSansLao.variable} ${jetbrainsMono.variable} h-full antialiased`}
     >
-      <body className="min-h-full flex flex-col">
-          <SiteNavbar />
-          {children}
-        </body>
+      <body>
+        <SiteNavbar />
+        {children}
+      </body>
     </html>
   );
 }
