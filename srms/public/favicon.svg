@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" width="32" height="32">
+  <!-- Background circle -->
+  <circle cx="16" cy="16" r="16" fill="#1B4332"/>
+
+  <!-- Thin gold ring -->
+  <circle cx="16" cy="16" r="14.5" fill="none" stroke="#C9A84C" stroke-width="0.8" opacity="0.7"/>
+
+  <!-- Water ripple lines at bottom -->
+  <path d="M 7 23 Q 11 20.5 16 23 Q 21 25.5 25 23" fill="none" stroke="#C9A84C" stroke-width="1.1" stroke-linecap="round" opacity="0.8"/>
+  <path d="M 9 26 Q 13 23.5 16 25.5 Q 19 27.5 23 26" fill="none" stroke="#C9A84C" stroke-width="0.7" stroke-linecap="round" opacity="0.5"/>
+
+  <!-- T monogram — horizontal bar -->
+  <rect x="9" y="9" width="14" height="3.5" rx="1" fill="#FAF6F0"/>
+  <!-- T monogram — vertical stroke -->
+  <rect x="13.25" y="9" width="5.5" height="15" rx="1" fill="#FAF6F0"/>
+
+  <!-- Leaf bud ornament on top of T -->
+  <ellipse cx="16" cy="7" rx="2" ry="3" fill="#C9A84C"/>
+  <line x1="16" y1="10" x2="16" y2="12.5" stroke="#C9A84C" stroke-width="1" stroke-linecap="round" opacity="0.8"/>
+  <!-- Small side leaves -->
+  <path d="M 13.5 9.5 Q 11 6 13 4.5 Q 14 7.5 13.5 9.5 Z" fill="#C9A84C" opacity="0.75"/>
+  <path d="M 18.5 9.5 Q 21 6 19 4.5 Q 18 7.5 18.5 9.5 Z" fill="#C9A84C" opacity="0.75"/>
+</svg>
