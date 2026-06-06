@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Playfair_Display, Noto_Sans_Lao, JetBrains_Mono } from "next/font/google";
 import SiteNavbar from "@/components/common/site-navbar";
+import SiteFooter from "@/components/common/site-footer";
 import "./globals.css";
 
 const playfairDisplay = Playfair_Display({
@@ -43,6 +44,7 @@ export default function RootLayout({
       <body>
         <SiteNavbar />
         {children}
+        <SiteFooter />
       </body>
     </html>
   );
