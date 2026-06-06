@@ -5,9 +5,12 @@ import { Navbar, NavItems, NavItem, NavCta } from "@/components/common/navbar"
 
 function TonNamLogo() {
   return (
-    <Link href="/" className="flex flex-col gap-1 leading-none">
+    <Link href="/" className="flex gap-1 leading-none">
+      <span className="font-heading text-[20px] md:text-2xl font-semibold text-white leading-none">
+        Ton
+      </span>
       <span className="font-heading italic text-[20px] md:text-2xl font-semibold text-gold leading-none">
-        TonNam
+        Nam
       </span>
     </Link>
   )

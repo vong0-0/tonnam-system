@@ -511,4 +511,12 @@
     cursor: not-allowed;
   }
 
+  .crosshatch-pattern-overlay {
+    position: absolute;
+    inset: 0;
+    background-image:
+      repeating-linear-gradient(45deg, color-mix(in srgb, var(--color-gold) 7%, transparent) 0px, color-mix(in srgb, var(--color-gold) 7%, transparent) 1px, transparent 1px, transparent 28px),
+      repeating-linear-gradient(-45deg, color-mix(in srgb, var(--color-gold) 7%, transparent) 0px, color-mix(in srgb, var(--color-gold) 7%, transparent) 1px, transparent 1px, transparent 28px);
+    pointer-events: none;
+  }
 }
