@@ -1,5 +1,6 @@
 import http from 'http'
 import { Server } from 'socket.io'
+import { wsAllowedOrigins } from '@/config/cors.js'
 import { consumeTicket } from '@/websocket/ticket-store.js'
 import { WS_EVENTS } from '@/websocket/events.js'
 import logger from '@/utils/logger.js'
@@ -49,7 +50,7 @@ function canSubscribe(role: string, channel: string): boolean {
 }
 
 export function initWebSocket(server: http.Server): Server {
-  io = new Server(server, { cors: { origin: '*' } })
+  io = new Server(server, { cors: { origin: wsAllowedOrigins, credentials: true } })
 
   io.on('connection', (socket) => {
     const ticket = socket.handshake.query['ticket']

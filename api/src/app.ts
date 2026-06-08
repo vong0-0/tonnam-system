@@ -1,9 +1,11 @@
 import http from 'http'
 import { checkMissingEnvVars } from '@/config/env.js'
 import { connectDB } from '@/config/db.js'
+import { corsOptions } from '@/config/cors.js'
 import { errorHandler } from '@/middleware/error-handler.js'
 import { initWebSocket } from '@/websocket/handlers.js'
 import cookieParser from 'cookie-parser'
+import cors from 'cors'
 import express from 'express'
 import logger from '@/utils/logger.js'
 import authRouter from '@/routes/auth.routes.js'
@@ -24,6 +26,7 @@ await connectDB()
 
 const app = express()
 
+app.use(cors(corsOptions))
 app.use(express.json())
 app.use(cookieParser())
 
