@@ -39,3 +39,6 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# Override root lib/ pattern if it ever appears — src/lib/ must be tracked
+!src/lib/

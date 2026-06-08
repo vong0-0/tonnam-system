@@ -30,3 +30,6 @@ Thumbs.db
 
 # Test coverage
 coverage/
+
+# Override root lib/ pattern if it ever appears — src/lib/ must be tracked
+!src/lib/

@@ -1,7 +1,13 @@
 .DS_Store
 .env
+.env.development
+.env.staging
+.env.production
 /node_modules/
 
 # React Router
 /.react-router/
 /build/
+
+# Override root monorepo lib/ ignore rule (Python template) — app/lib/ must be tracked
+!app/lib/
