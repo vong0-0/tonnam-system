@@ -4,6 +4,7 @@ export const API = {
     REFRESH:   '/v1/auth/refresh',
     LOGOUT:    '/v1/auth/logout',
     WS_TICKET: '/v1/auth/ws-ticket',
+    ME:        '/v1/auth/me',
   },
 
   USERS: '/v1/users',

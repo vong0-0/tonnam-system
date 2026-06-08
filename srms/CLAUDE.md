@@ -112,11 +112,11 @@ Every API integration follows exactly 3 layers. Never skip or merge layers.
 service → query/mutation hook → component
 ```
 
-### Layer 1 — Service (`src/services/*.ts`)
+### Layer 1 — Service (`app/services/*.ts`)
 Raw API call only. No React. No state. Just axios + return data.
 
 ```ts
-// src/services/table.service.ts
+// app/services/table.service.ts
 import { api } from '@/lib/api'
 import { API } from '@/constants/api'
 import type { Table, ApiResponse, PaginatedResponse } from '@/types'
@@ -135,11 +135,11 @@ export async function updateTableStatus(
 }
 ```
 
-### Layer 2 — Hook (`src/hooks/*.ts`)
+### Layer 2 — Hook (`app/hooks/*.ts`)
 TanStack Query wrapping the service. No JSX. No business logic.
 
 ```ts
-// src/hooks/useTables.ts
+// app/hooks/useTables.ts
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { listTables, updateTableStatus } from '@/services/table.service'
 
@@ -171,7 +171,7 @@ export function useUpdateTableStatus() {
 Calls the hook. Renders data. No direct api or service imports.
 
 ```ts
-// src/pages/pos/index.tsx
+// app/pages/pos/index.tsx
 import { useTables } from '@/hooks/useTables'
 
 export function PosPage() {
@@ -182,8 +182,8 @@ export function PosPage() {
 
 ### File naming convention
 ```
-src/services/   table.service.ts, bill.service.ts, order.service.ts ...
-src/hooks/      useTables.ts, useBills.ts, useOrders.ts ...
+app/services/   table.service.ts, bill.service.ts, order.service.ts ...
+app/hooks/      useTables.ts, useBills.ts, useOrders.ts ...
 ```
 
 ### Query key convention
