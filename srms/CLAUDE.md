@@ -199,6 +199,22 @@ Never use raw string arrays as query keys inline in components.
 - One service file per API resource
 - One hook file per service file
 
+## Forms
+
+All forms use React Hook Form + Zod via shared wrappers.
+NEVER import from libraries directly.
+
+```ts
+import { useZodForm, z, type SubmitHandler } from '@/lib/form'
+import { loginSchema } from '@/schemas/auth.schema'
+```
+
+Schema location:
+```
+Shared primitives:  app/lib/schemas.ts
+Domain schemas:     app/schemas/*.schema.ts — one file per domain
+```
+
 ## WebSocket
 ALWAYS through `lib/socket.ts` only.
 Auth flow: POST /auth/ws-ticket → ticket (30s TTL, one-time) → connect with ?ticket=xxx
