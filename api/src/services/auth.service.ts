@@ -6,7 +6,16 @@ import logger from '@/utils/logger.js'
 import { problem } from '@/utils/problem.js'
 import { createTicket, consumeTicket } from '@/websocket/ticket-store.js'
 
+type AuthUser = {
+  id:         string
+  username:   string
+  first_name: string
+  last_name:  string
+  role:       Role
+}
+
 type TokenPair = { accessToken: string; refreshToken: string }
+type LoginResult = TokenPair & { user: AuthUser }
 
 function requireEnv(key: string): string {
   const value = process.env[key]
@@ -28,7 +37,7 @@ function signRefreshToken(userId: string): string {
   })
 }
 
-export async function login(username: string, password: string): Promise<TokenPair> {
+export async function login(username: string, password: string): Promise<LoginResult> {
   const INVALID = 'Invalid username or password.'
 
   const user = await UserModel.findOne({ username, is_active: true })
@@ -58,8 +67,15 @@ export async function login(username: string, password: string): Promise<TokenPa
   const payload: JwtPayload = { userId, role: user.role, name }
 
   return {
-    accessToken: signAccessToken(payload),
+    accessToken:  signAccessToken(payload),
     refreshToken: signRefreshToken(userId),
+    user: {
+      id:         userId,
+      username:   user.username,
+      first_name: user.first_name,
+      last_name:  user.last_name,
+      role:       user.role,
+    },
   }
 }
 

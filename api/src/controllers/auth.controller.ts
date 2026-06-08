@@ -17,12 +17,12 @@ const cookieOptions = {
 
 export async function login(req: Request, res: Response, next: NextFunction): Promise<void> {
   try {
-    const { accessToken, refreshToken } = await authService.login(
+    const { accessToken, refreshToken, user } = await authService.login(
       req.body.username,
       req.body.password,
     )
     res.cookie('refreshToken', refreshToken, { ...cookieOptions, maxAge: 7 * 24 * 60 * 60 * 1000 })
-    res.json(success({ accessToken }, 'Login successful'))
+    res.json(success({ access_token: accessToken, user }, 'Login successful'))
   } catch (err) {
     next(err)
   }
@@ -54,7 +54,7 @@ export async function refresh(req: Request, res: Response, next: NextFunction): 
       ...cookieOptions,
       maxAge: 7 * 24 * 60 * 60 * 1000,
     })
-    res.json(success({ accessToken }, 'Token refreshed'))
+    res.json(success({ access_token: accessToken }, 'Token refreshed'))
   } catch (err) {
     next(err)
   }
