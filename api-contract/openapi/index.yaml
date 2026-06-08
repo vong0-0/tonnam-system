@@ -175,6 +175,8 @@ paths:
     $ref: './paths/auth.yaml#/logout'
   /auth/ws-ticket:
     $ref: './paths/auth.yaml#/ws-ticket'
+  /auth/me:
+    $ref: './paths/auth.yaml#/me'
 
   # Users
   /users:

@@ -1,5 +1,6 @@
 import type { NextFunction, Request, Response } from 'express'
 import * as authService from '@/services/auth.service.js'
+import * as userService from '@/services/user.service.js'
 import { type AuthRequest } from '@/types/index.js'
 import { PROBLEM_CONTENT_TYPE, problem } from '@/utils/problem.js'
 import { success } from '@/utils/response.js'
@@ -74,6 +75,15 @@ export async function wsTicket(req: Request, res: Response, next: NextFunction):
     const { userId, role, name } = asAuth(req).user
     const payload = await authService.generateWsTicket(userId, role, name)
     res.json(success(payload, 'WebSocket ticket generated'))
+  } catch (err) {
+    next(err)
+  }
+}
+
+export async function getMe(req: Request, res: Response, next: NextFunction): Promise<void> {
+  try {
+    const user = await userService.getUserById(asAuth(req).user.userId)
+    res.status(200).json(success(user, 'User retrieved successfully'))
   } catch (err) {
     next(err)
   }

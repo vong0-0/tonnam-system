@@ -10,5 +10,6 @@ router.post('/login', validate(loginSchema), authController.login)
 router.post('/refresh', authController.refresh)
 router.post('/logout', authenticate, authController.logout)
 router.post('/ws-ticket', authenticate, authController.wsTicket)
+router.get('/me', authenticate, authController.getMe)
 
 export default router
