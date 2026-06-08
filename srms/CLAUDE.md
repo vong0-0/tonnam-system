@@ -97,6 +97,26 @@ import { ROLES } from '@/constants/roles'
 import { WS_EVENTS, WS_CHANNELS } from '@/constants/socket'
 ```
 
+## Date & Time
+ALWAYS use `@/lib/date` — NEVER call date-fns or Date methods directly in components.
+
+```
+Default format: dd/MM/yyyy (CE Gregorian) · 24-hour clock
+```
+
+```ts
+import { formatDate, formatRelative, useLiveClock, DATE_FORMATS } from '@/lib/date'
+
+formatDate(date)                           // "08/06/2026" (default)
+formatDate(date, DATE_FORMATS.DATE_TIME)   // "08/06/2026 14:32"
+formatDate(date, DATE_FORMATS.TIME)        // "14:32"
+formatRelative(date)                       // "2 minutes ago"
+useLiveClock()                             // "14:32:05" (hook, updates every 1s)
+useLiveClock(DATE_FORMATS.TIME)            // "14:32"
+```
+
+ALWAYS use `DATE_FORMATS` constants — NEVER pass raw format strings in components.
+
 ## API Calls
 ALWAYS through `lib/api.ts` (Axios instance) only:
 ```ts

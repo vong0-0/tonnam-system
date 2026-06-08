@@ -1,8 +1,10 @@
 import { z } from 'zod'
-import { requiredString, password } from '@/lib/schemas'
+import { password } from '@/lib/schemas'
 
 export const loginSchema = z.object({
-  username: requiredString,
+  username: z
+    .string({ error: 'ກະລຸນາປ້ອນຊື່ຜູ້ໃຊ້ຂອງທ່ານ' })
+    .min(1, 'ກະລຸນາປ້ອນຊື່ຜູ້ໃຊ້ຂອງທ່ານ'),
   password: password,
 })
 

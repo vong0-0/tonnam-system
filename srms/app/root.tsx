@@ -11,6 +11,7 @@ import { ReactQueryDevtools } from '@tanstack/react-query-devtools'
 
 import type { Route } from "./+types/root";
 import { queryClient } from '@/lib/query-client'
+import { useRestoreAuth } from '@/hooks/useAuth'
 import "./app.css";
 
 export const links: Route.LinksFunction = () => [];
@@ -33,13 +34,27 @@ export function Layout({ children }: { children: React.ReactNode }) {
   );
 }
 
+function AppInner() {
+  const { isLoading } = useRestoreAuth()
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-ink-50 flex items-center justify-center">
+        <div className="w-6 h-6 border-2 border-green border-t-transparent rounded-full animate-spin" />
+      </div>
+    )
+  }
+
+  return <Outlet />
+}
+
 export default function App() {
   return (
     <QueryClientProvider client={queryClient}>
-      <Outlet />
+      <AppInner />
       {import.meta.env.DEV && <ReactQueryDevtools initialIsOpen={false} />}
     </QueryClientProvider>
-  );
+  )
 }
 
 export function ErrorBoundary({ error }: Route.ErrorBoundaryProps) {

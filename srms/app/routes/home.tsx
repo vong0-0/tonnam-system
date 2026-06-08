@@ -1,13 +1,14 @@
-import type { Route } from "./+types/home";
-import { Welcome } from "../welcome/welcome";
-
-export function meta({}: Route.MetaArgs) {
-  return [
-    { title: "New React Router App" },
-    { name: "description", content: "Welcome to React Router!" },
-  ];
-}
+import { Navigate } from 'react-router'
+import { useAuthStore } from '@/stores/auth.store'
+import { ROLE_REDIRECT } from '@/constants/roles'
+import { ROUTES } from '@/constants/routes'
 
 export default function Home() {
-  return <Welcome />;
+  const user = useAuthStore((s) => s.user)
+
+  if (user) {
+    return <Navigate to={ROLE_REDIRECT[user.role]} replace />
+  }
+
+  return <Navigate to={ROUTES.LOGIN} replace />
 }
