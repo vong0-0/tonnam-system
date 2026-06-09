@@ -93,9 +93,9 @@
   --color-status-available-border: rgba(15, 155, 142, 0.30);
   --color-status-available-fg: #0F9B8E;
 
-  --color-status-occupied-bg: #1B4332;
-  --color-status-occupied-border: #1B4332;
-  --color-status-occupied-fg: #FAF6F0;
+  --color-status-occupied-bg: rgba(27, 67, 50, 0.12);
+  --color-status-occupied-border: rgba(27, 67, 50, 0.30);
+  --color-status-occupied-fg: #1B4332;
 
   --color-status-reserved-bg: rgba(245, 166, 35, 0.10);
   --color-status-reserved-border: rgba(245, 166, 35, 0.40);
@@ -104,6 +104,15 @@
   --color-status-paid-bg: #D8EDDF;
   --color-status-paid-border: #2D6A4F;
   --color-status-paid-fg: #2D6A4F;
+
+  /* Status — Bill Badges */
+  --color-status-open-bg: rgba(27, 67, 50, 0.12);
+  --color-status-open-border: rgba(27, 67, 50, 0.30);
+  --color-status-open-fg: #1B4332;
+
+  --color-status-cancelled-bg: rgba(192, 57, 43, 0.08);
+  --color-status-cancelled-border: rgba(192, 57, 43, 0.22);
+  --color-status-cancelled-fg: #C0392B;
 
   /* ─── FONTS ──────────────────────────────────── */
 
@@ -524,8 +533,8 @@
   --card-foreground: oklch(0.145 0 0);
   --popover: oklch(1 0 0);
   --popover-foreground: oklch(0.145 0 0);
-  --primary: oklch(0.205 0 0);
-  --primary-foreground: oklch(0.985 0 0);
+  --primary: oklch(0.27 0.07 152);
+  --primary-foreground: oklch(1 0 0);
   --secondary: oklch(0.97 0 0);
   --secondary-foreground: oklch(0.205 0 0);
   --muted: oklch(0.97 0 0);

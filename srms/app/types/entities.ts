@@ -153,8 +153,14 @@ export interface OrderWithItems extends Order {
   items: OrderItem[]
 }
 
+export interface BillTable {
+  id: string
+  table_name: string
+  status: TableStatus
+}
+
 export interface BillDetail extends Bill {
-  table: { id: string; table_name: string; status: TableStatus } | null
+  table: BillTable
   orders: OrderWithItems[]
   payments: Payment[]
 }

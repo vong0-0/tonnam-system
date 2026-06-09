@@ -2,11 +2,14 @@ import { useState, useEffect } from 'react'
 import { format, formatDistanceToNow, isValid, parseISO } from 'date-fns'
 
 export const DATE_FORMATS = {
-  DATE:              'dd/MM/yyyy',
-  DATE_SHORT:        'd/M/yyyy',
-  DATE_TIME:         'dd/MM/yyyy HH:mm',
-  TIME:              'HH:mm',
-  TIME_WITH_SECONDS: 'HH:mm:ss',
+  DATE:                       'dd/MM/yyyy',
+  DATE_SHORT:                 'd/M/yyyy',
+  DATE_TIME:                  'dd/MM/yyyy HH:mm',
+  TIME:                       'HH:mm',
+  TIME_WITH_SECONDS:          'HH:mm:ss',
+  DATE_ISO:                   'yyyy-MM-dd',
+  DATE_TIME_ISO:              'yyyy-MM-dd HH:mm',
+  DATE_TIME_ISO_WITH_SECONDS: 'yyyy-MM-dd HH:mm:ss',
 } as const
 
 export type DateFormat = (typeof DATE_FORMATS)[keyof typeof DATE_FORMATS]
