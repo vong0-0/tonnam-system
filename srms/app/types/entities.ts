@@ -50,7 +50,7 @@ export interface Table {
   status:         TableStatus
   is_temporary:   boolean
   merge_group_id: string | null
-  bill_ids:       string[]
+  bill_ids:       string[] | null
   created_at:     string
   updated_at:     string
 }
@@ -60,6 +60,10 @@ export interface TableMergeGroup {
   table_ids:  string[]
   created_by: string
   created_at: string
+}
+
+export interface TableWithMergeGroup extends Table {
+  merge_group: TableMergeGroup | null
 }
 
 export interface Reservation {

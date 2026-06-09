@@ -7,6 +7,9 @@ export default [
   layout("layouts/guard.layout.tsx", [
     route("select", "routes/select.tsx"),
     route("admin", "routes/admin/index.tsx"),
+    layout("layouts/waiter.layout.tsx", [
+      route("waiter", "routes/waiter/index.tsx"),
+    ])
   ]),
   route("*", "routes/not-found.tsx"),
 ] satisfies RouteConfig;

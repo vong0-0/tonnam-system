@@ -1,0 +1,253 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-06-09T00:00:00.000Z",
+  "title": "Design System: TonNam · ต้นน้ำ",
+  "extensions": {
+    "colorMeta": {
+      "forest-deep": {
+        "role": "primary",
+        "displayName": "Deep Forest",
+        "canonical": "#1B4332",
+        "tonalRamp": ["#0A1B14", "#112B1F", "#1B4332", "#245B43", "#2D6A4F", "#438B67", "#7DBB9A", "#D8EDDF"]
+      },
+      "forest-light": {
+        "role": "primary",
+        "displayName": "Forest Light",
+        "canonical": "#2D6A4F",
+        "tonalRamp": ["#112B1F", "#1B4332", "#245B43", "#2D6A4F", "#3D7D61", "#4FA077", "#7EC4A1", "#D8EDDF"]
+      },
+      "forest-pale": {
+        "role": "primary",
+        "displayName": "Forest Pale",
+        "canonical": "#D8EDDF",
+        "tonalRamp": ["#1B4332", "#2D6A4F", "#4A9970", "#78BF96", "#A8D6BC", "#C4E5D0", "#D8EDDF", "#F0F9F4"]
+      },
+      "gold": {
+        "role": "secondary",
+        "displayName": "Warm Gold",
+        "canonical": "#C9A84C",
+        "tonalRamp": ["#3D2B04", "#6B4A09", "#8B6A1A", "#A88430", "#C9A84C", "#D9BF78", "#E9D5A8", "#F5EDCE"]
+      },
+      "gold-dark": {
+        "role": "secondary",
+        "displayName": "Gold Dark",
+        "canonical": "#8B6A1A",
+        "tonalRamp": ["#3D2B04", "#6B4A09", "#8B6A1A", "#A88430", "#C9A84C", "#D9BF78", "#E9D5A8", "#F5EDCE"]
+      },
+      "gold-pale": {
+        "role": "secondary",
+        "displayName": "Gold Pale",
+        "canonical": "#F5EDCE",
+        "tonalRamp": ["#3D2B04", "#6B4A09", "#8B6A1A", "#A88430", "#C9A84C", "#D9BF78", "#E9D5A8", "#F5EDCE"]
+      },
+      "terra": {
+        "role": "tertiary",
+        "displayName": "Terracotta",
+        "canonical": "#C4623A",
+        "tonalRamp": ["#4A1A0A", "#7A2C15", "#8B3A1F", "#A84A2A", "#C4623A", "#D47E5A", "#E4A888", "#F2D5C4"]
+      },
+      "cream": {
+        "role": "neutral",
+        "displayName": "Warm Cream",
+        "canonical": "#FAF6F0",
+        "tonalRamp": ["#2C1810", "#4A3528", "#7A5A48", "#A88070", "#C9AFA0", "#E0CEC5", "#EDE8DC", "#FAF6F0"]
+      },
+      "brown": {
+        "role": "neutral",
+        "displayName": "Dark Brown",
+        "canonical": "#2C1810",
+        "tonalRamp": ["#0F0806", "#1C100A", "#2C1810", "#4A3528", "#7A5A48", "#A88070", "#D4B8AC", "#FAF6F0"]
+      },
+      "ink-900": {
+        "role": "neutral",
+        "displayName": "Deep Charcoal",
+        "canonical": "#1F2326",
+        "tonalRamp": ["#0D0F11", "#141719", "#1F2326", "#2E3338", "#495057", "#6C757D", "#ADB5BD", "#F1F3F5"]
+      },
+      "ink-700": {
+        "role": "neutral",
+        "displayName": "Slate Body",
+        "canonical": "#495057",
+        "tonalRamp": ["#141719", "#1F2326", "#2E3338", "#495057", "#6C757D", "#ADB5BD", "#CED4DA", "#F1F3F5"]
+      },
+      "ink-500": {
+        "role": "neutral",
+        "displayName": "Muted Slate",
+        "canonical": "#6C757D",
+        "tonalRamp": ["#1F2326", "#2E3338", "#495057", "#6C757D", "#ADB5BD", "#CED4DA", "#E9ECEF", "#F8F9FA"]
+      },
+      "ink-100": {
+        "role": "neutral",
+        "displayName": "Border Grey",
+        "canonical": "#DEE2E6",
+        "tonalRamp": ["#495057", "#6C757D", "#ADB5BD", "#CED4DA", "#DEE2E6", "#E9ECEF", "#F1F3F5", "#FFFFFF"]
+      },
+      "ink-50": {
+        "role": "neutral",
+        "displayName": "Near White",
+        "canonical": "#F1F3F5",
+        "tonalRamp": ["#6C757D", "#ADB5BD", "#CED4DA", "#DEE2E6", "#E9ECEF", "#F1F3F5", "#F8F9FA", "#FFFFFF"]
+      },
+      "paper": {
+        "role": "neutral",
+        "displayName": "Paper White",
+        "canonical": "#FFFFFF",
+        "tonalRamp": ["#1F2326", "#495057", "#ADB5BD", "#DEE2E6", "#F1F3F5", "#F8F9FA", "#FCFCFC", "#FFFFFF"]
+      },
+      "success": {
+        "role": "semantic",
+        "displayName": "Teal Jade",
+        "canonical": "#0F9B8E",
+        "tonalRamp": ["#042B28", "#065F57", "#0A7A71", "#0F9B8E", "#19B2A5", "#46C5B9", "#82D9D3", "#C4EEEB"]
+      },
+      "warning": {
+        "role": "semantic",
+        "displayName": "Warm Amber",
+        "canonical": "#F5A623",
+        "tonalRamp": ["#3D2400", "#7A4A00", "#A86400", "#C98010", "#F5A623", "#F7BD5A", "#FAD38E", "#FDEAC6"]
+      },
+      "danger": {
+        "role": "semantic",
+        "displayName": "Chili Red",
+        "canonical": "#C0392B",
+        "tonalRamp": ["#3B0A07", "#6B1510", "#8B1C15", "#A5271E", "#C0392B", "#D05347", "#E08A83", "#F2C5C1"]
+      }
+    },
+    "typographyMeta": {
+      "display":  { "displayName": "Display",      "purpose": "Hero headlines on public surfaces only. Playfair Display. Forbidden on internal pages." },
+      "headline": { "displayName": "Headline",     "purpose": "Page-level H2 on public. Menu section headers." },
+      "title":    { "displayName": "Title",        "purpose": "H3 on public, major section titles on public." },
+      "body":     { "displayName": "Body",         "purpose": "All readable prose. Max 65–75ch. Noto Sans Thai on all surfaces." },
+      "label":    { "displayName": "Label Medium", "purpose": "Button text, form labels, nav items, badge text, internal primary text." },
+      "caption":  { "displayName": "Caption",      "purpose": "Supporting text, timestamps, helper text." },
+      "mono":     { "displayName": "Mono",         "purpose": "ALL short IDs (B-0042, O-0117) and currency amounts in data tables. Never for body copy." },
+      "eyebrow":  { "displayName": "Eyebrow",      "purpose": "Section labels on public surfaces only, Terracotta color. Forbidden on internal pages." }
+    },
+    "shadows": [
+      { "name": "subtle-lift",  "value": "0 1px 2px rgba(44,24,16,0.06)",                                     "purpose": "Small elements at hover, buttons at rest." },
+      { "name": "card",         "value": "0 2px 8px rgba(44,24,16,0.08), 0 1px 2px rgba(44,24,16,0.05)",     "purpose": "Standard cards, dropdowns, select panels." },
+      { "name": "elevated",     "value": "0 8px 24px rgba(44,24,16,0.12), 0 2px 6px rgba(44,24,16,0.06)",    "purpose": "Modals, drawers, command palettes, sticky headers when scrolled." },
+      { "name": "hero",         "value": "0 24px 60px rgba(27,67,50,0.22)",                                   "purpose": "Large focal elements on public pages. Green-tinted rather than brown." },
+      { "name": "focus-ring",   "value": "0 0 0 3px rgba(27,67,50,0.20)",                                     "purpose": "Focus state on all interactive elements. Forest green tint." }
+    ],
+    "motion": [
+      { "name": "quick",      "value": "120ms ease",                          "purpose": "Toggle switches, checkbox ticks, focus rings, hover background fills on internal." },
+      { "name": "base",       "value": "200ms ease",                          "purpose": "Card hover lifts, status badge color transitions, button press scale, dropdown open." },
+      { "name": "slow",       "value": "360ms ease",                          "purpose": "Page-level transitions, modal open/close, drawer slide, hero elements on public." },
+      { "name": "ease-enter", "value": "cubic-bezier(0.22, 0.61, 0.36, 1)",  "purpose": "Enter animations. Elements arriving on screen." },
+      { "name": "ease-trans", "value": "cubic-bezier(0.65, 0, 0.35, 1)",     "purpose": "State transitions. Elements changing in place." }
+    ],
+    "breakpoints": [
+      { "name": "mobile",  "value": "375px",  "purpose": "Waiter App and Kitchen Display primary viewport." },
+      { "name": "desktop", "value": "1280px", "purpose": "POS and Admin primary viewport." }
+    ]
+  },
+  "components": [
+    {
+      "name": "Primary Button",
+      "kind": "button",
+      "refersTo": "button-primary",
+      "description": "Forest Green fill. The primary action on any given screen. Used for confirm, submit, pay, seat.",
+      "html": "<button class=\"ds-btn-primary\">ยืนยัน</button>",
+      "css": ".ds-btn-primary { display: inline-flex; align-items: center; justify-content: center; gap: 4px; height: 40px; padding: 0 16px; background: #1B4332; color: #FFFFFF; font-family: 'Noto Sans Thai', sans-serif; font-size: 14px; font-weight: 600; border: none; border-radius: 8px; cursor: pointer; transition: background 180ms ease, transform 150ms ease; white-space: nowrap; } .ds-btn-primary:hover { background: #2D6A4F; } .ds-btn-primary:focus-visible { outline: none; box-shadow: 0 0 0 3px rgba(27,67,50,0.3); } .ds-btn-primary:active { transform: scale(0.97); } .ds-btn-primary:disabled { opacity: 0.5; cursor: not-allowed; }"
+    },
+    {
+      "name": "Secondary Button",
+      "kind": "button",
+      "refersTo": "button-secondary",
+      "description": "Transparent fill with 2px Forest Green border. Equal visual weight to Primary via border thickness, not fill.",
+      "html": "<button class=\"ds-btn-secondary\">ยกเลิก</button>",
+      "css": ".ds-btn-secondary { display: inline-flex; align-items: center; justify-content: center; height: 40px; padding: 0 16px; background: transparent; color: #1B4332; font-family: 'Noto Sans Thai', sans-serif; font-size: 14px; font-weight: 600; border: 2px solid #1B4332; border-radius: 8px; cursor: pointer; transition: background 180ms ease, transform 150ms ease; white-space: nowrap; } .ds-btn-secondary:hover { background: rgba(27,67,50,0.08); } .ds-btn-secondary:focus-visible { outline: none; box-shadow: 0 0 0 3px rgba(27,67,50,0.3); } .ds-btn-secondary:active { transform: scale(0.97); } .ds-btn-secondary:disabled { opacity: 0.5; cursor: not-allowed; }"
+    },
+    {
+      "name": "Danger Button",
+      "kind": "button",
+      "refersTo": "button-danger",
+      "description": "Chili Red fill. Destructive actions only. Label must be specific: ยืนยันการยกเลิก not ยืนยัน.",
+      "html": "<button class=\"ds-btn-danger\">ยืนยันการยกเลิก</button>",
+      "css": ".ds-btn-danger { display: inline-flex; align-items: center; justify-content: center; height: 40px; padding: 0 16px; background: #C0392B; color: #FFFFFF; font-family: 'Noto Sans Thai', sans-serif; font-size: 14px; font-weight: 600; border: none; border-radius: 8px; cursor: pointer; transition: background 180ms ease, transform 150ms ease; white-space: nowrap; } .ds-btn-danger:hover { background: #a93226; } .ds-btn-danger:focus-visible { outline: none; box-shadow: 0 0 0 3px rgba(192,57,43,0.3); } .ds-btn-danger:active { transform: scale(0.97); } .ds-btn-danger:disabled { opacity: 0.5; cursor: not-allowed; }"
+    },
+    {
+      "name": "Status Badges",
+      "kind": "chip",
+      "refersTo": "badge",
+      "description": "Operational heartbeat of the staff interface. Pill shape, dot + label. Color is never the sole indicator.",
+      "html": "<div style=\"display:flex;gap:8px;flex-wrap:wrap\"><span class=\"ds-badge ds-badge-available\"><span class=\"ds-badge-dot\"></span>ว่าง</span><span class=\"ds-badge ds-badge-occupied\"><span class=\"ds-badge-dot\"></span>มีลูกค้า</span><span class=\"ds-badge ds-badge-reserved\"><span class=\"ds-badge-dot\"></span>จอง</span><span class=\"ds-badge ds-badge-paid\"><span class=\"ds-badge-dot\"></span>ชำระแล้ว</span></div>",
+      "css": ".ds-badge { display: inline-flex; align-items: center; gap: 5px; padding: 2px 8px; border-radius: 999px; font-family: 'Noto Sans Thai', sans-serif; font-size: 12px; font-weight: 600; white-space: nowrap; border: none; } .ds-badge-dot { width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; } .ds-badge-available { background: rgba(15,155,142,0.08); color: #0F9B8E; } .ds-badge-available .ds-badge-dot { background: #0F9B8E; } .ds-badge-occupied { background: #1B4332; color: #FAF6F0; } .ds-badge-occupied .ds-badge-dot { background: #FAF6F0; } .ds-badge-reserved { background: rgba(245,166,35,0.10); color: #B37D00; } .ds-badge-reserved .ds-badge-dot { background: #F5A623; } .ds-badge-paid { background: #D8EDDF; color: #2D6A4F; } .ds-badge-paid .ds-badge-dot { background: #2D6A4F; }"
+    },
+    {
+      "name": "Internal Card",
+      "kind": "card",
+      "refersTo": "card-internal",
+      "description": "Paper White on Near-White page. Warm hairline border. Card shadow at rest. Standard internal container.",
+      "html": "<div class=\"ds-card\"><p class=\"ds-card-title\">โต๊ะ 3</p><p class=\"ds-card-meta\">4 ที่นั่ง · ว่าง</p></div>",
+      "css": ".ds-card { background: #FFFFFF; border: 1px solid rgba(44,24,16,0.10); border-radius: 10px; padding: 16px; box-shadow: 0 2px 8px rgba(44,24,16,0.08), 0 1px 2px rgba(44,24,16,0.05); max-width: 280px; } .ds-card-title { font-family: 'Noto Sans Thai', sans-serif; font-size: 13px; font-weight: 600; color: #1F2326; margin: 0 0 4px 0; } .ds-card-meta { font-family: 'Noto Sans Thai', sans-serif; font-size: 12px; color: #6C757D; margin: 0; }"
+    },
+    {
+      "name": "Search Input",
+      "kind": "input",
+      "refersTo": "input",
+      "description": "Full-width search with pinned Search icon left, clear X button when value is set. Debounce at 300ms.",
+      "html": "<div class=\"ds-search-wrap\"><svg class=\"ds-search-icon\" xmlns=\"http://www.w3.org/2000/svg\" width=\"14\" height=\"14\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"#6C757D\" stroke-width=\"1.5\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><circle cx=\"11\" cy=\"11\" r=\"8\"/><path d=\"m21 21-4.35-4.35\"/></svg><input class=\"ds-search-input\" type=\"text\" placeholder=\"ຄົ້ນຫາ...\"></div>",
+      "css": ".ds-search-wrap { position: relative; display: inline-flex; align-items: center; width: 240px; } .ds-search-icon { position: absolute; left: 10px; pointer-events: none; } .ds-search-input { width: 100%; height: 40px; padding: 0 12px 0 34px; background: #FFFFFF; color: #1F2326; font-family: 'Noto Sans Thai', sans-serif; font-size: 15px; border: 1px solid #DEE2E6; border-radius: 8px; outline: none; transition: border-color 150ms ease, box-shadow 150ms ease; } .ds-search-input::placeholder { color: #ADB5BD; } .ds-search-input:focus { border-color: #1B4332; box-shadow: 0 0 0 3px rgba(27,67,50,0.12); }"
+    },
+    {
+      "name": "Table Card — Waiter",
+      "kind": "card",
+      "refersTo": "card-internal",
+      "description": "Signature component. Status-tinted card for the waiter table list. Each status has its own bg/border/text palette. OCCUPIED inverts to Forest fill.",
+      "html": "<div style=\"display:flex;flex-direction:column;gap:8px;width:320px\"><div class=\"ds-tcard ds-tcard-available\"><div class=\"ds-tcard-info\"><span class=\"ds-tcard-name\">โต๊ะ 1</span><span class=\"ds-tcard-meta\">4 ທີ່ນັ່ງ</span></div><span class=\"ds-badge ds-badge-available\"><span class=\"ds-badge-dot\"></span>ວ່າງ</span></div><div class=\"ds-tcard ds-tcard-occupied\"><div class=\"ds-tcard-info\"><span class=\"ds-tcard-name\">โต๊ะ 2</span><span class=\"ds-tcard-meta\">2 ທີ່ນັ່ງ</span></div><span class=\"ds-badge ds-badge-occupied\"><span class=\"ds-badge-dot\"></span>ມີລູກຄ້າ</span></div><div class=\"ds-tcard ds-tcard-reserved\"><div class=\"ds-tcard-info\"><span class=\"ds-tcard-name\">โต๊ะ 3</span><span class=\"ds-tcard-meta\">6 ທີ່ນັ່ງ</span></div><span class=\"ds-badge ds-badge-reserved\"><span class=\"ds-badge-dot\"></span>ຈອງ</span></div><div class=\"ds-tcard ds-tcard-paid\"><div class=\"ds-tcard-info\"><span class=\"ds-tcard-name\">โต๊ะ 4</span><span class=\"ds-tcard-meta\">4 ທີ່ນັ່ງ</span></div><span class=\"ds-badge ds-badge-paid\"><span class=\"ds-badge-dot\"></span>ຊຳລະເງິນແລ້ວ</span></div></div>",
+      "css": ".ds-tcard { display: flex; align-items: center; justify-content: space-between; padding: 12px 16px; border-radius: 10px; border: 1px solid; cursor: pointer; transition: transform 200ms ease, box-shadow 200ms ease; } .ds-tcard:hover { transform: translateY(-2px); box-shadow: 0 2px 8px rgba(44,24,16,0.08), 0 1px 2px rgba(44,24,16,0.05); } .ds-tcard:active { transform: translateY(0); box-shadow: none; } .ds-tcard-info { display: flex; flex-direction: column; gap: 2px; } .ds-tcard-name { font-family: 'Noto Sans Thai', sans-serif; font-size: 13px; font-weight: 600; } .ds-tcard-meta { font-family: 'Noto Sans Thai', sans-serif; font-size: 12px; } .ds-tcard-available { background: rgba(15,155,142,0.08); border-color: rgba(15,155,142,0.30); } .ds-tcard-available .ds-tcard-name { color: #1F2326; } .ds-tcard-available .ds-tcard-meta { color: #495057; } .ds-tcard-occupied { background: #1B4332; border-color: #1B4332; } .ds-tcard-occupied .ds-tcard-name { color: #FAF6F0; } .ds-tcard-occupied .ds-tcard-meta { color: rgba(250,246,240,0.70); } .ds-tcard-reserved { background: rgba(245,166,35,0.10); border-color: rgba(245,166,35,0.40); } .ds-tcard-reserved .ds-tcard-name { color: #1F2326; } .ds-tcard-reserved .ds-tcard-meta { color: #495057; } .ds-tcard-paid { background: #D8EDDF; border-color: #2D6A4F; } .ds-tcard-paid .ds-tcard-name { color: #1F2326; } .ds-tcard-paid .ds-tcard-meta { color: #495057; } .ds-badge { display: inline-flex; align-items: center; gap: 5px; padding: 2px 8px; border-radius: 999px; font-family: 'Noto Sans Thai', sans-serif; font-size: 12px; font-weight: 600; white-space: nowrap; } .ds-badge-dot { width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; } .ds-badge-available { background: rgba(15,155,142,0.08); color: #0F9B8E; } .ds-badge-available .ds-badge-dot { background: #0F9B8E; } .ds-badge-occupied { background: rgba(250,246,240,0.15); color: #FAF6F0; } .ds-badge-occupied .ds-badge-dot { background: #FAF6F0; } .ds-badge-reserved { background: rgba(245,166,35,0.10); color: #B37D00; } .ds-badge-reserved .ds-badge-dot { background: #F5A623; } .ds-badge-paid { background: #D8EDDF; color: #2D6A4F; } .ds-badge-paid .ds-badge-dot { background: #2D6A4F; }"
+    }
+  ],
+  "narrative": {
+    "northStar": "Quiet Heritage",
+    "overview": "TonNam is a Thai heritage restaurant. The design system runs on two parallel tracks: one for guests, one for staff. Neither track is a compromise of the other.\n\nThe Public Track (guest-facing: /, /menu) is full brand expression — deep forest green, warm gold accents, Playfair Display serif headings, generous cream backgrounds. It should feel like picking up a menu printed on cotton paper, or sitting in a dining room where the walls are made of something that took time.\n\nThe Internal Track (staff-facing: /pos, /waiter, /kitchen, /admin) is where the same brand becomes functional authority. Forest green returns as the primary action color. Noto Sans Thai carries everything. The palette steps down to a structured greyscale ink scale with forest green reserved for what matters: primary buttons, active navigation, key states. Staff should feel they are using a professional tool built specifically for TonNam — not a rebranded SaaS panel.\n\nBoth tracks reject the same failure modes: cold generic admin panels, loud gradient dashboards, sterile fintech neutrality, Western fine-dining minimalism that strips warmth in the name of whitespace.",
+    "keyCharacteristics": [
+      "Two-track identity: warm heritage public / functional authority internal",
+      "Forest green (#1B4332) as the single brand anchor across both tracks",
+      "Warm brown-tinted shadows throughout — never neutral grey",
+      "Bilingual Thai + English on public; Thai-primary on internal",
+      "Monospace for all IDs and currency amounts (B-0042, ฿1,250.00)",
+      "Real-time state is always visible; the screen is always current"
+    ],
+    "rules": [
+      { "name": "The No-Pure-Neutral Rule",    "body": "Never use pure black (#000) or pure white (#FFF) as text or background on public surfaces. Dark Brown (#2C1810) and Warm Cream (#FAF6F0) are the floor and ceiling.", "section": "colors" },
+      { "name": "The Gold Rarity Rule",         "body": "Gold (#C9A84C) appears on ≤15% of any given screen: italic emphasis in one heading word, prices, logo mark accent. Not as a background fill, not as decoration. Its scarcity is what makes it feel like value.", "section": "colors" },
+      { "name": "The Track Rule",               "body": "The warm public palette (cream, brown, gold) and the greyscale internal palette (ink scale) do not mix within a single page. No Warm Cream on internal pages; no ink-50 on public pages. Forest green is the only color that crosses the line — and it does so deliberately.", "section": "colors" },
+      { "name": "The Two-Font Rule",            "body": "Playfair Display is forbidden on internal pages (POS, Waiter, Kitchen, Admin). Noto Sans Thai handles all internal typography including headings. The serif is a guest-facing material, not a tool material.", "section": "typography" },
+      { "name": "The Italic Gold Rule",         "body": "One italic-gold (#C9A84C) emphasis word per Playfair Display heading, maximum. Never two gold words in the same heading. Never italic-gold on body text.", "section": "typography" },
+      { "name": "The Thai-First Rule",          "body": "All internal interfaces are Thai-primary. All IDs and currency values use monospace. Sentence case throughout — never ALL CAPS buttons.", "section": "typography" },
+      { "name": "The Warm Shadow Rule",         "body": "Every shadow in this system is tinted with brand brown (rgba(44,24,16,...)) or brand green (rgba(27,67,50,...)). Never rgba(0,0,0,...). A neutral-grey shadow on any TonNam surface is a defect, not a design choice.", "section": "elevation" },
+      { "name": "The Flat-By-Default Rule",     "body": "Internal pages are flat at rest. Shadows appear only on elevated surfaces (cards, dropdowns, modals) and as a response to interaction (hover lift, focused input ring). Depth on internal is earned through tonal background steps (ink-50 page → white card → ink-100 border), not shadow stacking.", "section": "elevation" }
+    ],
+    "dos": [
+      "Do use Warm Cream (#FAF6F0) as the only page background on public surfaces. Never pure white on public.",
+      "Do use Dark Brown (#2C1810) for body text on public. Never pure black.",
+      "Do render all short IDs (B-0042, O-0117, T-05) and all currency amounts in JetBrains Mono with font-variant-numeric: tabular-nums on currency columns.",
+      "Do write all Thai bill names and entity names verbatim (e.g. บิลโต๊ะ 5, โต๊ะ 3).",
+      "Do write button labels in sentence case, Thai-primary on internal (e.g. ยืนยันการชำระเงิน, Save changes).",
+      "Do reserve Playfair Display strictly for public surfaces: headings, hero text, the public CTA button, the logo.",
+      "Do tint all shadows with brand brown (rgba(44,24,16,...)) or brand green (rgba(27,67,50,...)).",
+      "Do animate WebSocket state changes — table status, order item cooked, payment confirmed — with 200ms ease transitions.",
+      "Do use text-wrap: balance on H1–H3 headings.",
+      "Do set touch targets to ≥44px on Waiter App and Kitchen Display.",
+      "Do include @media (prefers-reduced-motion: reduce) for every animation."
+    ],
+    "donts": [
+      "Don't use Playfair Display on any internal page (POS, Waiter, Kitchen, Admin). It is a guest-facing material, not a tool material.",
+      "Don't use the warm public palette (cream, gold, terra, brown) on internal pages. The Track Rule is absolute.",
+      "Don't use rgba(0,0,0,...) for shadows. Every shadow is warm-tinted. A neutral-grey shadow is a defect.",
+      "Don't reach for a modal as the default pattern for any task that could be done inline.",
+      "Don't use color as the sole state indicator. Every status badge carries a dot and a label.",
+      "Don't build the Kitchen Display like a web app. It reads like a physical ticket board: high contrast, large touch targets, no decorative elements.",
+      "Don't make internal staff tools look like rebranded SaaS panels (grey bodies, blue accents, Inter everywhere).",
+      "Don't build a Western fine-dining minimal public site. TonNam is Thai Heritage — warmth comes from color and material, not whitespace alone.",
+      "Don't use loud gradient dashboards with decorative chart animations on the Admin analytics views.",
+      "Don't use exclamation marks in any copy. The TonNam voice is quiet confidence.",
+      "Don't use gradient text (background-clip: text with a gradient). Use a single solid color.",
+      "Don't use border-left colored accent stripes (>1px) on cards, callouts, or list items.",
+      "Don't hide WebSocket connection state from staff on any internal page."
+    ]
+  }
+}
