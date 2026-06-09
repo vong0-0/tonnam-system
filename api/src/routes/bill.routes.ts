@@ -14,7 +14,7 @@ import { createBillSchema, updateBillSchema, cancelBillSchema, splitBillSchema }
 
 const router = Router()
 
-router.post('/', authenticate, authorize(['ADMIN', 'CASHIER']), validate(createBillSchema), createBillController)
+router.post('/', authenticate, authorize(['ADMIN', 'CASHIER', 'WAITER']), validate(createBillSchema), createBillController)
 router.get('/', authenticate, authorize(['ADMIN', 'CASHIER', 'WAITER']), listBillsController)
 router.get('/:id', authenticate, authorize(['ADMIN', 'CASHIER', 'WAITER']), getBillByIdController)
 router.patch('/:id', authenticate, authorize(['ADMIN', 'CASHIER']), validate(updateBillSchema), updateBillController)
