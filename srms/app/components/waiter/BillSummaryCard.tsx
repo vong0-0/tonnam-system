@@ -26,7 +26,7 @@ export default function BillSummaryCard({ bill }: BillSummaryCardProps) {
 
         <div className='w-full flex items-center justify-between gap-2 pt-3 mt-5 border-t border-zinc-200'>
           <div className='text-sm text-zinc-500'>{countBillItemQuantity(bill.orders || [])} ລາຍການ</div>
-          <div className='text-sm text-zinc-500'>ເປີດບິນເມື່ອ: {formatDate(bill.created_at, DATE_FORMATS.TIME)} ໂມງ</div>
+          <div className='text-sm text-zinc-500'>ເປີດບິນເມື່ອ: {bill.created_at ? formatDate(bill.created_at, DATE_FORMATS.TIME) : '-'} ໂມງ</div>
         </div>
       </CardContent>
     </Card>

@@ -37,7 +37,7 @@ export default function OrderItemList({ orders, className }: OrderItemListProps)
 
 
               <div className="text-xs text-ink-400">
-                {formatDate(order.created_at, DATE_FORMATS.TIME)} ໂມງ
+                {order.created_at ? formatDate(order.created_at, DATE_FORMATS.TIME) : '-'} ໂມງ
               </div>
             </div>
 

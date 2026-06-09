@@ -1,5 +1,6 @@
-import { useQuery, useInfiniteQuery } from '@tanstack/react-query'
-import { listTables, getTableById } from '@/services/table.service'
+import { useQuery, useInfiniteQuery, useMutation, useQueryClient } from '@tanstack/react-query'
+import { listTables, getTableById, moveTable, updateTableStatus } from '@/services/table.service'
+import type { ManualTableStatus } from '@/services/table.service'
 import type { Table } from '@/types/entities'
 import type { TableStatus } from '@/types/enums'
 
@@ -47,5 +48,27 @@ export function useTable(id: string) {
     queryFn:  () => getTableById(id),
     enabled:  !!id,
     staleTime: 30_000,
+  })
+}
+
+export function useMoveTable() {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: ({ sourceId, targetTableId }: { sourceId: string; targetTableId: string }) =>
+      moveTable(sourceId, { target_table_id: targetTableId }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: TABLE_KEYS.all })
+    },
+  })
+}
+
+export function useUpdateTableStatus() {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: ({ id, status }: { id: string; status: ManualTableStatus }) =>
+      updateTableStatus(id, { status }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: TABLE_KEYS.all })
+    },
   })
 }

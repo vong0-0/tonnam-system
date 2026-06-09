@@ -6,6 +6,10 @@ interface UseInfiniteScrollOptions {
   isFetchingNextPage: boolean
   rootMargin?: string
   threshold?: number
+  /** Scroll container element to use as IntersectionObserver root.
+   *  Pass a DOM node (via useState callback ref) when the list lives inside
+   *  an overflow container — NOT a RefObject, so changes trigger re-runs. */
+  root?: HTMLElement | null
 }
 
 export function useInfiniteScroll({
@@ -14,6 +18,7 @@ export function useInfiniteScroll({
   isFetchingNextPage,
   rootMargin = '100px',
   threshold = 0,
+  root,
 }: UseInfiniteScrollOptions): RefObject<HTMLDivElement | null> {
   const ref = useRef<HTMLDivElement>(null)
 
@@ -27,12 +32,12 @@ export function useInfiniteScroll({
           fetchNextPage()
         }
       },
-      { rootMargin, threshold },
+      { root: root ?? null, rootMargin, threshold },
     )
 
     observer.observe(el)
     return () => observer.disconnect()
-  }, [fetchNextPage, hasNextPage, isFetchingNextPage, rootMargin, threshold])
+  }, [fetchNextPage, hasNextPage, isFetchingNextPage, root, rootMargin, threshold])
 
   return ref
 }
