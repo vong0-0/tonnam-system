@@ -1,8 +1,10 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router'
 import { useDebounce } from 'use-debounce'
+import { TableProperties } from 'lucide-react'
 import Filterbar from '@/components/waiter/filterbar'
 import TableCard from '@/components/waiter/TableCard'
+import { EmptyState } from '@/components/common/EmptyState'
 import { useTables } from '@/hooks/useTables'
 import { useInfiniteScroll } from '@/hooks/useInfiniteScroll'
 import { ROUTES } from '@/constants/routes'
@@ -59,7 +61,11 @@ export default function WaiterIndex() {
             </div>
 
             {isEmpty && (
-              <p className="py-8 text-center text-sm text-ink-400">ບໍ່ພົບໂຕະທີ່ຄົ້ນຫາ</p>
+              <EmptyState
+                icon={TableProperties}
+                title="ບໍ່ພົບໂຕະ"
+                description="ບໍ່ມີໂຕະທີ່ກົງກັບການຄົ້ນຫາຂອງທ່ານ ລອງປ່ຽນຕົວກອງໃໝ່"
+              />
             )}
 
             {isFetchingNextPage && (
