@@ -19,3 +19,8 @@ export async function listTables(params: ListTablesParams = {}): Promise<Paginat
   })
   return data
 }
+
+export async function getTableById(id: string): Promise<Table> {
+  const { data } = await api.get<{ data: Table }>(API.TABLE(id))
+  return data.data
+}

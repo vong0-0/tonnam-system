@@ -3,7 +3,7 @@ import type { Table } from '@/types/entities'
 
 export const mockTables: Table[] = [
   {
-    id:             't-001',
+    _id:             't-001',
     table_name:     'โต๊ะ 1',
     capacity:       4,
     status:         TableStatus.AVAILABLE,
@@ -14,7 +14,7 @@ export const mockTables: Table[] = [
     updated_at:     '2026-01-01T08:00:00.000Z',
   },
   {
-    id:             't-002',
+    _id:             't-002',
     table_name:     'โต๊ะ 2',
     capacity:       2,
     status:         TableStatus.OCCUPIED,
@@ -25,7 +25,7 @@ export const mockTables: Table[] = [
     updated_at:     '2026-06-09T10:15:00.000Z',
   },
   {
-    id:             't-003',
+    _id:             't-003',
     table_name:     'โต๊ะ 3',
     capacity:       6,
     status:         TableStatus.RESERVED,
@@ -36,7 +36,7 @@ export const mockTables: Table[] = [
     updated_at:     '2026-06-09T11:00:00.000Z',
   },
   {
-    id:             't-004',
+    _id:             't-004',
     table_name:     'โต๊ะ 4',
     capacity:       4,
     status:         TableStatus.PAID,
@@ -47,7 +47,7 @@ export const mockTables: Table[] = [
     updated_at:     '2026-06-09T12:30:00.000Z',
   },
   {
-    id:             't-005',
+    _id:             't-005',
     table_name:     'โต๊ะพิเศษ',
     capacity:       10,
     status:         TableStatus.AVAILABLE,

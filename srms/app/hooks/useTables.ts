@@ -1,5 +1,5 @@
-import { useInfiniteQuery } from '@tanstack/react-query'
-import { listTables } from '@/services/table.service'
+import { useQuery, useInfiniteQuery } from '@tanstack/react-query'
+import { listTables, getTableById } from '@/services/table.service'
 import type { Table } from '@/types/entities'
 import type { TableStatus } from '@/types/enums'
 
@@ -11,8 +11,9 @@ export interface UseTablesParams {
 }
 
 export const TABLE_KEYS = {
-  all:  ['tables'] as const,
-  list: (params: UseTablesParams) => ['tables', params] as const,
+  all:    ['tables'] as const,
+  list:   (params: UseTablesParams) => ['tables', params] as const,
+  detail: (id: string) => ['tables', id] as const,
 }
 
 export function useTables(params: UseTablesParams = {}) {
@@ -38,4 +39,13 @@ export function useTables(params: UseTablesParams = {}) {
   const isEmpty = tables.length === 0 && !query.isLoading
 
   return { ...query, tables, isEmpty }
+}
+
+export function useTable(id: string) {
+  return useQuery<Table>({
+    queryKey: TABLE_KEYS.detail(id),
+    queryFn:  () => getTableById(id),
+    enabled:  !!id,
+    staleTime: 30_000,
+  })
 }

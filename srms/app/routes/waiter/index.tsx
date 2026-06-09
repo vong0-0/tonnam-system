@@ -53,9 +53,9 @@ export default function WaiterIndex() {
             <div className="grid grid-cols-1 gap-2">
               {tables.map((table) => (
                 <TableCard
-                  key={table.id}
+                  key={table._id}
                   table={table}
-                  onClick={() => navigate(ROUTES.WAITER_TABLE(table.id))}
+                  onClick={() => navigate(ROUTES.WAITER_TABLE(table._id))}
                 />
               ))}
             </div>
