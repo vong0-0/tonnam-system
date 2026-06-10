@@ -15,8 +15,10 @@ export const ROUTES = {
   WAITER_ORDER_NEW:'/waiter/orders/new',
   WAITER_ORDER:    (id: string) => `/waiter/orders/${id}`,
 
-  KITCHEN:         '/kitchen',
-  KITCHEN_HISTORY: '/kitchen/history',
+  KITCHEN:               '/kitchen',
+  KITCHEN_HISTORY:       '/kitchen/history',
+  KITCHEN_ORDER_HISTORY: '/kitchen/order-history',
+  KITCHEN_PROFILE:       '/kitchen/profile',
 
   ADMIN:              '/admin',
   ADMIN_ANALYTICS:    '/admin/analytics',

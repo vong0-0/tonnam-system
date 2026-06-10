@@ -12,6 +12,11 @@ export default [
       route("waiter/tables/:id", "routes/waiter/table-detail.tsx"),
       route("waiter/tables/:tableId/orders/new", "routes/waiter/order-new.tsx"),
       route("waiter/profile", "routes/profile/index.tsx")
+    ]),
+    layout("layouts/kitchen.layout.tsx", [
+      route("kitchen", "routes/kitchen/index.tsx"),
+      route("kitchen/order-history", "routes/kitchen/order-history.tsx"),
+      route("kitchen/profile", "routes/kitchen/profile.tsx"),
     ])
   ]),
   route("*", "routes/not-found.tsx"),
