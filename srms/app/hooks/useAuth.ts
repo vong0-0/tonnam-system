@@ -4,6 +4,8 @@ import { login, logout, getMe } from '@/services/auth.service'
 import { useAuthStore } from '@/stores/auth.store'
 import { ROUTES } from '@/constants/routes'
 import { ROLE_REDIRECT } from '@/constants/roles'
+import { toastError } from '@/lib/toast'
+import { disconnectSocket } from '@/lib/socket'
 
 export function useLogin() {
   const navigate = useNavigate()
@@ -16,6 +18,9 @@ export function useLogin() {
       setAuth(data.user, data.access_token)
       navigate(ROLE_REDIRECT[data.user.role], { replace: true })
     },
+    onError: (error) => {
+      toastError(error, 'ຊື່ຜູ້ໃຊ້ ຫຼື ລະຫັດຜ່ານບໍ່ຖືກຕ້ອງ')
+    },
   })
 }
 
@@ -26,6 +31,7 @@ export function useLogout() {
   return useMutation({
     mutationFn: logout,
     onSettled: () => {
+      disconnectSocket()
       clearAuth()
       navigate(ROUTES.LOGIN, { replace: true })
     },

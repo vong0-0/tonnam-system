@@ -2,6 +2,7 @@ import { useQuery, useInfiniteQuery, useMutation, useQueryClient } from '@tansta
 import { listBills, getBillById, createBill } from '@/services/bill.service'
 import type { Bill, BillDetail } from '@/types/entities'
 import type { BillStatus } from '@/types/enums'
+import { toastSuccess, toastError } from '@/lib/toast'
 
 export interface UseBillsParams {
   search?: string
@@ -56,6 +57,10 @@ export function useCreateBill() {
     mutationFn: (body: { table_id: string; name?: string }) => createBill(body),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: BILL_KEYS.all })
+      toastSuccess('ເປີດບິນສຳເລັດ')
+    },
+    onError: (error) => {
+      toastError(error, 'ບໍ່ສາມາດເປີດບິນໄດ້ ກະລຸນາລອງໃໝ່')
     },
   })
 }

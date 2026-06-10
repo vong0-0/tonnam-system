@@ -3,6 +3,7 @@ import { listTables, getTableById, moveTable, updateTableStatus } from '@/servic
 import type { ManualTableStatus } from '@/services/table.service'
 import type { Table } from '@/types/entities'
 import type { TableStatus } from '@/types/enums'
+import { toastSuccess, toastError } from '@/lib/toast'
 
 export interface UseTablesParams {
   search?: string
@@ -58,6 +59,10 @@ export function useMoveTable() {
       moveTable(sourceId, { target_table_id: targetTableId }),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: TABLE_KEYS.all })
+      toastSuccess('ຍ້າຍໂຕະສຳເລັດ')
+    },
+    onError: (error) => {
+      toastError(error, 'ບໍ່ສາມາດຍ້າຍໂຕະໄດ້ ກະລຸນາລອງໃໝ່')
     },
   })
 }
@@ -69,6 +74,10 @@ export function useUpdateTableStatus() {
       updateTableStatus(id, { status }),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: TABLE_KEYS.all })
+      toastSuccess('ອັປເດດສະຖານະໂຕະສຳເລັດ')
+    },
+    onError: (error) => {
+      toastError(error, 'ບໍ່ສາມາດອັປເດດສະຖານະໂຕະໄດ້ ກະລຸນາລອງໃໝ່')
     },
   })
 }

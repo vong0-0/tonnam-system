@@ -10,6 +10,7 @@ import {
 import { BILL_KEYS } from '@/hooks/useBills'
 import type { Order, OrderWithItems } from '@/types/entities'
 import type { OrderStatus } from '@/types/enums'
+import { toastSuccess, toastError } from '@/lib/toast'
 
 export interface UseOrdersParams {
   bill_id?: string
@@ -64,6 +65,10 @@ export function useCreateOrder() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ORDER_KEYS.all })
       queryClient.invalidateQueries({ queryKey: BILL_KEYS.all })
+      toastSuccess('ສ່ງ order ສຳເລັດ')
+    },
+    onError: (error) => {
+      toastError(error, 'ບໍ່ສາມາດສ່ງ order ໄດ້ ກະລຸນາລອງໃໝ່')
     },
   })
 }
@@ -82,6 +87,10 @@ export function useUpdateOrderItem() {
     }) => updateOrderItem(orderId, itemId, body),
     onSuccess: (_, variables) => {
       queryClient.invalidateQueries({ queryKey: ORDER_KEYS.detail(variables.orderId) })
+      toastSuccess('ອັປເດດລາຍການສຳເລັດ')
+    },
+    onError: (error) => {
+      toastError(error, 'ບໍ່ສາມາດອັປເດດລາຍການໄດ້ ກະລຸນາລອງໃໝ່')
     },
   })
 }
