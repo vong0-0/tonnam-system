@@ -3,7 +3,7 @@ import { loginSchema, type LoginInput } from '@/schemas/auth.schema'
 import { useLogin } from '@/hooks/useAuth'
 
 export function LoginForm() {
-  const { mutate: login, isPending, error } = useLogin()
+  const { mutate: login, isPending } = useLogin()
 
   const {
     register,
@@ -59,12 +59,6 @@ export function LoginForm() {
           {isPending ? 'ກຳລັງເຂົ້າສູ່ລະບົບ...' : 'ເຂົ້າສູ່ລະບົບ'}
         </button>
       </form>
-
-      {error && (
-        <p className="text-danger text-sm text-center mb-4">
-          {(error as any)?.response?.data?.detail ?? 'ເຂົ້າສູ່ລະບົບບໍ່ສຳເລັດ ກະລຸນາລອງໃໝ່'}
-        </p>
-      )}
 
       <p className="text-center text-sm text-ink-500">
         ລືມລະຫັດຜ່ານ?{' '}

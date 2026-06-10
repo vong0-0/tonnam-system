@@ -6,12 +6,17 @@ import {
   Scripts,
   ScrollRestoration,
 } from "react-router";
+import { useEffect } from 'react'
 import { QueryClientProvider } from '@tanstack/react-query'
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools'
+import { Toaster } from 'react-hot-toast'
 
 import type { Route } from "./+types/root";
 import { queryClient } from '@/lib/query-client'
 import { useRestoreAuth } from '@/hooks/useAuth'
+import { useAuthStore } from '@/stores/auth.store'
+import { connectSocket, disconnectSocket } from '@/lib/socket'
+import { initNotificationListeners } from '@/stores/notification.store'
 import "./app.css";
 
 export const links: Route.LinksFunction = () => [];
@@ -36,6 +41,13 @@ export function Layout({ children }: { children: React.ReactNode }) {
 
 function AppInner() {
   const { isLoading } = useRestoreAuth()
+  const isAuthenticated = useAuthStore((state) => state.isAuthenticated())
+
+  useEffect(() => {
+    if (!isAuthenticated) return
+    connectSocket().then(() => initNotificationListeners())
+    return () => disconnectSocket()
+  }, [isAuthenticated])
 
   if (isLoading) {
     return (
@@ -52,6 +64,10 @@ export default function App() {
   return (
     <QueryClientProvider client={queryClient}>
       <AppInner />
+      <Toaster
+        position="top-center"
+        toastOptions={{ duration: 3000 }}
+      />
       {import.meta.env.DEV && <ReactQueryDevtools initialIsOpen={false} />}
     </QueryClientProvider>
   )
