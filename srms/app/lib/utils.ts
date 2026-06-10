@@ -11,3 +11,9 @@ export function formatNumber(value: number, decimals = 0): string {
     maximumFractionDigits: decimals,
   })
 }
+
+export function getInitials(firstName: string, lastName?: string): string {
+  const first = firstName.trim()[0] ?? ''
+  const last = lastName?.trim()[0] ?? ''
+  return (first + last).toUpperCase()
+}

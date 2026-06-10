@@ -2,13 +2,13 @@ import { useState, useEffect } from 'react'
 import { format, formatDistanceToNow, isValid, parseISO } from 'date-fns'
 
 export const DATE_FORMATS = {
-  DATE:                       'dd/MM/yyyy',
-  DATE_SHORT:                 'd/M/yyyy',
-  DATE_TIME:                  'dd/MM/yyyy HH:mm',
-  TIME:                       'HH:mm',
-  TIME_WITH_SECONDS:          'HH:mm:ss',
-  DATE_ISO:                   'yyyy-MM-dd',
-  DATE_TIME_ISO:              'yyyy-MM-dd HH:mm',
+  DATE: 'dd/MM/yyyy',
+  DATE_SHORT: 'd/M/yyyy',
+  DATE_TIME: 'dd/MM/yyyy HH:mm',
+  TIME: 'HH:mm',
+  TIME_WITH_SECONDS: 'HH:mm:ss',
+  DATE_ISO: 'yyyy-MM-dd',
+  DATE_TIME_ISO: 'yyyy-MM-dd HH:mm',
   DATE_TIME_ISO_WITH_SECONDS: 'yyyy-MM-dd HH:mm:ss',
 } as const
 
@@ -29,6 +29,25 @@ export function formatDate(
 
 export function formatRelative(date: Date | string): string {
   return formatDistanceToNow(toDate(date), { addSuffix: true })
+}
+
+const LAO_MONTHS = [
+  'ມັງກອນ', 'ກຸມພາ', 'ມີນາ', 'ເມສາ',
+  'ພຶດສະພາ', 'ມິຖຸນາ', 'ກໍລະກົດ', 'ສິງຫາ',
+  'ກັນຍາ', 'ຕຸລາ', 'ພະຈິກ', 'ທັນວາ',
+] as const
+
+export function formatDateLao(date: Date | string | undefined | null): string {
+  if (date == null) return '—'
+  try {
+    const d = toDate(date)
+    const day = d.getDate()
+    const month = LAO_MONTHS[d.getMonth()]
+    const year = d.getFullYear() + 543
+    return `${day} ${month} ${year}`
+  } catch {
+    return '—'
+  }
 }
 
 export function useLiveClock(
