@@ -38,7 +38,7 @@ export function ProfileDropdown({ className, iconClassName }: ProfileDropdownPro
       <DropdownMenuContent align="end" className="w-40">
         <DropdownMenuItem
           className="cursor-pointer gap-2.5 py-2 text-sm"
-          onSelect={() => navigate(ROUTES.PROFILE)}
+          onSelect={() => navigate(`/waiter${ROUTES.PROFILE}`)}
         >
           <User size={14} />
           ໂປຣໄຟລ໌

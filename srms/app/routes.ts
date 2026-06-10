@@ -11,6 +11,7 @@ export default [
       route("waiter", "routes/waiter/index.tsx"),
       route("waiter/tables/:id", "routes/waiter/table-detail.tsx"),
       route("waiter/tables/:tableId/orders/new", "routes/waiter/order-new.tsx"),
+      route("waiter/profile", "routes/profile/index.tsx")
     ])
   ]),
   route("*", "routes/not-found.tsx"),
