@@ -58,4 +58,6 @@ temp
 design-token.json
 DESIGN.md
 PRODUCT.md
-.claude/skills/impeccable
+.claude
+.agents
+.impeccable
