@@ -39,19 +39,19 @@ export function initNotificationListeners(): void {
   const { addNotification } = useNotificationStore.getState()
 
   onWsEvent(WS_EVENTS.ORDER_NEW_ORDER_RECEIVED, (data) => {
-    addNotification({ type: 'order', message: `มี order ใหม่ ${data.order.short_id}` })
+    addNotification({ type: 'order', message: `ມີ order ໃໝ່ ${data.order.short_id}` })
   })
 
   onWsEvent(WS_EVENTS.ORDER_ITEM_STATUS_UPDATED, (data) => {
-    addNotification({ type: 'order', message: `รายการอาหารในออเดอร์ ${data.order_id} อัปเดตแล้ว` })
+    addNotification({ type: 'order', message: `ລາຍການໃນ order ${data.order_id} ອັບເດດແລ້ວ` })
   })
 
   onWsEvent(WS_EVENTS.TABLE_STATUS_UPDATED, (data) => {
-    addNotification({ type: 'table', message: `สถานะโต๊ะเปลี่ยนเป็น ${data.status}` })
+    addNotification({ type: 'table', message: `ສະຖານະໂຕະປ່ຽນເປັນ ${data.status}` })
   })
 
   onWsEvent(WS_EVENTS.BILL_PAYMENT_CONFIRMED, (data) => {
-    addNotification({ type: 'bill', message: `บิล ${data.bill_id} ชำระเงินแล้ว` })
+    addNotification({ type: 'bill', message: `ບິນ ${data.bill_id} ຊຳລະເງິນແລ້ວ` })
   })
 
   onWsEvent(WS_EVENTS.SYSTEM_FORCE_LOGOUT, (data) => {

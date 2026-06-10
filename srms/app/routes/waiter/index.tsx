@@ -7,10 +7,13 @@ import TableCard from '@/components/waiter/TableCard'
 import { EmptyState } from '@/components/common/EmptyState'
 import { useTables } from '@/hooks/useTables'
 import { useInfiniteScroll } from '@/hooks/useInfiniteScroll'
+import { useTableListRealtime } from '@/hooks/useTableListRealtime'
 import { ROUTES } from '@/constants/routes'
 import type { TableStatus } from '@/types/enums'
 
 export default function WaiterIndex() {
+  useTableListRealtime()
+
   const navigate = useNavigate()
   const [search, setSearch] = useState('')
   const [status, setStatus] = useState('')

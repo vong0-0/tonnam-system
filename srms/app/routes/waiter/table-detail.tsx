@@ -3,6 +3,7 @@ import { useQueryClient } from '@tanstack/react-query'
 import { ChevronLeft, Plus, DoorOpen, UtensilsCrossed, Loader } from 'lucide-react'
 import { useTable, TABLE_KEYS, useUpdateTableStatus } from '@/hooks/useTables'
 import { useBill, useCreateBill } from '@/hooks/useBills'
+import { useTableDetailRealtime } from '@/hooks/useTableDetailRealtime'
 import { EmptyState } from '@/components/common/EmptyState'
 import TableStatusBadge from '@/components/common/TableStatusBadge'
 import BillSummaryCard from '@/components/waiter/BillSummaryCard'
@@ -15,6 +16,8 @@ export default function WaiterTableDetail() {
   const queryClient = useQueryClient()
   const { data: table, isLoading: isTableLoading, isError: isTableError } = useTable(tableId ?? '')
   const activeBillId = table?.bill_ids?.[0] ?? null
+
+  useTableDetailRealtime(tableId ?? '', activeBillId)
   const { data: bill, isLoading: isBillLoading, isError: isBillError } = useBill(activeBillId ?? '')
   const { mutate: openBill, isPending: isOpeningBill } = useCreateBill()
   const { mutate: doUpdateStatus, isPending: isUpdatingStatus } = useUpdateTableStatus()
@@ -117,7 +120,7 @@ export default function WaiterTableDetail() {
             <button
               onClick={handleOpenTable}
               disabled={isUpdatingStatus}
-              className="w-full h-12 rounded-xl bg-green hover:bg-green-light active:bg-green transition-colors duration-150 text-white text-sm font-semibold flex items-center justify-center gap-2 disabled:opacity-70 disabled:cursor-not-allowed"
+              className="w-full h-12 rounded-xl bg-success hover:bg-green-light active:bg-green transition-colors duration-150 text-white text-sm font-semibold flex items-center justify-center gap-2 disabled:opacity-70 disabled:cursor-not-allowed"
             >
               {isUpdatingStatus ? (
                 <><Loader size={16} className="animate-spin" />ກຳລັງເປີດໂຕະ...</>
@@ -129,7 +132,7 @@ export default function WaiterTableDetail() {
             <button
               onClick={handleOpenBill}
               disabled={isOpeningBill}
-              className="w-full h-12 rounded-xl bg-green hover:bg-green-light active:bg-green transition-colors duration-150 text-white text-sm font-semibold flex items-center justify-center gap-2 disabled:opacity-70 disabled:cursor-not-allowed"
+              className="w-full h-12 rounded-xl bg-success hover:bg-green-light active:bg-green transition-colors duration-150 text-white text-sm font-semibold flex items-center justify-center gap-2 disabled:opacity-70 disabled:cursor-not-allowed"
             >
               {isOpeningBill ? (
                 <><Loader size={16} className="animate-spin" />ກຳລັງເປີດບິນ...</>
@@ -140,7 +143,7 @@ export default function WaiterTableDetail() {
           ) : (
             <button
               onClick={() => navigate(`/waiter/tables/${tableId}/orders/new`)}
-              className="w-full h-12 rounded-xl bg-green hover:bg-green-light active:bg-green transition-colors duration-150 text-white text-sm font-semibold flex items-center justify-center gap-2"
+              className="w-full h-12 rounded-xl bg-success hover:bg-green-light active:bg-green transition-colors duration-150 text-white text-sm font-semibold flex items-center justify-center gap-2"
             >
               <Plus size={16} strokeWidth={2.5} />
               ສັ່ງເມນູເພີ່ມ
