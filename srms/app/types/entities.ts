@@ -22,7 +22,7 @@ export interface User {
 }
 
 export interface MenuCategory {
-  id: string
+  _id: string
   name: string
   description: string | null
   item_count: number
@@ -31,7 +31,7 @@ export interface MenuCategory {
 }
 
 export interface MenuItem {
-  id: string
+  _id: string
   category_id: string
   name: string
   description: string | null
@@ -81,13 +81,13 @@ export interface Reservation {
 }
 
 export interface OrderItem {
-  id: string
+  _id: string
   order_id: string
   menu_item_id: string
   name: string
   unit_price: number
   quantity: number
-  notes: string | null
+  note: string | null
   status: OrderItemStatus | null
   cancel_reason: string | null
   created_at: string
@@ -95,7 +95,7 @@ export interface OrderItem {
 }
 
 export interface Order {
-  id: string
+  _id: string
   short_id: string
   bill_id: string
   status: OrderStatus
@@ -106,7 +106,7 @@ export interface Order {
 }
 
 export interface Bill {
-  id: string
+  _id: string
   short_id: string
   name: string
   table_id: string
@@ -127,7 +127,7 @@ interface CashDetail {
 }
 
 export interface Payment {
-  id: string
+  _id: string
   bill_id: string
   method: PaymentMethod
   amount: number
@@ -149,7 +149,8 @@ export interface AuditLog {
   created_at: string
 }
 
-export interface OrderWithItems extends Order {
+export interface OrderWithItems {
+  order: Order
   items: OrderItem[]
 }
 
@@ -159,10 +160,18 @@ export interface BillTable {
   status: TableStatus
 }
 
-export interface BillDetail extends Bill {
-  table: BillTable
+export interface BillDetail {
+  bill: Bill
+  table: BillTable | null
   orders: OrderWithItems[]
   payments: Payment[]
+}
+
+export type CartEntry = {
+  id: string
+  item: MenuItem
+  quantity: number
+  note: string
 }
 
 export interface AuthUser {
