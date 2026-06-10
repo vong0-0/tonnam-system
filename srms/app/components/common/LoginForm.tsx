@@ -1,9 +1,16 @@
+import { AlertCircle } from 'lucide-react'
 import { useZodForm, type SubmitHandler } from '@/lib/form'
 import { loginSchema, type LoginInput } from '@/schemas/auth.schema'
 import { useLogin } from '@/hooks/useAuth'
 
+function getLoginError(error: unknown): string {
+  const status = (error as any)?.response?.status
+  if (status != null && status >= 400 && status < 500) return 'ຊື່ຜູ້ໃຊ້ ຫຼື ລະຫັດຜ່ານບໍ່ຖືກຕ້ອງ'
+  return 'ເກີດຂໍ້ຜິດພາດໃນລະບົບ ກະລຸນາລອງໃໝ່ພາຍຫຼັງ'
+}
+
 export function LoginForm() {
-  const { mutate: login, isPending } = useLogin()
+  const { mutate: login, isPending, isError, error } = useLogin()
 
   const {
     register,
@@ -54,6 +61,13 @@ export function LoginForm() {
             )}
           </div>
         </div>
+
+        {isError && (
+          <div className="flex items-center gap-2 rounded-lg bg-danger/10 px-3 py-2.5 text-sm text-danger mb-4">
+            <AlertCircle size={14} className="shrink-0" />
+            <span>{getLoginError(error)}</span>
+          </div>
+        )}
 
         <button type="submit" className="btn btn-primary w-full h-12 mb-5" disabled={isPending}>
           {isPending ? 'ກຳລັງເຂົ້າສູ່ລະບົບ...' : 'ເຂົ້າສູ່ລະບົບ'}
