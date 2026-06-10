@@ -64,7 +64,12 @@ api.interceptors.response.use(
       return Promise.reject(error)
     }
 
-    // CASE 1: The failed request IS the refresh endpoint
+    // CASE 1: The failed request IS the login endpoint — don't attempt refresh
+    if (original.url?.includes(API.AUTH.LOGIN)) {
+      return Promise.reject(error)
+    }
+
+    // CASE 2: The failed request IS the refresh endpoint
     if (original.url?.includes(API.AUTH.REFRESH)) {
       const retries = (original[RETRY_META_KEY] ?? 0) + 1
 
@@ -80,7 +85,7 @@ api.interceptors.response.use(
       return Promise.reject(error)
     }
 
-    // CASE 2: Another refresh is already in flight — queue this request
+    // CASE 3: Another refresh is already in flight — queue this request
     if (isRefreshing) {
       return enqueue().then((newToken) => {
         original.headers.Authorization = `Bearer ${newToken}`
@@ -88,7 +93,7 @@ api.interceptors.response.use(
       })
     }
 
-    // CASE 3: First 401 — initiate token refresh
+    // CASE 4: First 401 — initiate token refresh
     isRefreshing = true
 
     try {

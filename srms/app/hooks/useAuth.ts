@@ -1,10 +1,9 @@
-import { useMutation, useQuery } from '@tanstack/react-query'
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { useNavigate } from 'react-router'
 import { login, logout, getMe } from '@/services/auth.service'
 import { useAuthStore } from '@/stores/auth.store'
 import { ROUTES } from '@/constants/routes'
 import { ROLE_REDIRECT } from '@/constants/roles'
-import { toastError } from '@/lib/toast'
 import { disconnectSocket } from '@/lib/socket'
 
 export function useLogin() {
@@ -18,21 +17,20 @@ export function useLogin() {
       setAuth(data.user, data.access_token)
       navigate(ROLE_REDIRECT[data.user.role], { replace: true })
     },
-    onError: (error) => {
-      toastError(error, 'ຊື່ຜູ້ໃຊ້ ຫຼື ລະຫັດຜ່ານບໍ່ຖືກຕ້ອງ')
-    },
   })
 }
 
 export function useLogout() {
   const navigate = useNavigate()
   const { clearAuth } = useAuthStore()
+  const queryClient = useQueryClient()
 
   return useMutation({
     mutationFn: logout,
     onSettled: () => {
       disconnectSocket()
       clearAuth()
+      queryClient.clear()
       navigate(ROUTES.LOGIN, { replace: true })
     },
   })
