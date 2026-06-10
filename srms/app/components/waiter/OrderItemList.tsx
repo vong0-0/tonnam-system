@@ -1,7 +1,6 @@
 import { cn, formatNumber } from '@/lib/utils'
 import { DATE_FORMATS, formatDate } from '@/lib/date'
 import OrderItemStatusBadge from '@/components/common/OrderItemStatusBadge'
-import { OrderStatus } from '@/types/enums'
 import type { OrderWithItems } from '@/types/entities'
 
 interface OrderItemListProps {
@@ -9,49 +8,42 @@ interface OrderItemListProps {
   className?: string
 }
 
-const orderStatusConfig: Record<OrderStatus, { label: string; color: string }> = {
-  SENT_TO_KITCHEN: { label: 'ໃນຄົວ', color: '#B37D00' },
-  COOKED: { label: 'ເຮັດສຳເລັດ', color: '#0F9B8E' },
-  CANCELLED: { label: 'ຍົກເລີກ', color: '#C0392B' },
-}
-
 export default function OrderItemList({ orders, className }: OrderItemListProps) {
   if (!orders.length) return null
+  console.log('orders: ', orders)
 
   return (
     <div className={cn('space-y-3', className)}>
-      {orders.map((order) => {
-        const { label, color } = orderStatusConfig[order.status]
-
+      {orders.map((entry) => {
         return (
           <div
-            key={order.id}
+            key={String(entry.order._id)}
             className="rounded-xl border border-ink-100 bg-paper overflow-hidden shadow-sm"
           >
             {/* Order header */}
             <div className="flex items-center justify-between px-4 py-2.5 bg-ink-50 border-b border-ink-100">
 
               <div className="text-sm font-semibold text-ink-900 font-mono tracking-tight">
-                {order.short_id}
+                {entry.order.short_id}
               </div>
 
 
               <div className="text-xs text-ink-400">
-                {order.created_at ? formatDate(order.created_at, DATE_FORMATS.TIME) : '-'} ໂມງ
+                {entry.order.created_at ? formatDate(entry.order.created_at, DATE_FORMATS.TIME) : '-'} ໂມງ
               </div>
             </div>
 
             {/* Item rows */}
             <ul>
-              {order.items.map((item, idx) => {
+              {entry.items.map((item, idx) => {
                 const isCancelled = item.status === 'CANCELLED'
 
                 return (
                   <li
-                    key={item.id}
+                    key={String(item._id)}
                     className={cn(
                       'px-4 py-3',
-                      idx < order.items.length - 1 && 'border-b border-ink-100',
+                      idx < entry.items.length - 1 && 'border-b border-ink-100',
                     )}
                   >
                     <div className="flex items-start gap-3">
@@ -71,9 +63,9 @@ export default function OrderItemList({ orders, className }: OrderItemListProps)
                         >
                           ຈຳນວນ: {item.quantity}
                         </p>
-                        {item.notes && !isCancelled && (
+                        {item.note && (
                           <p className="text-xs text-gold mt-0.5 leading-tight">
-                            ຫມາຍເຫດ: {item.notes}
+                            ຫມາຍເຫດ: {item.note}
                           </p>
                         )}
                       </div>

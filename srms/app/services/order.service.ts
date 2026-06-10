@@ -17,7 +17,7 @@ export interface CreateOrderBody {
   items: Array<{
     menu_item_id: string
     quantity: number
-    note?: string | null
+    note?: string
   }>
 }
 

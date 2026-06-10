@@ -20,17 +20,9 @@ export async function listBills(params: ListBillsParams = {}): Promise<Paginated
   return data
 }
 
-interface BillDetailResponse {
-  bill: Bill
-  table: BillTable
-  orders: OrderWithItems[]
-  payments: Payment[]
-}
-
 export async function getBillById(id: string): Promise<BillDetail> {
-  const { data } = await api.get<ApiResponse<BillDetailResponse>>(API.BILL(id))
-  const { bill, table, orders, payments } = data.data
-  return { ...bill, table, orders, payments }
+  const { data } = await api.get<ApiResponse<BillDetail>>(API.BILL(id))
+  return data.data
 }
 
 export async function createBill(body: { table_id: string; name?: string }): Promise<Bill> {
