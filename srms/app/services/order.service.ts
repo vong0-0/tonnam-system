@@ -10,6 +10,7 @@ export interface ListOrdersParams {
   limit?: number
   bill_id?: string
   status?: OrderStatus | 'ALL'
+  date?: string  // format: YYYY-MM-DD
 }
 
 export interface CreateOrderBody {
