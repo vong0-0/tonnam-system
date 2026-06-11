@@ -1,6 +1,7 @@
 import { useEffect } from 'react'
 import { useZodForm, type SubmitHandler } from '@/lib/form'
 import { createTableSchema, type CreateTableInput } from '@/schemas/table.schema'
+import { useCreateTable } from '@/hooks/useTables'
 import {
   Dialog,
   DialogContent,
@@ -27,13 +28,14 @@ export default function CreateTableModal({ open, onOpenChange }: CreateTableModa
     defaultValues: { table_name: '', capacity: undefined as unknown as number, is_temporary: false },
   })
 
+  const { mutate, isPending } = useCreateTable()
+
   useEffect(() => {
     if (!open) reset()
   }, [open, reset])
 
   const onSubmit: SubmitHandler<CreateTableInput> = (data) => {
-    console.log('[CreateTable]', data)
-    onOpenChange(false)
+    mutate(data, { onSuccess: () => onOpenChange(false) })
   }
 
   return (
@@ -105,8 +107,8 @@ export default function CreateTableModal({ open, onOpenChange }: CreateTableModa
             >
               ຍົກເລີກ
             </Button>
-            <Button type="submit" className="gap-1.5 px-4 py-2 bg-blue-500 hover:bg-blue-600">
-              ເພິ່ມໂຕະ
+            <Button type="submit" disabled={isPending} className="gap-1.5 px-4 py-2 bg-blue-500 hover:bg-blue-600">
+              {isPending ? 'ກຳລັງເພີ່ມ...' : 'ເພິ່ມໂຕະ'}
             </Button>
           </DialogFooter>
         </form>

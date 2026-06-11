@@ -13,27 +13,27 @@ const statusConfig: Record<
 > = {
   AVAILABLE: {
     label: 'ວ່າງ',
-    bgClass: 'bg-status-available-bg',
-    textClass: 'text-status-available-fg',
-    dotClass: 'bg-status-available-fg',
+    bgClass: 'bg-teal-100',
+    textClass: 'text-teal-800',
+    dotClass: 'bg-teal-800',
   },
   OCCUPIED: {
     label: 'ມີລູກຄ້າ',
-    bgClass: 'bg-status-occupied-bg',
-    textClass: 'text-status-occupied-fg',
-    dotClass: 'bg-status-occupied-fg',
+    bgClass: 'bg-amber-100',
+    textClass: 'text-amber-800',
+    dotClass: 'bg-amber-800',
   },
   RESERVED: {
     label: 'ຈອງ',
-    bgClass: 'bg-status-reserved-bg',
-    textClass: 'text-status-reserved-fg',
-    dotClass: 'bg-warning',
+    bgClass: 'bg-blue-100',
+    textClass: 'text-blue-800',
+    dotClass: 'bg-blue-800',
   },
   PAID: {
     label: 'ຊຳລະແລ້ວ',
-    bgClass: 'bg-status-paid-bg',
-    textClass: 'text-status-paid-fg',
-    dotClass: 'bg-status-paid-fg',
+    bgClass: 'bg-slate-100',
+    textClass: 'text-slate-800',
+    dotClass: 'bg-slate-800',
   },
 }
 

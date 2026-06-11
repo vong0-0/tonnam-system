@@ -1,6 +1,7 @@
 import { useQuery, useInfiniteQuery, useMutation, useQueryClient } from '@tanstack/react-query'
-import { listTables, getTableById, moveTable, updateTableStatus } from '@/services/table.service'
+import { listTables, getTableById, createTable, moveTable, updateTableStatus } from '@/services/table.service'
 import type { ManualTableStatus } from '@/services/table.service'
+import type { CreateTableInput } from '@/schemas/table.schema'
 import type { Table } from '@/types/entities'
 import type { TableStatus } from '@/types/enums'
 import { toastSuccess, toastError } from '@/lib/toast'
@@ -49,6 +50,20 @@ export function useTable(id: string) {
     queryFn:  () => getTableById(id),
     enabled:  !!id,
     staleTime: 30_000,
+  })
+}
+
+export function useCreateTable() {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: (body: CreateTableInput) => createTable(body),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: TABLE_KEYS.all })
+      toastSuccess('ເພີ່ມໂຕະສຳເລັດ')
+    },
+    onError: (error) => {
+      toastError(error, 'ບໍ່ສາມາດເພີ່ມໂຕະໄດ້ ກະລຸນາລອງໃໝ່')
+    },
   })
 }
 

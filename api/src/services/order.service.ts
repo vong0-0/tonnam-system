@@ -153,6 +153,7 @@ export async function createOrder(input: CreateOrderInput): Promise<OrderWithIte
 
       return {
         menu_item_id: item.menu_item_id,
+        name: menuItem.name,
         quantity: item.quantity,
         note: item.note,
         unit_price: menuItem.price,
@@ -173,6 +174,7 @@ export async function createOrder(input: CreateOrderInput): Promise<OrderWithIte
     resolvedItems.map((item) => ({
       order_id: order._id,
       menu_item_id: new mongoose.Types.ObjectId(item.menu_item_id),
+      name: item.name,
       quantity: item.quantity,
       unit_price: item.unit_price,
       note: item.note ?? null,

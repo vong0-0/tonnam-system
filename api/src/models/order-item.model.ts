@@ -4,6 +4,7 @@ import { OrderItemStatus } from '@/types/index.js'
 export interface IOrderItem extends Document {
   order_id: Types.ObjectId
   menu_item_id: Types.ObjectId
+  name: string
   quantity: number
   unit_price: number
   note: string | null
@@ -18,6 +19,7 @@ const orderItemSchema = new Schema<IOrderItem>(
   {
     order_id: { type: Schema.Types.ObjectId, ref: 'Order', required: true },
     menu_item_id: { type: Schema.Types.ObjectId, ref: 'MenuItem', required: true },
+    name: { type: String, required: true },
     quantity: { type: Number, required: true, min: 1 },
     unit_price: { type: Number, required: true, min: 0 },
     note: { type: String, default: null },

@@ -3,6 +3,7 @@ import { type IBill, BillModel } from "@/models/bill.model.js";
 import { type ITable, TableModel } from "@/models/table.model.js";
 import { type IOrder, OrderModel } from "@/models/order.model.js";
 import { type IOrderItem, OrderItemModel } from "@/models/order-item.model.js";
+import { type IMenuItem, MenuItemModel } from "@/models/menu-item.model.js";
 import { type IPayment, PaymentModel } from "@/models/payment.model.js";
 import { createAuditLog } from "@/services/audit-log.service.js";
 import {
@@ -219,6 +220,27 @@ export async function getBillById(id: string): Promise<BillDetail> {
       const items = (await OrderItemModel.find({
         order_id: order._id,
       }).lean()) as IOrderItem[];
+
+      const missingNameIds = items
+        .filter((item) => !item.name)
+        .map((item) => item.menu_item_id);
+
+      if (missingNameIds.length > 0) {
+        const menuItems = (await MenuItemModel.find({
+          _id: { $in: missingNameIds },
+        })
+          .select("name")
+          .lean()) as IMenuItem[];
+        const nameMap = new Map(
+          menuItems.map((m) => [String(m._id), m.name]),
+        );
+        items.forEach((item) => {
+          if (!item.name) {
+            item.name = nameMap.get(String(item.menu_item_id)) ?? "";
+          }
+        });
+      }
+
       return { order, items };
     }),
   );
