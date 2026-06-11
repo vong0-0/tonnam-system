@@ -8,6 +8,7 @@ import KitchenFilterBar from '@/components/kitchen/KitchenFilterBar'
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { useOrders } from '@/hooks/useOrders'
 import { useInfiniteScroll } from '@/hooks/useInfiniteScroll'
+import { useKitchenOrdersRealtime } from '@/hooks/useKitchenOrdersRealtime'
 import { formatDate, DATE_FORMATS } from '@/lib/date'
 import { OrderStatus } from '@/types/enums'
 import type { Order } from '@/types/entities'
@@ -39,6 +40,8 @@ function OrderList({ orders }: { orders: Order[] }) {
 }
 
 export default function KitchenIndexPage() {
+  useKitchenOrdersRealtime()
+
   const [searchParams, setSearchParams] = useSearchParams()
   const activeTab = (searchParams.get('tab') ?? 'sent-to-kitchen') as KitchenTab
 

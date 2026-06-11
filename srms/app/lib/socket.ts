@@ -9,9 +9,11 @@ const MAX_RECONNECT_ATTEMPTS = 5
 const RECONNECT_DELAY_BASE   = 1_000
 
 // ── Private module state ──────────────────────────────────────
-let socket:            Socket | null                       = null
-let reconnectAttempts: number                              = 0
-let reconnectTimer:    number | null                        = null
+let socket:              Socket | null                     = null
+let reconnectAttempts:   number                            = 0
+let reconnectTimer:      number | null                     = null
+let connectionGeneration: number                           = 0
+const pendingConnectFns: Array<() => void>                 = []
 
 // ── Helpers ───────────────────────────────────────────────────
 function redirectToLogin(): void {
@@ -59,7 +61,12 @@ function handleOnline(): void {
 export async function connectSocket(): Promise<void> {
   if (socket?.connected) return
 
+  const myGen = ++connectionGeneration
+
   const { data } = await api.post(API.AUTH.WS_TICKET)
+
+  if (myGen !== connectionGeneration) return
+
   const ticket: string = data.data.ticket
 
   socket = io(import.meta.env.VITE_API_URL as string, {
@@ -68,13 +75,21 @@ export async function connectSocket(): Promise<void> {
     autoConnect: false,
   })
 
-  socket.on('connect', () => {
+  const currentSocket = socket
+
+  currentSocket.on('connect', () => {
+    if (myGen !== connectionGeneration) {
+      currentSocket.disconnect()
+      return
+    }
     reconnectAttempts = 0
     reconnectTimer    = null
-    console.info('[socket] Connected', socket?.id)
+    console.info('[socket] Connected', currentSocket.id)
+    const cbs = pendingConnectFns.splice(0)
+    cbs.forEach((fn) => fn())
   })
 
-  socket.on('disconnect', (reason) => {
+  currentSocket.on('disconnect', (reason) => {
     console.warn('[socket] Disconnected:', reason)
 
     if (reason === 'io server disconnect') {
@@ -86,12 +101,12 @@ export async function connectSocket(): Promise<void> {
     scheduleReconnect()
   })
 
-  socket.on('connect_error', (error) => {
+  currentSocket.on('connect_error', (error) => {
     console.error('[socket] Connection error:', error.message)
     scheduleReconnect()
   })
 
-  socket.on('message', (raw: string) => {
+  currentSocket.on('message', (raw: string) => {
     try {
       const msg = JSON.parse(raw) as WsMessage
       if (
@@ -106,11 +121,12 @@ export async function connectSocket(): Promise<void> {
     }
   })
 
-  socket.connect()
+  currentSocket.connect()
   window.addEventListener('online', handleOnline)
 }
 
 export function disconnectSocket(): void {
+  connectionGeneration++
   if (reconnectTimer !== null) {
     clearTimeout(reconnectTimer as number)
     reconnectTimer = null
@@ -152,4 +168,20 @@ export function onWsEvent<K extends keyof WsPayloadMap>(
 
 export function getSocket(): Socket | null {
   return socket
+}
+
+export function runWhenConnected(fn: () => void): () => void {
+  if (socket?.connected) {
+    fn()
+    return () => {}
+  }
+  if (socket) {
+    socket.once('connect', fn)
+    return () => socket?.off('connect', fn)
+  }
+  pendingConnectFns.push(fn)
+  return () => {
+    const i = pendingConnectFns.indexOf(fn)
+    if (i >= 0) pendingConnectFns.splice(i, 1)
+  }
 }

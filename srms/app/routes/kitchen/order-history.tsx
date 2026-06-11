@@ -8,6 +8,7 @@ import { AppSelect, type SelectOption } from '@/components/common/AppSelect'
 import { DatePickerFilter } from '@/components/common/DatePickerFilter'
 import { useOrders } from '@/hooks/useOrders'
 import { useInfiniteScroll } from '@/hooks/useInfiniteScroll'
+import { useKitchenOrdersRealtime } from '@/hooks/useKitchenOrdersRealtime'
 import { formatDate, DATE_FORMATS } from '@/lib/date'
 import { OrderStatus } from '@/types/enums'
 import type { Order } from '@/types/entities'
@@ -39,6 +40,8 @@ function OrderList({ orders }: { orders: Order[] }) {
 }
 
 export default function KitchenOrderHistoryPage() {
+  useKitchenOrdersRealtime()
+
   const [search, setSearch] = useState('')
   const [status, setStatus] = useState('ALL')
   const [selectedDate, setSelectedDate] = useState<Date | undefined>(undefined)
