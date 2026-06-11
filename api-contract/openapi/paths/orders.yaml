@@ -21,6 +21,16 @@ list-create:
           type: string
           enum: [SENT_TO_KITCHEN, COOKED, CANCELLED]
         description: Filter by order status.
+      - name: date
+        in: query
+        required: false
+        schema:
+          type: string
+          format: date
+          example: "2026-06-11"
+        description: >
+          Filter orders created on this date (inclusive, full day).
+          Format: YYYY-MM-DD
     responses:
       "200":
         description: Orders retrieved successfully.

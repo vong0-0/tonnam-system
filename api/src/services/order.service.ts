@@ -39,6 +39,7 @@ interface ListOrdersQuery {
   limit?: number
   bill_id?: string
   status?: string
+  date?: string  // format: YYYY-MM-DD
 }
 
 interface ActorInput {
@@ -235,11 +236,18 @@ export async function getOrderById(id: string): Promise<OrderWithItems> {
 export async function listOrders(query: ListOrdersQuery): Promise<SuccessListResponse<IOrder>> {
   const page = query.page ?? 1
   const limit = query.limit ?? 20
-  const { bill_id, status } = query
+  const { bill_id, status, date } = query
 
   const filter: Record<string, unknown> = {}
   if (bill_id !== undefined) filter['bill_id'] = bill_id
   if (status !== undefined) filter['status'] = status
+  if (date !== undefined) {
+    const start = new Date(date)
+    start.setHours(0, 0, 0, 0)
+    const end = new Date(date)
+    end.setHours(23, 59, 59, 999)
+    filter['created_at'] = { $gte: start, $lte: end }
+  }
 
   const skip = (page - 1) * limit
   const [rawItems, total] = await Promise.all([

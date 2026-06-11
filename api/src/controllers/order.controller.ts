@@ -44,12 +44,14 @@ export async function listOrdersController(
     const limit = Number(req.query['limit']) || 20
     const bill_id = req.query['bill_id'] as string | undefined
     const status = req.query['status'] as string | undefined
+    const date = req.query['date'] as string | undefined
 
     const result = await orderService.listOrders({
       page,
       limit,
       ...(bill_id !== undefined ? { bill_id } : {}),
       ...(status !== undefined ? { status } : {}),
+      ...(date !== undefined ? { date } : {}),
     })
     res.json(result)
   } catch (err) {
