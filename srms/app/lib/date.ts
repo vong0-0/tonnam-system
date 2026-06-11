@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { format, formatDistanceToNow, isValid, parseISO } from 'date-fns'
+import { format, formatDistanceToNow, isValid, isSameDay, parseISO } from 'date-fns'
 
 export const DATE_FORMATS = {
   DATE: 'dd/MM/yyyy',
@@ -25,6 +25,10 @@ export function formatDate(
   fmt: string = DATE_FORMATS.DATE
 ): string {
   return format(toDate(date), fmt)
+}
+
+export function isToday(date: Date | string): boolean {
+  return isSameDay(toDate(date), new Date())
 }
 
 export function formatRelative(date: Date | string): string {

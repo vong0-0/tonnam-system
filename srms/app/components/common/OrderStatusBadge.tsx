@@ -1,23 +1,24 @@
 import { Badge } from '@/components/ui/badge'
 import { cn } from '@/lib/utils'
-import type { OrderItemStatus } from '@/types/enums'
+import type { OrderStatus } from '@/types/enums'
 
-interface OrderItemStatusBadgeProps {
-  status: OrderItemStatus | null
+interface OrderStatusBadgeProps {
+  status: OrderStatus
   className?: string
 }
 
-type StatusKey = 'PENDING' | 'COOKED' | 'CANCELLED'
-
-const statusConfig: Record<StatusKey, { label: string; bgClass: string; textClass: string; dotClass: string }> = {
-  PENDING: {
-    label:     'ກຳລັງເຮັດ',
+const statusConfig: Record<
+  OrderStatus,
+  { label: string; bgClass: string; textClass: string; dotClass: string }
+> = {
+  SENT_TO_KITCHEN: {
+    label:     'ລໍຖ້າ',
     bgClass:   'bg-gold-pale',
     textClass: 'text-gold-dark',
     dotClass:  'bg-gold-dark',
   },
   COOKED: {
-    label:     'ເຮັດສຳເລັດ',
+    label:     'ສຳເລັດ',
     bgClass:   'bg-green-pale',
     textClass: 'text-green',
     dotClass:  'bg-green',
@@ -30,9 +31,8 @@ const statusConfig: Record<StatusKey, { label: string; bgClass: string; textClas
   },
 }
 
-export default function OrderItemStatusBadge({ status, className }: OrderItemStatusBadgeProps) {
-  const key: StatusKey = status === null ? 'PENDING' : status
-  const { label, bgClass, textClass, dotClass } = statusConfig[key]
+export function OrderStatusBadge({ status, className }: OrderStatusBadgeProps) {
+  const { label, bgClass, textClass, dotClass } = statusConfig[status]
 
   return (
     <Badge
