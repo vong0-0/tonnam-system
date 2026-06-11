@@ -16,6 +16,7 @@ export interface UseOrdersParams {
   bill_id?: string
   status?: OrderStatus | 'ALL'
   limit?: number
+  date?: string
 }
 
 export const ORDER_KEYS = {
@@ -87,6 +88,7 @@ export function useUpdateOrderItem() {
     }) => updateOrderItem(orderId, itemId, body),
     onSuccess: (_, variables) => {
       queryClient.invalidateQueries({ queryKey: ORDER_KEYS.detail(variables.orderId) })
+      queryClient.invalidateQueries({ queryKey: ORDER_KEYS.all })
       toastSuccess('ອັປເດດລາຍການສຳເລັດ')
     },
     onError: (error) => {

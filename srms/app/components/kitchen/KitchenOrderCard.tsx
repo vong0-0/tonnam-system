@@ -6,6 +6,7 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from '@/components/ui/accordion'
+import { CancelReasonDialog } from '@/components/common/CancelReasonDialog'
 import { OrderStatusBadge } from '@/components/common/OrderStatusBadge'
 import OrderItemStatusBadge from '@/components/common/OrderItemStatusBadge'
 import { Button } from '@/components/ui/button'
@@ -21,11 +22,11 @@ const orderStatusConfig: Record<OrderStatus, { style: string }> = {
   [OrderStatus.CANCELLED]: { style: 'bg-rose-50 text-rose-600' },
 }
 
+
 function OrderItemsContent({ orderId }: { orderId: string }) {
   const { data: orderDetail, isLoading } = useOrder(orderId)
   const { mutate: updateItem, isPending: isUpdating } = useUpdateOrderItem()
-  const [cancelItemId, setCancelItemId] = useState<string | null>(null)
-  const [cancelReason, setCancelReason] = useState('')
+  const [cancelItem, setCancelItem] = useState<OrderItem | null>(null)
 
   const items = orderDetail?.items ?? []
   const pendingItems = items.filter((i: OrderItem) => i.status === null)
@@ -33,15 +34,25 @@ function OrderItemsContent({ orderId }: { orderId: string }) {
   const handleMarkDone = (itemId: string) =>
     updateItem({ orderId, itemId, body: { status: 'COOKED' } })
 
-  const handleConfirmCancel = (itemId: string) => {
-    if (!cancelReason.trim()) return
-    updateItem({ orderId, itemId, body: { status: 'CANCELLED', reason: cancelReason } })
-    setCancelItemId(null)
-    setCancelReason('')
+  const handleConfirmCancel = (reason: string) => {
+    if (!cancelItem) return
+    updateItem(
+      { orderId, itemId: cancelItem._id, body: { status: 'CANCELLED', reason } },
+      { onSuccess: () => setCancelItem(null) },
+    )
   }
 
   return (
     <>
+      <CancelReasonDialog
+        open={!!cancelItem}
+        onOpenChange={(open) => { if (!open) setCancelItem(null) }}
+        title="ຢືນຢັນການຍົກເລີກລາຍການ"
+        description={`ທ່ານຕ້ອງການຍົກເລິກລາຍການອາຫານນີ້ແທ້ໍບໍ ?`}
+        onConfirm={handleConfirmCancel}
+        isPending={isUpdating}
+      />
+
       <div className="px-5 py-4">
         {items.length === 0 ? (
           <p className="text-center font-bold text-lg text-zinc-500">ບໍ່ມີລາຍການອາຫານ</p>
@@ -57,35 +68,6 @@ function OrderItemsContent({ orderId }: { orderId: string }) {
 
                 {item.status !== null ? (
                   <OrderItemStatusBadge status={item.status} />
-                ) : cancelItemId === item._id ? (
-                  <div className="flex flex-col gap-2 min-w-48">
-                    <input
-                      value={cancelReason}
-                      onChange={(e) => setCancelReason(e.target.value)}
-                      placeholder="ໃສ່ເຫດຜົນ..."
-                      className="input text-sm"
-                      autoFocus
-                    />
-                    <div className="flex gap-2">
-                      <Button
-                        type="button"
-                        size="sm"
-                        variant="outline"
-                        onClick={() => { setCancelItemId(null); setCancelReason('') }}
-                      >
-                        ກັບໄປ
-                      </Button>
-                      <Button
-                        type="button"
-                        size="sm"
-                        className="bg-red-500 hover:bg-red-600"
-                        disabled={!cancelReason.trim() || isUpdating}
-                        onClick={() => handleConfirmCancel(item._id)}
-                      >
-                        ຢືນຢັນ
-                      </Button>
-                    </div>
-                  </div>
                 ) : (
                   <div className="space-x-2 shrink-0">
                     <Button
@@ -93,7 +75,7 @@ function OrderItemsContent({ orderId }: { orderId: string }) {
                       size="sm"
                       className="px-4 py-2 bg-red-500 hover:bg-red-600"
                       disabled={isUpdating}
-                      onClick={() => { setCancelItemId(item._id); setCancelReason('') }}
+                      onClick={() => setCancelItem(item)}
                     >
                       ຍົກເລິກລາຍການ
                     </Button>
