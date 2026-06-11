@@ -12,22 +12,22 @@ const statusConfig: Record<
   { label: string; bgClass: string; textClass: string; dotClass: string }
 > = {
   SENT_TO_KITCHEN: {
-    label:     'ລໍຖ້າ',
-    bgClass:   'bg-gold-pale',
-    textClass: 'text-gold-dark',
-    dotClass:  'bg-gold-dark',
+    label: 'ອໍເດີໃຫມ່',
+    bgClass: 'bg-amber-100',
+    textClass: 'text-amber-800',
+    dotClass: 'bg-amber-800',
   },
   COOKED: {
-    label:     'ສຳເລັດ',
-    bgClass:   'bg-green-pale',
-    textClass: 'text-green',
-    dotClass:  'bg-green',
+    label: 'ສຳເລັດ',
+    bgClass: 'bg-emerald-100',
+    textClass: 'text-emerald-800',
+    dotClass: 'bg-emerald-800',
   },
   CANCELLED: {
-    label:     'ຍົກເລີກ',
-    bgClass:   'bg-status-cancelled-bg',
-    textClass: 'text-status-cancelled-fg',
-    dotClass:  'bg-status-cancelled-fg',
+    label: 'ຍົກເລີກ',
+    bgClass: 'bg-rose-100',
+    textClass: 'text-rose-800',
+    dotClass: 'bg-rose-800',
   },
 }
 

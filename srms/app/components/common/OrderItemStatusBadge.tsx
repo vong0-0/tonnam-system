@@ -11,22 +11,22 @@ type StatusKey = 'PENDING' | 'COOKED' | 'CANCELLED'
 
 const statusConfig: Record<StatusKey, { label: string; bgClass: string; textClass: string; dotClass: string }> = {
   PENDING: {
-    label:     'ກຳລັງເຮັດ',
-    bgClass:   'bg-gold-pale',
-    textClass: 'text-gold-dark',
-    dotClass:  'bg-gold-dark',
+    label: 'ກຳລັງເຮັດ',
+    bgClass: 'bg-amber-100',
+    textClass: 'text-amber-800',
+    dotClass: 'bg-amber-800',
   },
   COOKED: {
-    label:     'ເຮັດສຳເລັດ',
-    bgClass:   'bg-green-pale',
-    textClass: 'text-green',
-    dotClass:  'bg-green',
+    label: 'ເຮັດສຳເລັດ',
+    bgClass: 'bg-emerald-100',
+    textClass: 'text-emerald-800',
+    dotClass: 'bg-emerald-800',
   },
   CANCELLED: {
-    label:     'ຍົກເລີກ',
-    bgClass:   'bg-status-cancelled-bg',
-    textClass: 'text-status-cancelled-fg',
-    dotClass:  'bg-status-cancelled-fg',
+    label: 'ຍົກເລີກ',
+    bgClass: 'bg-rose-100',
+    textClass: 'text-rose-800',
+    dotClass: 'bg-rose-800',
   },
 }
 
