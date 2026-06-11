@@ -10,9 +10,9 @@ interface NavItem {
 }
 
 const items: NavItem[] = [
-  { to: ROUTES.KITCHEN,               label: 'ອໍເດີ',    icon: UtensilsCrossed, end: true },
-  { to: ROUTES.KITCHEN_ORDER_HISTORY, label: 'ປະຫວັດ',   icon: ClipboardList },
-  { to: ROUTES.KITCHEN_PROFILE,       label: 'ໂປຣໄຟລ໌', icon: UserRound },
+  { to: ROUTES.KITCHEN, label: 'ອໍເດີ', icon: UtensilsCrossed, end: true },
+  { to: ROUTES.KITCHEN_ORDER_HISTORY, label: 'ປະຫວັດ', icon: ClipboardList },
+  { to: ROUTES.KITCHEN_PROFILE, label: 'ໂປຣໄຟລ໌', icon: UserRound },
 ]
 
 export default function KitchenBottomNav() {
@@ -25,8 +25,7 @@ export default function KitchenBottomNav() {
             to={to}
             end={end}
             className={({ isActive }) =>
-              `flex flex-1 flex-col items-center justify-center gap-1 transition-colors duration-150 ${
-                isActive ? 'text-green' : 'text-ink-400'
+              `flex flex-1 flex-col items-center justify-center gap-1 transition-colors duration-150 ${isActive ? 'text-green-light' : 'text-ink-400'
               }`
             }
           >
