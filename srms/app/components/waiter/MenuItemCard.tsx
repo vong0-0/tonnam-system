@@ -13,7 +13,8 @@ export function MenuItemCard({ item, cartQty, onAdd }: MenuItemCardProps) {
 
   return (
     <div
-      className={`flex items-center gap-3 bg-paper rounded-xl border shadow-sm border-ink-100 p-3 ${isUnavailable ? 'opacity-50' : ''}`}
+      onClick={onAdd}
+      className={`cursor-pointer flex items-center gap-3 bg-paper rounded-xl border shadow-sm border-ink-100 p-3 ${isUnavailable ? 'opacity-50' : ''}`}
     >
       {item.image_url ? (
         <img
@@ -45,11 +46,10 @@ export function MenuItemCard({ item, cartQty, onAdd }: MenuItemCardProps) {
       <button
         onClick={onAdd}
         disabled={isUnavailable}
-        className={`shrink-0 w-9 h-9 rounded-lg flex items-center justify-center transition-colors duration-150 ${
-          cartQty > 0
+        className={`shrink-0 w-9 h-9 rounded-lg flex items-center justify-center transition-colors duration-150 ${cartQty > 0
             ? 'bg-success text-white text-xs font-bold'
             : 'border border-ink-100 text-ink-700 hover:bg-ink-50 disabled:cursor-not-allowed'
-        }`}
+          }`}
         aria-label={`ເພີ່ມ ${item.name}`}
       >
         {cartQty > 0 ? cartQty : <Plus size={16} strokeWidth={2.5} />}

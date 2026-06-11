@@ -28,7 +28,9 @@ export default function PosFilterBar({ onCreateTable }: PosFilterBarProps) {
         placeholder="ທຸກສະຖານະ"
         triggerClassName="w-36 h-auto py-2 border-ink-300 bg-paper"
       />
-      <Button size="sm" className="gap-1.5 shrink-0 px-4 py-2 bg-blue-500 hover:bg-blue-600" onClick={onCreateTable}>
+      <Button style={{
+        height: "auto"
+      }} className="gap-1.5 px-4 py-2 shrink-0 bg-blue-500 hover:bg-blue-600" onClick={onCreateTable}>
         <Plus size={16} />
         ເພີ່ມໂຕະ
       </Button>

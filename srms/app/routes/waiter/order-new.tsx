@@ -118,7 +118,7 @@ export default function WaiterOrderNew() {
 
   const categoryOptions: SelectOption[] = [
     { value: 'ALL', label: 'ທຸກໝວດ' },
-    ...categories.map((c) => ({ value: c._id, label: c.name })),
+    ...categories.map((c: MenuCategory) => ({ value: c._id, label: c.name })),
   ]
 
   if (isTableLoading) {
