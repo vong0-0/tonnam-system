@@ -2,6 +2,7 @@ import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { createPayment, type CreatePaymentInput } from '@/services/payment.service'
 import { BILL_KEYS } from '@/hooks/useBills'
 import { TABLE_KEYS } from '@/hooks/useTables'
+import { ANALYTICS_KEYS } from '@/hooks/useAnalytics'
 import { toastSuccess, toastError } from '@/lib/toast'
 
 export function useCreatePayment() {
@@ -11,6 +12,7 @@ export function useCreatePayment() {
     onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: BILL_KEYS.detail(data.bill._id) })
       queryClient.invalidateQueries({ queryKey: TABLE_KEYS.all })
+      queryClient.invalidateQueries({ queryKey: ANALYTICS_KEYS.all })
       toastSuccess('ຊຳລະເງິນສຳເລັດ')
     },
     onError: (error) => {

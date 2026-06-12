@@ -126,7 +126,7 @@ export async function getSalesSummary(query: SalesSummaryQuery) {
   if (query.period === 'daily') {
     const hourlyMap = new Map<number, { revenue: number; bills: number }>()
     for (const bill of bills) {
-      const hour = new Date(bill.created_at).getUTCHours()
+      const hour = new Date(bill.created_at).getHours()
       const curr = hourlyMap.get(hour) ?? { revenue: 0, bills: 0 }
       hourlyMap.set(hour, { revenue: curr.revenue + bill.total_amount, bills: curr.bills + 1 })
     }
@@ -135,10 +135,12 @@ export async function getSalesSummary(query: SalesSummaryQuery) {
       return { hour, revenue: data.revenue, bills: data.bills }
     })
     breakdown = hourlyBreakdown
-    peak = { label: '0', revenue: 0, bills: 0 }
+    peak = { label: '', revenue: 0, bills: 0 }
     for (const item of hourlyBreakdown) {
       if (item.revenue > peak.revenue) {
-        peak = { label: String(item.hour), revenue: item.revenue, bills: item.bills }
+        const h = String(item.hour).padStart(2, '0')
+        const h1 = String((item.hour + 1) % 24).padStart(2, '0')
+        peak = { label: `${h}:00 - ${h1}:00`, revenue: item.revenue, bills: item.bills }
       }
     }
   } else if (query.period === 'weekly' || query.period === 'monthly') {

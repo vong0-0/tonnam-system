@@ -8,7 +8,11 @@ export function validateQuery(schema: ZodTypeAny): RequestHandler {
     const result = schema.safeParse(req.query)
 
     if (result.success) {
-      req.query = result.data as typeof req.query
+      Object.defineProperty(req, 'query', {
+        value: result.data,
+        writable: true,
+        configurable: true,
+      })
       next()
       return
     }
