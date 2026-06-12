@@ -31,9 +31,10 @@ export type SidebarNavGroup = {
 
 type AppSidebarProps = {
   navGroups: SidebarNavGroup[]
+  profileHref?: string
 }
 
-export default function AppSidebar({ navGroups }: AppSidebarProps) {
+export default function AppSidebar({ navGroups, profileHref }: AppSidebarProps) {
   const user = useAuthStore((s) => s.user)
   const clearAuth = useAuthStore((s) => s.clearAuth)
   const navigate = useNavigate()
@@ -94,12 +95,24 @@ export default function AppSidebar({ navGroups }: AppSidebarProps) {
         </NavLink>
 
         <div className="flex items-center justify-between px-3 py-2">
-          <div className="min-w-0">
-            <p className="text-white text-sm font-medium truncate">
-              {user?.first_name} {user?.last_name}
-            </p>
-            <p className="text-white/50 text-xs truncate">{user?.role}</p>
-          </div>
+          {profileHref ? (
+            <NavLink
+              to={profileHref}
+              className="min-w-0 flex-1 rounded-md hover:bg-green-light transition-colors -mx-1 px-1 py-0.5"
+            >
+              <p className="text-white text-sm font-medium truncate">
+                {user?.first_name} {user?.last_name}
+              </p>
+              <p className="text-white/50 text-xs truncate">{user?.role}</p>
+            </NavLink>
+          ) : (
+            <div className="min-w-0">
+              <p className="text-white text-sm font-medium truncate">
+                {user?.first_name} {user?.last_name}
+              </p>
+              <p className="text-white/50 text-xs truncate">{user?.role}</p>
+            </div>
+          )}
           <button
             onClick={handleLogout}
             className="ml-2 p-1.5 rounded-md text-white/50 hover:text-white hover:bg-green-light transition-colors shrink-0"
