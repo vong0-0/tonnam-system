@@ -22,6 +22,7 @@ import {
   RotateCcw,
   X,
 } from "lucide-react";
+import AddOrderModal from "./AddOrderModal";
 import PaymentModal from "./PaymentModal";
 import ReasonModal from "./ReasonModal";
 import MoveTableModal from "./MoveTableModal";
@@ -45,6 +46,7 @@ export default function TableOrderDetailModal({
   table,
   billDetail,
 }: TableOrderDetailModalProps) {
+  const [addOrderOpen, setAddOrderOpen] = useState(false);
   const [paymentOpen, setPaymentOpen] = useState(false);
   const [moveOpen, setMoveOpen] = useState(false);
   const [billCancelOpen, setBillCancelOpen] = useState(false);
@@ -288,6 +290,7 @@ export default function TableOrderDetailModal({
                 <Button
                   disabled={isPaid}
                   className="w-full font-bold text-lg bg-teal-500 hover:bg-teal-600 px-4 py-3"
+                  onClick={() => setAddOrderOpen(true)}
                 >
                   <Plus />
                   ສັ່ງອາຫານເພີ່ມ
@@ -339,6 +342,15 @@ export default function TableOrderDetailModal({
           )}
         </DialogContent>
       </Dialog>
+
+      {billDetail && (
+        <AddOrderModal
+          open={addOrderOpen}
+          onOpenChange={setAddOrderOpen}
+          billId={billDetail.bill._id}
+          tableName={table.table_name}
+        />
+      )}
 
       {billDetail && (
         <PaymentModal
