@@ -18,6 +18,7 @@ interface DatePickerFilterProps {
   placeholder?: string
   className?: string
   disableFuture?: boolean
+  disablePast?: boolean
 }
 
 export function DatePickerFilter({
@@ -26,6 +27,7 @@ export function DatePickerFilter({
   placeholder = 'ເລືອກວັນທີ',
   className,
   disableFuture = true,
+  disablePast = false,
 }: DatePickerFilterProps) {
   const [open, setOpen] = useState(false)
 
@@ -52,7 +54,13 @@ export function DatePickerFilter({
             mode="single"
             selected={value}
             onSelect={(d) => { onChange(d); setOpen(false) }}
-            disabled={disableFuture ? (date) => date > new Date() : undefined}
+            disabled={
+              disableFuture
+                ? (date) => date > new Date()
+                : disablePast
+                  ? (date) => date < new Date(new Date().setHours(0, 0, 0, 0))
+                  : undefined
+            }
             weekStartsOn={1}
             formatters={{
               formatCaption: (date: Date) =>

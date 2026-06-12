@@ -1,4 +1,5 @@
 import { Minus, Plus } from 'lucide-react'
+import { cn } from '@/lib/utils'
 
 interface QuantityStepperProps {
   value: number
@@ -7,6 +8,8 @@ interface QuantityStepperProps {
   max?: number
   size?: 'sm' | 'md'
   className?: string
+  minusClassName?: string
+  plusClassName?: string
 }
 
 export function QuantityStepper({
@@ -16,6 +19,8 @@ export function QuantityStepper({
   max,
   size = 'md',
   className,
+  minusClassName,
+  plusClassName,
 }: QuantityStepperProps) {
   const isMd = size === 'md'
 
@@ -25,11 +30,12 @@ export function QuantityStepper({
         type="button"
         onClick={() => onChange(Math.max(min, value - 1))}
         disabled={value <= min}
-        className={
+        className={cn(
           isMd
             ? 'w-10 h-10 rounded-full border-2 border-ink-200 flex items-center justify-center text-ink-700 hover:bg-ink-50 transition-colors disabled:opacity-40 disabled:cursor-not-allowed'
-            : 'w-8 h-8 rounded-lg border border-ink-100 flex items-center justify-center text-ink-700 hover:bg-ink-50 transition-colors disabled:opacity-40 disabled:cursor-not-allowed'
-        }
+            : 'w-8 h-8 rounded-lg border border-ink-100 flex items-center justify-center text-ink-700 hover:bg-ink-50 transition-colors disabled:opacity-40 disabled:cursor-not-allowed',
+          minusClassName,
+        )}
         aria-label="ຫຼຸດ"
       >
         <Minus size={isMd ? 16 : 14} />
@@ -49,11 +55,12 @@ export function QuantityStepper({
         type="button"
         onClick={() => onChange(max !== undefined ? Math.min(max, value + 1) : value + 1)}
         disabled={max !== undefined && value >= max}
-        className={
+        className={cn(
           isMd
             ? 'w-10 h-10 rounded-full bg-success text-white flex items-center justify-center hover:bg-green-light transition-colors disabled:opacity-40 disabled:cursor-not-allowed'
-            : 'w-8 h-8 rounded-lg border border-ink-100 flex items-center justify-center text-ink-700 hover:bg-ink-50 transition-colors disabled:opacity-40 disabled:cursor-not-allowed'
-        }
+            : 'w-8 h-8 rounded-lg border border-ink-100 flex items-center justify-center text-ink-700 hover:bg-ink-50 transition-colors disabled:opacity-40 disabled:cursor-not-allowed',
+          plusClassName,
+        )}
         aria-label="ເພີ່ມ"
       >
         <Plus size={isMd ? 16 : 14} />
