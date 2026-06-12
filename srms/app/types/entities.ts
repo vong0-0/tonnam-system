@@ -67,7 +67,7 @@ export interface TableWithMergeGroup extends Table {
 }
 
 export interface Reservation {
-  id: string
+  _id: string
   table_id: string
   reserver_name: string
   phone: string

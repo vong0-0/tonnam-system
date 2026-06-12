@@ -150,6 +150,39 @@ export async function updateReservation(
     })
   }
 
+  if (input.table_id && input.table_id !== String(reservation.table_id)) {
+    if (!mongoose.Types.ObjectId.isValid(input.table_id)) {
+      throw problem({
+        type: 'not-found',
+        title: 'Not Found',
+        status: 404,
+        detail: 'Table not found.',
+        instance: `/v1/reservations/${id}`,
+      })
+    }
+    const newTable = await TableModel.findById(input.table_id)
+    if (!newTable) {
+      throw problem({
+        type: 'not-found',
+        title: 'Not Found',
+        status: 404,
+        detail: 'Table not found.',
+        instance: `/v1/reservations/${id}`,
+      })
+    }
+    if (newTable.status !== 'AVAILABLE') {
+      throw problem({
+        type: 'conflict',
+        title: 'Conflict',
+        status: 409,
+        detail: 'Table is not available for reservation.',
+        instance: `/v1/reservations/${id}`,
+      })
+    }
+    await TableModel.findByIdAndUpdate(reservation.table_id, { status: 'AVAILABLE' })
+    await TableModel.findByIdAndUpdate(input.table_id, { status: 'RESERVED' })
+  }
+
   const updateData: Record<string, unknown> = { ...input }
   if (input.reserved_at !== undefined) {
     updateData['reserved_at'] = new Date(input.reserved_at)

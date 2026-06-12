@@ -9,17 +9,32 @@ export const createReservationSchema = z.object({
   reserved_at: z
     .string()
     .datetime()
-    .refine((val) => new Date(val) > new Date(), 'reserved_at must be in the future'),
+    .refine((val) => {
+      const d = new Date(val)
+      const today = new Date()
+      today.setHours(0, 0, 0, 0)
+      return d >= today
+    }, 'reserved_at must be today or in the future'),
   notes: z.string().trim().nullable().optional().default(null),
 })
 
 export const updateReservationSchema = z
   .object({
+    table_id: z.string().min(1).optional(),
     reserver_name: z.string().min(1).max(100).trim().optional(),
     phone: z.string().regex(/^020[0-9]{8}$/, 'Invalid Lao phone number format').optional(),
     party_size: z.number().int().min(1).optional(),
-    reserved_at: z.string().datetime().optional(),
-    notes: z.string().trim().optional(),
+    reserved_at: z
+      .string()
+      .datetime()
+      .refine((val) => {
+        const d = new Date(val)
+        const today = new Date()
+        today.setHours(0, 0, 0, 0)
+        return d >= today
+      }, 'reserved_at must be today or in the future')
+      .optional(),
+    notes: z.string().trim().nullable().optional(),
   })
   .refine((data) => Object.keys(data).length > 0, {
     message: 'At least one field must be provided',
