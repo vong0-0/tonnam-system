@@ -400,13 +400,30 @@ export async function cancelBill(input: CancelBillInput): Promise<IBill> {
     { $set: { status: OrderItemStatus.CANCELLED } },
   );
 
-  const openBillCount = await BillModel.countDocuments({
+  // Cancel any other open bills on the same table so the table clears cleanly
+  const otherOpenBills = (await BillModel.find({
     table_id: bill.table_id,
     status: BillStatus.OPEN,
-  });
-  if (openBillCount === 0) {
-    await TableModel.findByIdAndUpdate(bill.table_id, { status: "AVAILABLE" });
+    _id: { $ne: bill._id },
+  }).lean()) as IBill[];
+
+  if (otherOpenBills.length > 0) {
+    const otherBillIds = otherOpenBills.map((b) => b._id);
+    await BillModel.updateMany(
+      { _id: { $in: otherBillIds } },
+      { $set: { status: BillStatus.CANCELLED, cancel_reason: input.reason } },
+    );
+    const otherOrders = (await OrderModel.find({
+      bill_id: { $in: otherBillIds },
+    }).lean()) as IOrder[];
+    const otherOrderIds = otherOrders.map((o) => o._id);
+    await OrderItemModel.updateMany(
+      { order_id: { $in: otherOrderIds }, status: null },
+      { $set: { status: OrderItemStatus.CANCELLED } },
+    );
   }
+
+  await TableModel.findByIdAndUpdate(bill.table_id, { status: "AVAILABLE", bill_ids: [] });
 
   await createAuditLog({
     actor: input.actor,

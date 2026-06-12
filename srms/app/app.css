@@ -6,41 +6,46 @@
 /* ─── LOCAL FONTS ─────────────────────────────── */
 
 @font-face {
-  font-family: 'Playfair Display';
-  src: url('./assets/fonts/Playfair_Display/PlayfairDisplay-VariableFont_wght.ttf') format('truetype');
+  font-family: "Playfair Display";
+  src: url("./assets/fonts/Playfair_Display/PlayfairDisplay-VariableFont_wght.ttf")
+    format("truetype");
   font-weight: 400 900;
   font-style: normal;
   font-display: swap;
 }
 
 @font-face {
-  font-family: 'Playfair Display';
-  src: url('./assets/fonts/Playfair_Display/PlayfairDisplay-Italic-VariableFont_wght.ttf') format('truetype');
+  font-family: "Playfair Display";
+  src: url("./assets/fonts/Playfair_Display/PlayfairDisplay-Italic-VariableFont_wght.ttf")
+    format("truetype");
   font-weight: 400 900;
   font-style: italic;
   font-display: swap;
 }
 
 @font-face {
-  font-family: 'Noto Sans Lao';
-  src: url('./assets/fonts/Noto_Sans_Lao/NotoSansLao-VariableFont_wdth,wght.ttf') format('truetype');
+  font-family: "Noto Sans Lao";
+  src: url("./assets/fonts/Noto_Sans_Lao/NotoSansLao-VariableFont_wdth,wght.ttf")
+    format("truetype");
   font-weight: 100 900;
   font-style: normal;
   font-display: swap;
-  unicode-range: U+0E80-U+0EFF;
+  unicode-range: U+0E80- U+0EFF;
 }
 
 @font-face {
-  font-family: 'JetBrains Mono';
-  src: url('./assets/fonts/JetBrains_Mono/JetBrainsMono-VariableFont_wght.ttf') format('truetype');
+  font-family: "JetBrains Mono";
+  src: url("./assets/fonts/JetBrains_Mono/JetBrainsMono-VariableFont_wght.ttf")
+    format("truetype");
   font-weight: 100 800;
   font-style: normal;
   font-display: swap;
 }
 
 @font-face {
-  font-family: 'JetBrains Mono';
-  src: url('./assets/fonts/JetBrains_Mono/JetBrainsMono-Italic-VariableFont_wght.ttf') format('truetype');
+  font-family: "JetBrains Mono";
+  src: url("./assets/fonts/JetBrains_Mono/JetBrainsMono-Italic-VariableFont_wght.ttf")
+    format("truetype");
   font-weight: 100 800;
   font-style: italic;
   font-display: swap;
@@ -49,76 +54,75 @@
 @custom-variant dark (&:is(.dark *));
 
 @theme {
-
   /* ─── COLORS — Brand ─────────────────────────── */
 
   /* Primary — Forest Green */
-  --color-green: #1B4332;
-  --color-green-light: #2D6A4F;
-  --color-green-pale: #D8EDDF;
+  --color-green: #1b4332;
+  --color-green-light: #2d6a4f;
+  --color-green-pale: #d8eddf;
 
   /* Secondary — Warm Gold */
-  --color-gold: #C9A84C;
-  --color-gold-dark: #8B6A1A;
-  --color-gold-pale: #F5EDCE;
+  --color-gold: #c9a84c;
+  --color-gold-dark: #8b6a1a;
+  --color-gold-pale: #f5edce;
 
   /* Tertiary — Terracotta */
-  --color-terra: #C4623A;
-  --color-terra-dark: #8B3A1F;
-  --color-terra-pale: #F2D5C4;
+  --color-terra: #c4623a;
+  --color-terra-dark: #8b3a1f;
+  --color-terra-pale: #f2d5c4;
 
   /* Neutral — Public Track */
-  --color-cream: #FAF6F0;
-  --color-cream-dark: #EDE8DC;
-  --color-brown: #2C1810;
-  --color-brown-soft: #4A3528;
+  --color-cream: #faf6f0;
+  --color-cream-dark: #ede8dc;
+  --color-brown: #2c1810;
+  --color-brown-soft: #4a3528;
 
   /* Neutral — Internal Track (Ink Scale) */
-  --color-ink-900: #1F2326;
+  --color-ink-900: #1f2326;
   --color-ink-700: #495057;
-  --color-ink-500: #6C757D;
-  --color-ink-300: #ADB5BD;
-  --color-ink-100: #DEE2E6;
-  --color-ink-50: #F1F3F5;
-  --color-paper: #FFFFFF;
+  --color-ink-500: #6c757d;
+  --color-ink-300: #adb5bd;
+  --color-ink-100: #dee2e6;
+  --color-ink-50: #f1f3f5;
+  --color-paper: #ffffff;
 
   /* Semantic */
-  --color-success: #0F9B8E;
-  --color-warning: #F5A623;
-  --color-danger: #C0392B;
-  --color-info: #2980B9;
+  --color-success: #0f9b8e;
+  --color-warning: #f5a623;
+  --color-danger: #c0392b;
+  --color-info: #2980b9;
 
   /* Status — Table Cards & Badges */
   --color-status-available-bg: rgba(15, 155, 142, 0.08);
-  --color-status-available-border: rgba(15, 155, 142, 0.30);
-  --color-status-available-fg: #0F9B8E;
+  --color-status-available-border: rgba(15, 155, 142, 0.3);
+  --color-status-available-fg: #0f9b8e;
 
   --color-status-occupied-bg: rgba(27, 67, 50, 0.12);
-  --color-status-occupied-border: rgba(27, 67, 50, 0.30);
-  --color-status-occupied-fg: #1B4332;
+  --color-status-occupied-border: rgba(27, 67, 50, 0.3);
+  --color-status-occupied-fg: #1b4332;
 
-  --color-status-reserved-bg: rgba(245, 166, 35, 0.10);
-  --color-status-reserved-border: rgba(245, 166, 35, 0.40);
-  --color-status-reserved-fg: #B37D00;
+  --color-status-reserved-bg: rgba(245, 166, 35, 0.1);
+  --color-status-reserved-border: rgba(245, 166, 35, 0.4);
+  --color-status-reserved-fg: #b37d00;
 
-  --color-status-paid-bg: #D8EDDF;
-  --color-status-paid-border: #2D6A4F;
-  --color-status-paid-fg: #2D6A4F;
+  --color-status-paid-bg: #d8eddf;
+  --color-status-paid-border: #2d6a4f;
+  --color-status-paid-fg: #2d6a4f;
 
   /* Status — Bill Badges */
   --color-status-open-bg: rgba(27, 67, 50, 0.12);
-  --color-status-open-border: rgba(27, 67, 50, 0.30);
-  --color-status-open-fg: #1B4332;
+  --color-status-open-border: rgba(27, 67, 50, 0.3);
+  --color-status-open-fg: #1b4332;
 
   --color-status-cancelled-bg: rgba(192, 57, 43, 0.08);
   --color-status-cancelled-border: rgba(192, 57, 43, 0.22);
-  --color-status-cancelled-fg: #C0392B;
+  --color-status-cancelled-fg: #c0392b;
 
   /* ─── FONTS ──────────────────────────────────── */
 
-  --font-display: 'Playfair Display', Georgia, serif;
-  --font-body: 'Noto Sans Lao', sans-serif;
-  --font-mono: 'JetBrains Mono', monospace;
+  --font-display: "Playfair Display", Georgia, serif;
+  --font-body: "Noto Sans Lao", sans-serif;
+  --font-mono: "JetBrains Mono", monospace;
 
   /* ─── FONT SIZES ─────────────────────────────── */
 
@@ -171,12 +175,14 @@
   /* ─── SHADOWS — Warm brown tinted (never neutral grey) ── */
 
   --shadow-sm: 0 1px 2px rgba(44, 24, 16, 0.06);
-  --shadow-md: 0 2px 8px rgba(44, 24, 16, 0.08), 0 1px 2px rgba(44, 24, 16, 0.05);
-  --shadow-lg: 0 8px 24px rgba(44, 24, 16, 0.12), 0 2px 6px rgba(44, 24, 16, 0.06);
+  --shadow-md:
+    0 2px 8px rgba(44, 24, 16, 0.08), 0 1px 2px rgba(44, 24, 16, 0.05);
+  --shadow-lg:
+    0 8px 24px rgba(44, 24, 16, 0.12), 0 2px 6px rgba(44, 24, 16, 0.06);
   --shadow-hero: 0 24px 60px rgba(27, 67, 50, 0.22);
 
   /* Focus ring — Forest Green tinted */
-  --shadow-focus: 0 0 0 3px rgba(27, 67, 50, 0.20);
+  --shadow-focus: 0 0 0 3px rgba(27, 67, 50, 0.2);
 
   /* ─── SPACING — 4px base grid ────────────────── */
   /* Tailwind v4 uses rem — 1 spacing unit = 0.25rem = 4px */
@@ -185,7 +191,7 @@
   /* ─── ANIMATION ──────────────────────────────── */
 
   --ease-out: cubic-bezier(0.22, 0.61, 0.36, 1);
-  --ease-in-out: cubic-bezier(0.65, 0.00, 0.35, 1);
+  --ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
 
   --duration-quick: 120ms;
   --duration-base: 200ms;
@@ -205,7 +211,6 @@
   --breakpoint-mobile: 375px;
   --breakpoint-tablet: 768px;
   /* 'sm', 'md', 'lg', 'xl' — keep Tailwind defaults */
-
 }
 
 /* ─────────────────────────────────────────────────
@@ -213,7 +218,6 @@
 ───────────────────────────────────────────────── */
 
 @layer base {
-
   html {
     font-family: var(--font-body);
     color: var(--color-ink-900);
@@ -261,7 +265,6 @@
   }
 
   @media (prefers-reduced-motion: reduce) {
-
     *,
     *::before,
     *::after {
@@ -272,12 +275,10 @@
 
   * {
     @apply border-border outline-ring/50;
-
   }
 
   body {
     @apply bg-background text-foreground;
-
   }
 
   button {
@@ -285,9 +286,20 @@
   }
 
   label {
-    @apply inline-block
+    @apply inline-block;
   }
 
+  /* Chrome, Safari, Edge, Opera */
+  input::-webkit-outer-spin-button,
+  input::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+  }
+
+  /* Firefox */
+  input[type="number"] {
+    -moz-appearance: textfield;
+  }
 }
 
 /* ─────────────────────────────────────────────────
@@ -295,7 +307,6 @@
 ───────────────────────────────────────────────── */
 
 @layer components {
-
   /* ── Eyebrow / Section Label ── */
   .eyebrow {
     font-family: var(--font-body);
@@ -398,7 +409,7 @@
   }
 
   .badge::before {
-    content: '';
+    content: "";
     display: inline-block;
     width: 6px;
     height: 6px;
@@ -447,7 +458,7 @@
     background-color: var(--color-paper);
     border-radius: var(--radius-lg);
     padding: 1rem;
-    border: 0.5px solid rgba(44, 24, 16, 0.10);
+    border: 0.5px solid rgba(44, 24, 16, 0.1);
     box-shadow: var(--shadow-md);
   }
 
@@ -462,7 +473,9 @@
     font-family: var(--font-body);
     font-size: var(--text-md);
     width: 100%;
-    transition: border-color 150ms ease, box-shadow 150ms ease;
+    transition:
+      border-color 150ms ease,
+      box-shadow 150ms ease;
   }
 
   .input:focus {
@@ -485,16 +498,27 @@
     position: absolute;
     inset: 0;
     background-image:
-      repeating-linear-gradient(45deg, color-mix(in srgb, var(--color-gold) 7%, transparent) 0px, color-mix(in srgb, var(--color-gold) 7%, transparent) 1px, transparent 1px, transparent 28px),
-      repeating-linear-gradient(-45deg, color-mix(in srgb, var(--color-gold) 7%, transparent) 0px, color-mix(in srgb, var(--color-gold) 7%, transparent) 1px, transparent 1px, transparent 28px);
+      repeating-linear-gradient(
+        45deg,
+        color-mix(in srgb, var(--color-gold) 7%, transparent) 0px,
+        color-mix(in srgb, var(--color-gold) 7%, transparent) 1px,
+        transparent 1px,
+        transparent 28px
+      ),
+      repeating-linear-gradient(
+        -45deg,
+        color-mix(in srgb, var(--color-gold) 7%, transparent) 0px,
+        color-mix(in srgb, var(--color-gold) 7%, transparent) 1px,
+        transparent 1px,
+        transparent 28px
+      );
     pointer-events: none;
   }
-
 }
 
 @theme inline {
   --font-heading: var(--font-display);
-  --font-sans: 'Inter Variable', sans-serif;
+  --font-sans: "Inter Variable", sans-serif;
   --color-sidebar-ring: var(--sidebar-ring);
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
@@ -533,7 +557,6 @@
   --radius-2xl: calc(var(--radius) * 1.8);
   --radius-3xl: calc(var(--radius) * 2.2);
   --radius-4xl: calc(var(--radius) * 2.6);
-
 }
 
 :root {
@@ -569,7 +592,6 @@
   --sidebar-accent-foreground: oklch(0.205 0 0);
   --sidebar-border: oklch(0.922 0 0);
   --sidebar-ring: oklch(0.708 0 0);
-
 }
 
 .dark {
@@ -604,5 +626,4 @@
   --sidebar-accent-foreground: oklch(0.985 0 0);
   --sidebar-border: oklch(1 0 0 / 10%);
   --sidebar-ring: oklch(0.556 0 0);
-
 }

@@ -52,3 +52,17 @@ export async function updateOrderItem(
   const { data } = await api.patch<ApiResponse<OrderWithItems>>(API.ORDER_ITEM(orderId, itemId), body)
   return data.data
 }
+
+export interface UpdateOrderItemQuantityBody {
+  quantity: number
+  reason: string
+}
+
+export async function updateOrderItemQuantity(
+  orderId: string,
+  itemId: string,
+  body: UpdateOrderItemQuantityBody,
+): Promise<OrderWithItems> {
+  const { data } = await api.patch<ApiResponse<OrderWithItems>>(API.ORDER_ITEM(orderId, itemId), body)
+  return data.data
+}

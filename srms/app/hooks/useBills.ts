@@ -1,6 +1,7 @@
 import { useQuery, useInfiniteQuery, useMutation, useQueryClient } from '@tanstack/react-query'
-import { listBills, getBillById, createBill } from '@/services/bill.service'
+import { listBills, getBillById, createBill, cancelBill } from '@/services/bill.service'
 import type { Bill, BillDetail } from '@/types/entities'
+import { TABLE_KEYS } from '@/hooks/useTables'
 import type { BillStatus } from '@/types/enums'
 import { toastSuccess, toastError } from '@/lib/toast'
 
@@ -51,12 +52,30 @@ export function useBill(id: string) {
   })
 }
 
+export function useCancelBill() {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: ({ id, reason }: { id: string; reason: string }) =>
+      cancelBill(id, { status: 'CANCELLED', reason }),
+    onSuccess: (_, variables) => {
+      queryClient.invalidateQueries({ queryKey: BILL_KEYS.detail(variables.id) })
+      queryClient.invalidateQueries({ queryKey: BILL_KEYS.all })
+      queryClient.invalidateQueries({ queryKey: TABLE_KEYS.all })
+      toastSuccess('ຍົກເລີກບິນສຳເລັດ')
+    },
+    onError: (error) => {
+      toastError(error, 'ບໍ່ສາມາດຍົກເລີກບິນໄດ້ ກະລຸນາລອງໃໝ່')
+    },
+  })
+}
+
 export function useCreateBill() {
   const queryClient = useQueryClient()
   return useMutation({
     mutationFn: (body: { table_id: string; name?: string }) => createBill(body),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: BILL_KEYS.all })
+      queryClient.invalidateQueries({ queryKey: TABLE_KEYS.all })
       toastSuccess('ເປີດບິນສຳເລັດ')
     },
     onError: (error) => {

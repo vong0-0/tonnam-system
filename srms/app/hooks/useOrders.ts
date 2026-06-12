@@ -4,8 +4,10 @@ import {
   getOrderById,
   createOrder,
   updateOrderItem,
+  updateOrderItemQuantity,
   type CreateOrderBody,
   type UpdateOrderItemBody,
+  type UpdateOrderItemQuantityBody,
 } from '@/services/order.service'
 import { BILL_KEYS } from '@/hooks/useBills'
 import type { Order, OrderWithItems } from '@/types/entities'
@@ -89,10 +91,35 @@ export function useUpdateOrderItem() {
     onSuccess: (_, variables) => {
       queryClient.invalidateQueries({ queryKey: ORDER_KEYS.detail(variables.orderId) })
       queryClient.invalidateQueries({ queryKey: ORDER_KEYS.all })
+      queryClient.invalidateQueries({ queryKey: BILL_KEYS.all })
       toastSuccess('ອັປເດດລາຍການສຳເລັດ')
     },
     onError: (error) => {
       toastError(error, 'ບໍ່ສາມາດອັປເດດລາຍການໄດ້ ກະລຸນາລອງໃໝ່')
+    },
+  })
+}
+
+export function useUpdateOrderItemQuantity() {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: ({
+      orderId,
+      itemId,
+      body,
+    }: {
+      orderId: string
+      itemId: string
+      body: UpdateOrderItemQuantityBody
+    }) => updateOrderItemQuantity(orderId, itemId, body),
+    onSuccess: (_, variables) => {
+      queryClient.invalidateQueries({ queryKey: ORDER_KEYS.detail(variables.orderId) })
+      queryClient.invalidateQueries({ queryKey: ORDER_KEYS.all })
+      queryClient.invalidateQueries({ queryKey: BILL_KEYS.all })
+      toastSuccess('ອັປເດດຈຳນວນສຳເລັດ')
+    },
+    onError: (error) => {
+      toastError(error, 'ບໍ່ສາມາດອັປເດດຈຳນວນໄດ້ ກະລຸນາລອງໃໝ່')
     },
   })
 }
