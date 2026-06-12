@@ -162,6 +162,7 @@ export interface BillTable {
 
 export interface BillDetail {
   bill: Bill
+  created_by_name: string
   table: BillTable | null
   orders: OrderWithItems[]
   payments: Payment[]

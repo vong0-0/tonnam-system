@@ -11,6 +11,8 @@ export interface ListBillsParams {
   search?: string
   table_id?: string
   status?: BillStatus | 'ALL'
+  date_from?: string
+  date_to?: string
 }
 
 export async function listBills(params: ListBillsParams = {}): Promise<PaginatedResponse<Bill>> {

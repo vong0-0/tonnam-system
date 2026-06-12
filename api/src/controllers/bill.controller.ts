@@ -46,6 +46,7 @@ export async function listBillsController(
     const status = req.query['status'] as string | undefined
     const date_from = req.query['date_from'] as string | undefined
     const date_to = req.query['date_to'] as string | undefined
+    const search = req.query['search'] as string | undefined
 
     const result = await billService.listBills({
       page,
@@ -54,6 +55,7 @@ export async function listBillsController(
       ...(status !== undefined ? { status } : {}),
       ...(date_from !== undefined ? { date_from } : {}),
       ...(date_to !== undefined ? { date_to } : {}),
+      ...(search !== undefined ? { search } : {}),
     })
     res.json(result)
   } catch (err) {

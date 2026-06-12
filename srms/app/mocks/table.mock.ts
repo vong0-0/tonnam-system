@@ -86,6 +86,7 @@ export const mockTable: Table = {
 // total_amount: (120×2) + (180×1) + (20×2) + (60×2) + (80×1) = 660
 
 export const mockBillDetail: BillDetail[] = [{
+  created_by_name: 'Mock Cashier',
   bill: {
     _id: BILL_ID,
     short_id: 'B-0042',

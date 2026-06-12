@@ -22,6 +22,7 @@ export default [
     ]),
     layout("layouts/pos.layout.tsx", [
       route("pos", "routes/pos/index.tsx"),
+      route("pos/bills", "routes/pos/bills.tsx"),
     ])
   ]),
   route("*", "routes/not-found.tsx"),

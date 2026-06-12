@@ -1,4 +1,4 @@
-import { useQuery, useInfiniteQuery, useMutation, useQueryClient } from '@tanstack/react-query'
+import { useQuery, useInfiniteQuery, useMutation, useQueryClient, keepPreviousData } from '@tanstack/react-query'
 import { listBills, getBillById, createBill, cancelBill } from '@/services/bill.service'
 import type { Bill, BillDetail } from '@/types/entities'
 import { TABLE_KEYS } from '@/hooks/useTables'
@@ -41,6 +41,26 @@ export function useBills(params: UseBillsParams = {}) {
   const isEmpty = bills.length === 0 && !query.isLoading
 
   return { ...query, bills, isEmpty }
+}
+
+export interface UseBillsPageParams {
+  page?: number
+  limit?: number
+  status?: BillStatus | 'ALL'
+  search?: string
+  date_from?: string
+  date_to?: string
+}
+
+export function useBillsPage(params: UseBillsPageParams = {}) {
+  const { status, ...rest } = params
+  return useQuery({
+    queryKey: BILL_KEYS.list(params),
+    queryFn: () =>
+      listBills({ ...rest, ...(status && status !== 'ALL' ? { status } : {}) }),
+    staleTime: 30_000,
+    placeholderData: keepPreviousData,
+  })
 }
 
 export function useBill(id: string) {

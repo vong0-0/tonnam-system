@@ -5,6 +5,7 @@ import { type IOrder, OrderModel } from "@/models/order.model.js";
 import { type IOrderItem, OrderItemModel } from "@/models/order-item.model.js";
 import { type IMenuItem, MenuItemModel } from "@/models/menu-item.model.js";
 import { type IPayment, PaymentModel } from "@/models/payment.model.js";
+import { UserModel } from "@/models/user.model.js";
 import { createAuditLog } from "@/services/audit-log.service.js";
 import {
   BillStatus,
@@ -36,6 +37,7 @@ interface OrderWithItems {
 
 export interface BillDetail {
   bill: IBill;
+  created_by_name: string;
   table: { id: Types.ObjectId; table_name: string; status: TableStatus } | null;
   orders: OrderWithItems[];
   payments: IPayment[];
@@ -54,6 +56,7 @@ interface ListBillsQuery {
   status?: string;
   date_from?: string;
   date_to?: string;
+  search?: string;
 }
 
 interface UpdateBillInput {
@@ -249,7 +252,14 @@ export async function getBillById(id: string): Promise<BillDetail> {
     bill_id: bill._id,
   }).lean()) as IPayment[];
 
-  return { bill, table, orders, payments };
+  const creator = (await UserModel.findById(bill.created_by)
+    .select("first_name last_name")
+    .lean()) as { first_name: string; last_name: string } | null;
+  const created_by_name = creator
+    ? `${creator.first_name} ${creator.last_name}`.trim()
+    : String(bill.created_by);
+
+  return { bill, created_by_name, table, orders, payments };
 }
 
 export async function listBills(
@@ -257,9 +267,10 @@ export async function listBills(
 ): Promise<SuccessListResponse<IBill>> {
   const page = query.page ?? 1;
   const limit = query.limit ?? 20;
-  const { table_id, status, date_from, date_to } = query;
+  const { table_id, status, date_from, date_to, search } = query;
 
   const filter: Record<string, unknown> = {};
+  if (search !== undefined && search !== "") filter["short_id"] = { $regex: search, $options: "i" };
   if (table_id !== undefined) filter["table_id"] = table_id;
   if (status !== undefined) filter["status"] = status;
   if (date_from !== undefined || date_to !== undefined) {

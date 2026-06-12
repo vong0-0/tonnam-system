@@ -5,6 +5,7 @@ export const ROUTES = {
   PROFILE: '/profile',
 
   POS:               '/pos',
+  POS_BILLS:         '/pos/bills',
   POS_RESERVATIONS:  '/pos/reservations',
   POS_BILL:          (id: string) => `/pos/bills/${id}`,
   POS_BILL_NEW_ORDER:(id: string) => `/pos/bills/${id}/orders/new`,

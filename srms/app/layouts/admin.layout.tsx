@@ -33,7 +33,7 @@ export default function AdminLayout() {
   return (
     <SidebarProvider>
       <AppSidebar navGroups={ADMIN_NAV} />
-      <SidebarInset className="min-h-screen bg-ink-50">
+      <SidebarInset className="bg-ink-50">
         <AppHeader navGroups={ADMIN_NAV} />
         <Outlet />
       </SidebarInset>
