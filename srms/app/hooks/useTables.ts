@@ -82,6 +82,14 @@ export function useMoveTable() {
   })
 }
 
+export function useTableStatusSummary() {
+  return useQuery({
+    queryKey: ['tables', 'summary'] as const,
+    queryFn:  () => listTables({ limit: 200 }),
+    staleTime: 30_000,
+  })
+}
+
 export function useUpdateTableStatus() {
   const queryClient = useQueryClient()
   return useMutation({
