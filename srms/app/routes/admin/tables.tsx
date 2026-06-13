@@ -53,10 +53,10 @@ import { cn } from "@/lib/utils";
 const PAGE_SIZE = 20;
 
 const STATUS_CONFIG = {
-  [TableStatus.AVAILABLE]: { dot: "bg-teal-800",  label: "ວ່າງ" },
-  [TableStatus.RESERVED]:  { dot: "bg-blue-800",  label: "ຈອງແລ້ວ" },
-  [TableStatus.OCCUPIED]:  { dot: "bg-amber-800", label: "ມີລູກຄ້າ" },
-  [TableStatus.PAID]:      { dot: "bg-slate-800", label: "ຊຳລະແລ້ວ" },
+  [TableStatus.AVAILABLE]: { dot: "bg-teal-500",  label: "ວ່າງ" },
+  [TableStatus.RESERVED]:  { dot: "bg-blue-500",  label: "ຈອງແລ້ວ" },
+  [TableStatus.OCCUPIED]:  { dot: "bg-amber-500", label: "ມີລູກຄ້າ" },
+  [TableStatus.PAID]:      { dot: "bg-slate-400", label: "ຊຳລະແລ້ວ" },
 } as const;
 
 const STATUS_FILTERS = [
