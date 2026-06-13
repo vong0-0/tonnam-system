@@ -11,7 +11,6 @@ import { formatDateLao } from "@/lib/date";
 export default function ProfilePageMobile() {
   const navigate = useNavigate()
   const { data: user, isLoading, isError } = useMe()
-
   if (isLoading) {
     return (
       <div className="flex items-center justify-center py-32">

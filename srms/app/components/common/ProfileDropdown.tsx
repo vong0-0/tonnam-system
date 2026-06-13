@@ -1,4 +1,4 @@
-import { CircleUserRound, User, LogOut } from 'lucide-react'
+import { CircleUserRound, User, LogOut, ChevronsUpDown } from 'lucide-react'
 import { useNavigate } from 'react-router'
 import {
   DropdownMenu,
@@ -8,7 +8,9 @@ import {
   DropdownMenuSeparator,
 } from '@/components/ui/dropdown-menu'
 import { useLogout } from '@/hooks/useAuth'
+import { useAuthStore } from '@/stores/auth.store'
 import { ROUTES } from '@/constants/routes'
+import { ROLES } from '@/constants/roles'
 import { cn } from '@/lib/utils'
 
 interface ProfileDropdownProps {
@@ -19,6 +21,10 @@ interface ProfileDropdownProps {
 export function ProfileDropdown({ className, iconClassName }: ProfileDropdownProps) {
   const navigate = useNavigate()
   const { mutate: logout } = useLogout()
+  const canSwitch = useAuthStore((s) => {
+    const role = s.user?.role
+    return role === ROLES.ADMIN || role === ROLES.CASHIER
+  })
 
   return (
     <DropdownMenu>
@@ -35,7 +41,7 @@ export function ProfileDropdown({ className, iconClassName }: ProfileDropdownPro
         </button>
       </DropdownMenuTrigger>
 
-      <DropdownMenuContent align="end" className="w-40">
+      <DropdownMenuContent align="end" className="w-44">
         <DropdownMenuItem
           className="cursor-pointer gap-2.5 py-2 text-sm"
           onSelect={() => navigate(`/waiter${ROUTES.PROFILE}`)}
@@ -43,6 +49,16 @@ export function ProfileDropdown({ className, iconClassName }: ProfileDropdownPro
           <User size={14} />
           ໂປຣໄຟລ໌
         </DropdownMenuItem>
+
+        {canSwitch && (
+          <DropdownMenuItem
+            className="cursor-pointer gap-2.5 py-2 text-sm"
+            onSelect={() => navigate(ROUTES.SELECT)}
+          >
+            <ChevronsUpDown size={14} />
+            Switch Subsystem
+          </DropdownMenuItem>
+        )}
 
         <DropdownMenuSeparator />
 

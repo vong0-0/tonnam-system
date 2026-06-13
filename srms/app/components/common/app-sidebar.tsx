@@ -96,15 +96,14 @@ export default function AppSidebar({ navGroups, profileHref }: AppSidebarProps) 
 
         <div className="flex items-center justify-between px-3 py-2">
           {profileHref ? (
-            <NavLink
-              to={profileHref}
-              className="min-w-0 flex-1 rounded-md hover:bg-green-light transition-colors -mx-1 px-1 py-0.5"
+            <div
+              className="min-w-0 flex-1 -mx-1 px-1 py-0.5"
             >
               <p className="text-white text-sm font-medium truncate">
                 {user?.first_name} {user?.last_name}
               </p>
               <p className="text-white/50 text-xs truncate">{user?.role}</p>
-            </NavLink>
+            </div>
           ) : (
             <div className="min-w-0">
               <p className="text-white text-sm font-medium truncate">

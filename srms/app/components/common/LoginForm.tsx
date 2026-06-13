@@ -1,4 +1,5 @@
-import { AlertCircle } from 'lucide-react'
+import { useState } from 'react'
+import { AlertCircle, Eye, EyeOff } from 'lucide-react'
 import { useZodForm, type SubmitHandler } from '@/lib/form'
 import { loginSchema, type LoginInput } from '@/schemas/auth.schema'
 import { useLogin } from '@/hooks/useAuth'
@@ -11,6 +12,7 @@ function getLoginError(error: unknown): string {
 
 export function LoginForm() {
   const { mutate: login, isPending, isError, error } = useLogin()
+  const [showPassword, setShowPassword] = useState(false)
 
   const {
     register,
@@ -49,13 +51,24 @@ export function LoginForm() {
           </div>
           <div>
             <label className="eyebrow block mb-2">ລະຫັດຜ່ານ · PASSWORD</label>
-            <input
-              {...register('password')}
-              className="input"
-              type="password"
-              placeholder="••••••••"
-              autoComplete="current-password"
-            />
+            <div className="relative">
+              <input
+                {...register('password')}
+                className="input pr-10"
+                type={showPassword ? 'text' : 'password'}
+                placeholder="••••••••"
+                autoComplete="current-password"
+              />
+              <button
+                type="button"
+                onClick={() => setShowPassword((v) => !v)}
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-ink-400 hover:text-ink-700 transition-colors"
+                tabIndex={-1}
+                aria-label={showPassword ? 'ເຊື່ອງລະຫັດຜ່ານ' : 'ສະແດງລະຫັດຜ່ານ'}
+              >
+                {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
+              </button>
+            </div>
             {errors.password && (
               <p className="text-danger text-xs mt-1">{errors.password.message}</p>
             )}

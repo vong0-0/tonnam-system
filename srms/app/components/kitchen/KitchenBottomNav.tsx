@@ -1,6 +1,8 @@
 import { NavLink } from 'react-router'
-import { UtensilsCrossed, ClipboardList, UserRound, type LucideIcon } from 'lucide-react'
+import { UtensilsCrossed, ClipboardList, UserRound, ChevronsUpDown, type LucideIcon } from 'lucide-react'
+import { useAuthStore } from '@/stores/auth.store'
 import { ROUTES } from '@/constants/routes'
+import { ROLES } from '@/constants/roles'
 
 interface NavItem {
   to: string
@@ -9,13 +11,19 @@ interface NavItem {
   end?: boolean
 }
 
-const items: NavItem[] = [
-  { to: ROUTES.KITCHEN, label: 'ອໍເດີ', icon: UtensilsCrossed, end: true },
-  { to: ROUTES.KITCHEN_ORDER_HISTORY, label: 'ປະຫວັດ', icon: ClipboardList },
-  { to: ROUTES.KITCHEN_PROFILE, label: 'ໂປຣໄຟລ໌', icon: UserRound },
-]
-
 export default function KitchenBottomNav() {
+  const canSwitch = useAuthStore((s) => {
+    const role = s.user?.role
+    return role === ROLES.ADMIN || role === ROLES.CASHIER
+  })
+
+  const items: NavItem[] = [
+    { to: ROUTES.KITCHEN, label: 'ອໍເດີ', icon: UtensilsCrossed, end: true },
+    { to: ROUTES.KITCHEN_ORDER_HISTORY, label: 'ປະຫວັດ', icon: ClipboardList },
+    { to: ROUTES.KITCHEN_PROFILE, label: 'ໂປຣໄຟລ໌', icon: UserRound },
+    ...(canSwitch ? [{ to: ROUTES.SELECT, label: 'Switch', icon: ChevronsUpDown }] : []),
+  ]
+
   return (
     <nav className="fixed bottom-0 inset-x-0 z-40 flex justify-center pb-4 px-4">
       <div className="w-full max-w-[500px] bg-white rounded-2xl shadow-lg flex items-center h-[var(--height-bottom-nav)]">
