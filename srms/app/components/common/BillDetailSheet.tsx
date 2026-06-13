@@ -13,7 +13,7 @@ import { useBill } from "@/hooks/useBills";
 import { formatDate, DATE_FORMATS } from "@/lib/date";
 import { formatNumber } from "@/lib/utils";
 import { printBill } from "@/lib/print-bill";
-import type { OrderWithItems, OrderItem } from "@/types/entities";
+import type { OrderWithItems, OrderItem, Payment } from "@/types/entities";
 import type { PaymentMethod } from "@/types/enums";
 
 function mergeItems(items: OrderItem[]): OrderItem[] {
@@ -123,19 +123,31 @@ export default function BillDetailSheet({
                   <p className="text-xs font-semibold text-ink-500 uppercase tracking-wide">
                     ການຊຳລະເງິນ
                   </p>
-                  {billDetail.payments.map((payment) => (
-                    <div
-                      key={payment._id}
-                      className="flex items-center justify-between text-sm"
-                    >
-                      <PaymentMethodBadge
-                        method={payment.method as PaymentMethod}
-                      />
-                      <span className="font-semibold text-ink-900">
-                        {formatNumber(payment.amount)} ກີບ
-                      </span>
-                    </div>
-                  ))}
+                  {billDetail.payments.map((payment: Payment) => {
+                    const cashDetail = payment.cash ?? payment.qr_promptpay
+                    return (
+                      <div key={payment._id} className="space-y-1.5">
+                        <div className="flex items-center justify-between text-sm pl-1">
+                          <span className="text-ink-500">ວິທີຊຳລະ</span>
+                          <PaymentMethodBadge
+                            method={payment.method as PaymentMethod}
+                          />
+                        </div>
+                        {cashDetail && cashDetail.received_amount > 0 && (
+                          <div className="grid grid-cols-2 gap-y-1 text-sm pl-1">
+                            <span className="text-ink-500">ເງິນທີ່ຮັບ</span>
+                            <span className="text-right text-ink-900">
+                              {formatNumber(cashDetail.received_amount)} ກີບ
+                            </span>
+                            <span className="text-ink-500">ເງິນທອນ</span>
+                            <span className="text-right font-medium text-success">
+                              {formatNumber(cashDetail.change_amount)} ກີບ
+                            </span>
+                          </div>
+                        )}
+                      </div>
+                    )
+                  })}
                 </div>
               )}
 

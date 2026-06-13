@@ -46,6 +46,8 @@ export default function PosBills() {
   const totalPages = data?.pagination.totalPages ?? 1;
   const total = data?.pagination.total ?? 0;
 
+  console.log("bills", bills);
+
   function handleStatusChange(v: string) {
     setStatus(v as BillStatus | "ALL");
     setPage(1);
