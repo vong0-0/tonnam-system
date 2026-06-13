@@ -31,7 +31,8 @@ function canSubscribe(role: string, channel: string): boolean {
         isPrefix('order:', 'orders') ||
         isPrefix('bill:') ||
         isExact('menu') ||
-        isExact('reservations')
+        isExact('reservations') ||
+        isExact('kitchen')
       )
     case 'WAITER':
       return (
