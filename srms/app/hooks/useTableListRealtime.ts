@@ -11,6 +11,15 @@ export function useTableListRealtime() {
     const unsubChannel = runWhenConnected(() => subscribeChannel(WS_CHANNELS.TABLES))
 
     const unsubs = [
+      onWsEvent(WS_EVENTS.TABLE_CREATED, () => {
+        queryClient.invalidateQueries({ queryKey: TABLE_KEYS.all })
+      }),
+      onWsEvent(WS_EVENTS.TABLE_UPDATED, () => {
+        queryClient.invalidateQueries({ queryKey: TABLE_KEYS.all })
+      }),
+      onWsEvent(WS_EVENTS.TABLE_DELETED, () => {
+        queryClient.invalidateQueries({ queryKey: TABLE_KEYS.all })
+      }),
       onWsEvent(WS_EVENTS.TABLE_STATUS_UPDATED, () => {
         queryClient.invalidateQueries({ queryKey: TABLE_KEYS.all })
       }),

@@ -32,12 +32,14 @@ import { Input } from "@/components/ui/input";
 import { Skeleton } from "@/components/ui/skeleton";
 import { SearchInput } from "@/components/common/SearchInput";
 import { ConfirmDialog } from "@/components/common/ConfirmDialog";
+import TableStatusBadge from "@/components/common/TableStatusBadge";
 import {
   useAdminTables,
   useCreateTable,
   useUpdateTable,
   useDeleteTable,
 } from "@/hooks/useTables";
+import { useTableListRealtime } from "@/hooks/useTableListRealtime";
 import { useZodForm, type SubmitHandler } from "@/lib/form";
 import { createTableSchema, updateTableSchema } from "@/schemas/table.schema";
 import type {
@@ -51,45 +53,19 @@ import { cn } from "@/lib/utils";
 const PAGE_SIZE = 20;
 
 const STATUS_CONFIG = {
-  [TableStatus.AVAILABLE]: {
-    dot: "bg-success",
-    label: "ວ່າງ",
-    text: "text-success",
-  },
-  [TableStatus.RESERVED]: {
-    dot: "bg-warning",
-    label: "ຈອງແລ້ວ",
-    text: "text-warning",
-  },
-  [TableStatus.OCCUPIED]: {
-    dot: "bg-danger",
-    label: "ມີລູກຄ້າ",
-    text: "text-danger",
-  },
-  [TableStatus.PAID]: {
-    dot: "bg-ink-300",
-    label: "ຊຳລະແລ້ວ",
-    text: "text-ink-400",
-  },
+  [TableStatus.AVAILABLE]: { dot: "bg-teal-800",  label: "ວ່າງ" },
+  [TableStatus.RESERVED]:  { dot: "bg-blue-800",  label: "ຈອງແລ້ວ" },
+  [TableStatus.OCCUPIED]:  { dot: "bg-amber-800", label: "ມີລູກຄ້າ" },
+  [TableStatus.PAID]:      { dot: "bg-slate-800", label: "ຊຳລະແລ້ວ" },
 } as const;
 
 const STATUS_FILTERS = [
   { value: "ALL" as const, label: "ທັງໝົດ" },
   { value: TableStatus.AVAILABLE, label: "ວ່າງ" },
-  { value: TableStatus.RESERVED, label: "ຈອງແລ້ວ" },
-  { value: TableStatus.OCCUPIED, label: "ມີລູກຄ້າ" },
-  { value: TableStatus.PAID, label: "ຊຳລະແລ້ວ" },
+  { value: TableStatus.RESERVED,  label: "ຈອງແລ້ວ" },
+  { value: TableStatus.OCCUPIED,  label: "ມີລູກຄ້າ" },
+  { value: TableStatus.PAID,      label: "ຊຳລະແລ້ວ" },
 ];
-
-function StatusBadge({ status }: { status: TableStatus }) {
-  const { dot, label, text } = STATUS_CONFIG[status];
-  return (
-    <div className="flex items-center gap-1.5">
-      <span className={cn("size-2 rounded-full shrink-0", dot)} />
-      <span className={cn("text-sm", text)}>{label}</span>
-    </div>
-  );
-}
 
 function SortButton({
   column,
@@ -375,6 +351,7 @@ function DeleteTableDialog({
 }
 
 export default function AdminTables() {
+  useTableListRealtime();
   const [search, setSearch] = useState("");
   const [debouncedSearch] = useDebounce(search, 300);
   const [statusFilter, setStatusFilter] = useState<TableStatus | "ALL">("ALL");
@@ -433,7 +410,7 @@ export default function AdminTables() {
       {
         accessorKey: "status",
         header: "ສະຖານະ",
-        cell: ({ row }) => <StatusBadge status={row.original.status} />,
+        cell: ({ row }) => <TableStatusBadge status={row.original.status} />,
         enableSorting: false,
       },
       {

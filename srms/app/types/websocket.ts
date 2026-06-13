@@ -14,6 +14,18 @@ export interface WsMessage<T = unknown> {
   timestamp: string
 }
 
+export interface WsTableCreatedPayload {
+  table_id: string
+}
+
+export interface WsTableUpdatedPayload {
+  table_id: string
+}
+
+export interface WsTableDeletedPayload {
+  table_id: string
+}
+
 export interface WsTableStatusUpdatedPayload {
   table_id: string
   status:   TableStatus
@@ -87,6 +99,9 @@ export interface WsSystemForceLogoutPayload {
 }
 
 export type WsPayloadMap = {
+  'table:created':                  WsTableCreatedPayload
+  'table:updated':                  WsTableUpdatedPayload
+  'table:deleted':                  WsTableDeletedPayload
   'table:status_updated':           WsTableStatusUpdatedPayload
   'table:merged':                   WsTableMergedPayload
   'table:unmerged':                 WsTableUnmergedPayload

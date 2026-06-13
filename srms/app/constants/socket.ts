@@ -1,5 +1,8 @@
 export const WS_EVENTS = {
   // Table
+  TABLE_CREATED:        'table:created',
+  TABLE_UPDATED:        'table:updated',
+  TABLE_DELETED:        'table:deleted',
   TABLE_STATUS_UPDATED: 'table:status_updated',
   TABLE_MERGED:         'table:merged',
   TABLE_UNMERGED:       'table:unmerged',

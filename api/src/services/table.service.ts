@@ -97,6 +97,17 @@ export async function createTable(input: CreateTableInput): Promise<ITable> {
     tableId: String(table._id),
     table_name: table.table_name,
   });
+
+  io.to("tables").emit(
+    "message",
+    JSON.stringify({
+      event: WS_EVENTS.TABLE_CREATED,
+      channel: "tables",
+      data: { table_id: String(table._id) },
+      timestamp: new Date().toISOString(),
+    }),
+  );
+
   return table;
 }
 
@@ -136,6 +147,16 @@ export async function updateTable(
     });
   }
 
+  io.to("tables").emit(
+    "message",
+    JSON.stringify({
+      event: WS_EVENTS.TABLE_UPDATED,
+      channel: "tables",
+      data: { table_id: id },
+      timestamp: new Date().toISOString(),
+    }),
+  );
+
   return updated;
 }
 
@@ -154,6 +175,17 @@ export async function deleteTable(id: string): Promise<null> {
 
   await TableModel.findByIdAndDelete(id);
   logger.info("Table deleted", { tableId: id });
+
+  io.to("tables").emit(
+    "message",
+    JSON.stringify({
+      event: WS_EVENTS.TABLE_DELETED,
+      channel: "tables",
+      data: { table_id: id },
+      timestamp: new Date().toISOString(),
+    }),
+  );
+
   return null;
 }
 
