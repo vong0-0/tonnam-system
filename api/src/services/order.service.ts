@@ -475,13 +475,19 @@ export async function updateOrderItemQuantity(
     after_state: { quantity: input.quantity },
   })
 
-  await recalculateBillTotal(String(order.bill_id))
+  const updatedBill = await recalculateBillTotal(String(order.bill_id))
 
   logger.info('Order item quantity updated', {
     orderId: input.order_id,
     itemId: input.item_id,
     quantity: input.quantity,
   })
+
+  io.to('orders').emit('message', JSON.stringify({
+    event: WS_EVENTS.BILL_UPDATED,
+    data: { bill: updatedBill },
+    timestamp: new Date().toISOString(),
+  }))
 
   const updatedItems = (await OrderItemModel.find({ order_id: order._id }).lean()) as IOrderItem[]
 

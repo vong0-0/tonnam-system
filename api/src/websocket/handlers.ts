@@ -20,7 +20,8 @@ function canSubscribe(role: string, channel: string): boolean {
         isExact('orders') ||
         isPrefix('bill:') ||
         isExact('menu') ||
-        isExact('kitchen')
+        isExact('kitchen') ||
+        isExact('reservations')
       )
     case 'CASHIER':
       return (
@@ -29,7 +30,8 @@ function canSubscribe(role: string, channel: string): boolean {
         isExact('orders') ||
         isPrefix('order:', 'orders') ||
         isPrefix('bill:') ||
-        isExact('menu')
+        isExact('menu') ||
+        isExact('reservations')
       )
     case 'WAITER':
       return (
@@ -37,7 +39,8 @@ function canSubscribe(role: string, channel: string): boolean {
         isPrefix('table:', 'tables') ||
         isExact('orders') ||
         isPrefix('order:', 'orders') ||
-        isExact('menu')
+        isExact('menu') ||
+        isExact('reservations')
       )
     case 'KITCHEN':
       return (

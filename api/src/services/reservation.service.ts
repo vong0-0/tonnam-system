@@ -10,6 +10,15 @@ import { type Pagination } from '@/types/index.js'
 import logger from '@/utils/logger.js'
 import { problem } from '@/utils/problem.js'
 import { successList, type SuccessListResponse } from '@/utils/response.js'
+import { io } from '@/websocket/handlers.js'
+import { WS_EVENTS, WS_CHANNELS } from '@/websocket/events.js'
+
+function emitReservation(event: string, reservation: IReservation) {
+  io.to(WS_CHANNELS.RESERVATIONS).emit(
+    'message',
+    JSON.stringify({ event, data: { reservation }, timestamp: new Date().toISOString() }),
+  )
+}
 
 interface ListReservationsQuery {
   page?: number
@@ -131,6 +140,8 @@ export async function createReservation(
     tableId: input.table_id,
   })
 
+  emitReservation(WS_EVENTS.RESERVATION_CREATED, reservation)
+
   return reservation
 }
 
@@ -202,6 +213,8 @@ export async function updateReservation(
     })
   }
 
+  emitReservation(WS_EVENTS.RESERVATION_UPDATED, updated)
+
   return updated
 }
 
@@ -256,12 +269,15 @@ export async function updateReservationStatus(
     to: input.status,
   })
 
+  emitReservation(WS_EVENTS.RESERVATION_STATUS_UPDATED, updated)
+
   return updated
 }
 
 export async function deleteReservation(id: string): Promise<null> {
-  await getReservationById(id)
+  const reservation = await getReservationById(id)
   await ReservationModel.findByIdAndDelete(id)
   logger.info('Reservation deleted', { reservationId: id })
+  emitReservation(WS_EVENTS.RESERVATION_DELETED, reservation)
   return null
 }

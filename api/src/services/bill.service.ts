@@ -17,7 +17,7 @@ import logger from "@/utils/logger.js";
 import { problem } from "@/utils/problem.js";
 import { successList, type SuccessListResponse } from "@/utils/response.js";
 import { io } from "@/websocket/handlers.js";
-import { WS_EVENTS } from "@/websocket/events.js";
+import { WS_EVENTS, WS_CHANNELS } from "@/websocket/events.js";
 
 interface CounterDoc {
   _id: string;
@@ -159,24 +159,14 @@ export async function createBill(input: CreateBillInput): Promise<IBill> {
 
   const billChannel = `bill:${String(bill._id)}`;
   const tableChannel = `table:${String(bill.table_id)}`;
-  io.to(billChannel).emit(
-    "message",
-    JSON.stringify({
-      event: WS_EVENTS.BILL_CREATED,
-      channel: billChannel,
-      data: { bill },
-      timestamp: new Date().toISOString(),
-    }),
-  );
-  io.to(tableChannel).emit(
-    "message",
-    JSON.stringify({
-      event: WS_EVENTS.BILL_CREATED,
-      channel: tableChannel,
-      data: { bill },
-      timestamp: new Date().toISOString(),
-    }),
-  );
+  const billCreatedPayload = JSON.stringify({
+    event: WS_EVENTS.BILL_CREATED,
+    data: { bill },
+    timestamp: new Date().toISOString(),
+  });
+  io.to(billChannel).emit("message", billCreatedPayload);
+  io.to(tableChannel).emit("message", billCreatedPayload);
+  io.to(WS_CHANNELS.TABLES).emit("message", billCreatedPayload);
 
   return bill;
 }
@@ -450,24 +440,22 @@ export async function cancelBill(input: CancelBillInput): Promise<IBill> {
 
   const billChannel = `bill:${String(bill._id)}`;
   const tableChannel = `table:${String(bill.table_id)}`;
-  io.to(billChannel).emit(
-    "message",
-    JSON.stringify({
-      event: WS_EVENTS.BILL_STATUS_UPDATED,
-      channel: billChannel,
-      data: { bill_id: String(bill._id), status: bill.status },
-      timestamp: new Date().toISOString(),
-    }),
-  );
-  io.to(tableChannel).emit(
-    "message",
-    JSON.stringify({
-      event: WS_EVENTS.BILL_STATUS_UPDATED,
-      channel: tableChannel,
-      data: { bill_id: String(bill._id), status: bill.status },
-      timestamp: new Date().toISOString(),
-    }),
-  );
+  const cancelPayload = JSON.stringify({
+    event: WS_EVENTS.BILL_STATUS_UPDATED,
+    data: { bill_id: String(bill._id), status: bill.status, table_id: String(bill.table_id) },
+    timestamp: new Date().toISOString(),
+  });
+  io.to(billChannel).emit("message", cancelPayload);
+  io.to(tableChannel).emit("message", cancelPayload);
+  io.to(WS_CHANNELS.TABLES).emit("message", cancelPayload);
+
+  const tableAvailablePayload = JSON.stringify({
+    event: WS_EVENTS.TABLE_STATUS_UPDATED,
+    data: { table_id: String(bill.table_id), status: "AVAILABLE" },
+    timestamp: new Date().toISOString(),
+  });
+  io.to(WS_CHANNELS.TABLES).emit("message", tableAvailablePayload);
+  io.to(tableChannel).emit("message", tableAvailablePayload);
 
   return bill;
 }
@@ -622,24 +610,14 @@ export async function splitBill(
 
   const billChannel = `bill:${String(parentBill._id)}`;
   const tableChannel = `table:${String(parentBill.table_id)}`;
-  io.to(billChannel).emit(
-    "message",
-    JSON.stringify({
-      event: WS_EVENTS.BILL_STATUS_UPDATED,
-      channel: billChannel,
-      data: { bill_id: String(parentBill._id), status: parentBill.status },
-      timestamp: new Date().toISOString(),
-    }),
-  );
-  io.to(tableChannel).emit(
-    "message",
-    JSON.stringify({
-      event: WS_EVENTS.BILL_STATUS_UPDATED,
-      channel: tableChannel,
-      data: { bill_id: String(parentBill._id), status: parentBill.status },
-      timestamp: new Date().toISOString(),
-    }),
-  );
+  const splitPayload = JSON.stringify({
+    event: WS_EVENTS.BILL_STATUS_UPDATED,
+    data: { bill_id: String(parentBill._id), status: parentBill.status, table_id: String(parentBill.table_id) },
+    timestamp: new Date().toISOString(),
+  });
+  io.to(billChannel).emit("message", splitPayload);
+  io.to(tableChannel).emit("message", splitPayload);
+  io.to(WS_CHANNELS.TABLES).emit("message", splitPayload);
 
   return { parent_bill: parentBill, sub_bills: subBills };
 }

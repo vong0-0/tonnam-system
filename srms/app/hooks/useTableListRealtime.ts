@@ -1,6 +1,6 @@
 import { useEffect } from 'react'
 import { useQueryClient } from '@tanstack/react-query'
-import { subscribeChannel, onWsEvent } from '@/lib/socket'
+import { subscribeChannel, onWsEvent, runWhenConnected } from '@/lib/socket'
 import { WS_EVENTS, WS_CHANNELS } from '@/constants/socket'
 import { TABLE_KEYS } from '@/hooks/useTables'
 
@@ -8,7 +8,7 @@ export function useTableListRealtime() {
   const queryClient = useQueryClient()
 
   useEffect(() => {
-    subscribeChannel(WS_CHANNELS.TABLES)
+    const unsubChannel = runWhenConnected(() => subscribeChannel(WS_CHANNELS.TABLES))
 
     const unsubs = [
       onWsEvent(WS_EVENTS.TABLE_STATUS_UPDATED, () => {
@@ -19,6 +19,9 @@ export function useTableListRealtime() {
       }),
     ]
 
-    return () => unsubs.forEach((fn) => fn())
+    return () => {
+      unsubChannel()
+      unsubs.forEach((fn) => fn())
+    }
   }, [queryClient])
 }

@@ -13,6 +13,7 @@ export default [
       route("waiter", "routes/waiter/index.tsx"),
       route("waiter/tables/:id", "routes/waiter/table-detail.tsx"),
       route("waiter/tables/:tableId/orders/new", "routes/waiter/order-new.tsx"),
+      route("waiter/reservations", "routes/waiter/reservations.tsx"),
       route("waiter/profile", "routes/profile/index.tsx")
     ]),
     layout("layouts/kitchen.layout.tsx", [
@@ -25,6 +26,7 @@ export default [
       route("pos/bills", "routes/pos/bills.tsx"),
       route("pos/summary", "routes/pos/summary.tsx"),
       route("pos/reservations", "routes/pos/reservations.tsx"),
+      route("pos/menu", "routes/pos/menu.tsx"),
       route("pos/profile", "routes/pos/profile.tsx"),
     ])
   ]),

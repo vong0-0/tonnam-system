@@ -6,7 +6,7 @@ import { BillStatus, PaymentMethod, type TableStatus } from '@/types/index.js'
 import logger from '@/utils/logger.js'
 import { problem } from '@/utils/problem.js'
 import { io } from '@/websocket/handlers.js'
-import { WS_EVENTS } from '@/websocket/events.js'
+import { WS_EVENTS, WS_CHANNELS } from '@/websocket/events.js'
 
 interface CreatePaymentInput {
   bill_id: string
@@ -149,18 +149,14 @@ export async function createPayment(input: CreatePaymentInput): Promise<CreatePa
     data: { bill_id: input.bill_id, payment_id: String(payment._id), method: payment.method, amount: payment.amount },
     timestamp: new Date().toISOString(),
   }))
-  io.to(billChannel).emit('message', JSON.stringify({
+  const paidPayload = JSON.stringify({
     event: WS_EVENTS.BILL_STATUS_UPDATED,
-    channel: billChannel,
-    data: { bill_id: input.bill_id, status: bill.status },
+    data: { bill_id: input.bill_id, status: bill.status, table_id: String(bill.table_id) },
     timestamp: new Date().toISOString(),
-  }))
-  io.to(tableChannel).emit('message', JSON.stringify({
-    event: WS_EVENTS.BILL_STATUS_UPDATED,
-    channel: tableChannel,
-    data: { bill_id: input.bill_id, status: bill.status },
-    timestamp: new Date().toISOString(),
-  }))
+  })
+  io.to(billChannel).emit('message', paidPayload)
+  io.to(tableChannel).emit('message', paidPayload)
+  io.to(WS_CHANNELS.TABLES).emit('message', paidPayload)
   io.to('tables').emit('message', JSON.stringify({
     event: WS_EVENTS.TABLE_STATUS_UPDATED,
     channel: 'tables',

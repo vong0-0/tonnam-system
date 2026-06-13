@@ -19,16 +19,23 @@ export const WS_EVENTS = {
   // Menu
   MENU_ITEM_AVAILABILITY_UPDATED: 'menu:item_availability_updated',
 
+  // Reservation
+  RESERVATION_CREATED:        'reservation:created',
+  RESERVATION_UPDATED:        'reservation:updated',
+  RESERVATION_STATUS_UPDATED: 'reservation:status_updated',
+  RESERVATION_DELETED:        'reservation:deleted',
+
   // System
   SYSTEM_TOKEN_EXPIRED: 'system:token_expired',
   SYSTEM_FORCE_LOGOUT:  'system:force_logout',
 } as const
 
 export const WS_CHANNELS = {
-  TABLES:  'tables',
-  ORDERS:  'orders',
-  MENU:    'menu',
-  KITCHEN: 'kitchen',
+  TABLES:       'tables',
+  ORDERS:       'orders',
+  MENU:         'menu',
+  KITCHEN:      'kitchen',
+  RESERVATIONS: 'reservations',
 } as const
 
 export type WsEvent   = (typeof WS_EVENTS)[keyof typeof WS_EVENTS]

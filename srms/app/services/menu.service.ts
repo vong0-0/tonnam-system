@@ -26,3 +26,16 @@ export async function listMenuCategories(): Promise<PaginatedResponse<MenuCatego
   })
   return data
 }
+
+export interface UpdateMenuItemAvailabilityInput {
+  is_available: boolean
+  is_sold_out: boolean
+}
+
+export async function updateMenuItemAvailability(
+  id: string,
+  input: UpdateMenuItemAvailabilityInput,
+): Promise<{ data: MenuItem }> {
+  const { data } = await api.patch<{ data: MenuItem }>(API.MENU_ITEM_AVAILABILITY(id), input)
+  return data
+}

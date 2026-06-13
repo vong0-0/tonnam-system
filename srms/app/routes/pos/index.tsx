@@ -4,9 +4,12 @@ import PosFilterBar from '@/components/pos/PosFilterBar'
 import CreateTableModal from '@/components/pos/CreateTableModal'
 import PosTableCard from '@/components/pos/PosTableCard'
 import { useTables } from '@/hooks/useTables'
+import { useTableListRealtime } from '@/hooks/useTableListRealtime'
 import type { TableStatus } from '@/types/enums'
 
 export default function PosIndex() {
+  useTableListRealtime()
+
   const [createOpen, setCreateOpen] = useState(false)
   const [search, setSearch] = useState('')
   const [status, setStatus] = useState('ALL')

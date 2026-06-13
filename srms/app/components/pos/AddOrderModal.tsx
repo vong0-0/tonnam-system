@@ -15,6 +15,7 @@ import { CartEntryRow } from "@/components/waiter/CartEntryRow";
 import { QuantityStepper } from "@/components/common/QuantityStepper";
 import { EmptyState } from "@/components/common/EmptyState";
 import { useMenuItems, useMenuCategories } from "@/hooks/useMenu";
+import { useMenuRealtime } from "@/hooks/useMenuRealtime";
 import { useCreateOrder } from "@/hooks/useOrders";
 import { useInfiniteScroll } from "@/hooks/useInfiniteScroll";
 import { formatNumber } from "@/lib/utils";
@@ -33,6 +34,7 @@ export default function AddOrderModal({
   billId,
   tableName,
 }: AddOrderModalProps) {
+  useMenuRealtime()
   const [cart, setCart] = useState<CartEntry[]>([]);
   const [selectedItem, setSelectedItem] = useState<MenuItem | null>(null);
   const [sheetQty, setSheetQty] = useState(1);
@@ -192,7 +194,7 @@ export default function AddOrderModal({
                 ) : (
                   <>
                     <div className="grid grid-cols-2 gap-2">
-                      {items.map((item) => (
+                      {items.filter((item) => item.is_available).map((item) => (
                         <MenuItemCard
                           key={item._id}
                           item={item}

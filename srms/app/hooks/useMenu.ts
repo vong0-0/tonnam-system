@@ -1,5 +1,11 @@
-import { useQuery, useInfiniteQuery } from '@tanstack/react-query'
-import { listMenuItems, listMenuCategories, type ListMenuItemsParams } from '@/services/menu.service'
+import { useQuery, useInfiniteQuery, useMutation, useQueryClient } from '@tanstack/react-query'
+import {
+  listMenuItems,
+  listMenuCategories,
+  updateMenuItemAvailability,
+  type ListMenuItemsParams,
+  type UpdateMenuItemAvailabilityInput,
+} from '@/services/menu.service'
 import type { MenuItem } from '@/types/entities'
 
 export const MENU_ITEM_KEYS = {
@@ -35,5 +41,16 @@ export function useMenuCategories() {
     queryFn: listMenuCategories,
     staleTime: 5 * 60_000,
     select: (data) => data.data,
+  })
+}
+
+export function useUpdateMenuItemAvailability() {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: ({ id, ...input }: { id: string } & UpdateMenuItemAvailabilityInput) =>
+      updateMenuItemAvailability(id, input),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: MENU_ITEM_KEYS.all })
+    },
   })
 }

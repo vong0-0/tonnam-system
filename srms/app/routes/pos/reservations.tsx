@@ -10,6 +10,7 @@ import { DataTable } from '@/components/admin/DataTable'
 import { makeReservationColumns } from '@/components/pos/reservation-columns'
 import ReservationFormModal from '@/components/pos/ReservationFormModal'
 import { useReservationsPage, useUpdateReservationStatus } from '@/hooks/useReservations'
+import { useReservationsRealtime } from '@/hooks/useReservationsRealtime'
 import { useTables } from '@/hooks/useTables'
 import { formatDate, DATE_FORMATS } from '@/lib/date'
 import type { ReservationStatus } from '@/types/enums'
@@ -25,6 +26,8 @@ const statusOptions: SelectOption[] = [
 const LIMIT = 20
 
 export default function PosReservations() {
+  useReservationsRealtime()
+
   const [page, setPage]     = useState(1)
   const [status, setStatus] = useState<ReservationStatus | 'ALL'>('ALL')
   const [search, setSearch] = useState('')

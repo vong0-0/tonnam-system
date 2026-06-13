@@ -5,7 +5,7 @@ import type {
   OrderItemStatus,
   PaymentMethod,
 } from '@/types/enums'
-import type { Bill, Order, OrderItem } from '@/types/entities'
+import type { Bill, Order, OrderItem, Reservation } from '@/types/entities'
 
 export interface WsMessage<T = unknown> {
   event:     string
@@ -40,8 +40,9 @@ export interface WsBillCreatedPayload {
 }
 
 export interface WsBillStatusUpdatedPayload {
-  bill_id: string
-  status:  BillStatus
+  bill_id:   string
+  status:    BillStatus
+  table_id?: string
 }
 
 export interface WsBillUpdatedPayload {
@@ -98,6 +99,14 @@ export type WsPayloadMap = {
   'order:item_status_updated':      WsOrderItemStatusUpdatedPayload
   'order:status_updated':           WsOrderStatusUpdatedPayload
   'menu:item_availability_updated': WsMenuItemAvailabilityUpdatedPayload
+  'reservation:created':            WsReservationPayload
+  'reservation:updated':            WsReservationPayload
+  'reservation:status_updated':     WsReservationPayload
+  'reservation:deleted':            WsReservationPayload
   'system:token_expired':           WsSystemTokenExpiredPayload
   'system:force_logout':            WsSystemForceLogoutPayload
+}
+
+export interface WsReservationPayload {
+  reservation: Reservation
 }

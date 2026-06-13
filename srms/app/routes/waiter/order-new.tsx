@@ -5,6 +5,7 @@ import { ChevronLeft, Loader, UtensilsCrossed } from 'lucide-react'
 import { Drawer } from 'vaul'
 import { useTable } from '@/hooks/useTables'
 import { useMenuItems, useMenuCategories } from '@/hooks/useMenu'
+import { useMenuRealtime } from '@/hooks/useMenuRealtime'
 import { useCreateOrder } from '@/hooks/useOrders'
 import { useInfiniteScroll } from '@/hooks/useInfiniteScroll'
 import { EmptyState } from '@/components/common/EmptyState'
@@ -18,6 +19,7 @@ import { formatNumber } from '@/lib/utils'
 import type { MenuItem, MenuCategory, CartEntry } from '@/types/entities'
 
 export default function WaiterOrderNew() {
+  useMenuRealtime()
   const { tableId } = useParams<{ tableId: string }>()
   const navigate = useNavigate()
 
@@ -208,7 +210,7 @@ export default function WaiterOrderNew() {
         ) : (
           <>
             <div className="space-y-2 py-2">
-              {items.map((item) => (
+              {items.filter((item) => item.is_available).map((item) => (
                 <MenuItemCard
                   key={item._id}
                   item={item}

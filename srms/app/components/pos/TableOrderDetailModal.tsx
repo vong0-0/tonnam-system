@@ -308,7 +308,7 @@ export default function TableOrderDetailModal({
                     }
                   >
                     <ReceiptText />
-                    {isClearing ? "ກຳລັງລ້າງ..." : "ລ້າງໂຕະ"}
+                    {isClearing ? "ກຳລັງເຄຍໂຕະ..." : "ເຄຍໂຕະ"}
                   </Button>
                 ) : (
                   <Button

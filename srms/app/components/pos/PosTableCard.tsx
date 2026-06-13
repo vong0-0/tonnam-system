@@ -6,6 +6,7 @@ import TableStatusBadge from "../common/TableStatusBadge";
 import { Button } from "../ui/button";
 import { useBill } from "@/hooks/useBills";
 import { useUpdateTableStatus } from "@/hooks/useTables";
+import { useTableDetailRealtime } from "@/hooks/useTableDetailRealtime";
 import TableOrderDetailModal from "./TableOrderDetailModal";
 
 const tableStatusConfig: Record<TableStatus, { style: string }> = {
@@ -48,6 +49,8 @@ export default function PosTableCard({ table }: PosTableCardProps) {
     table.status === TableStatus.OCCUPIED || table.status === TableStatus.PAID;
   const activeBillId = isActive ? (table.bill_ids?.at(-1) ?? "") : "";
   const { data: billDetail } = useBill(activeBillId);
+
+  useTableDetailRealtime(table._id, activeBillId || null);
 
   const allItems =
     billDetail?.orders.flatMap((o: OrderWithItems) => o.items) ?? [];
