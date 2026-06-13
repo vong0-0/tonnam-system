@@ -13,3 +13,8 @@ export const createTableSchema = z.object({
 })
 
 export type CreateTableInput = z.infer<typeof createTableSchema>
+
+export const updateTableSchema = createTableSchema
+  .pick({ table_name: true, capacity: true, is_temporary: true })
+  .partial()
+export type UpdateTableInput = z.infer<typeof updateTableSchema>

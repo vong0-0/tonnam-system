@@ -4,7 +4,7 @@ import { sanitizeParams } from '@/lib/sanitize-params'
 import type { Table } from '@/types/entities'
 import type { TableStatus } from '@/types/enums'
 import type { ApiResponse, PaginatedResponse } from '@/types/api'
-import type { CreateTableInput } from '@/schemas/table.schema'
+import type { CreateTableInput, UpdateTableInput } from '@/schemas/table.schema'
 
 export interface ListTablesParams {
   page?: number
@@ -46,6 +46,18 @@ export async function moveTable(
 export async function createTable(body: CreateTableInput): Promise<Table> {
   const { data } = await api.post<ApiResponse<Table>>(API.TABLES, body)
   return data.data
+}
+
+export async function updateTable(
+  id: string,
+  body: UpdateTableInput,
+): Promise<Table> {
+  const { data } = await api.patch<ApiResponse<Table>>(API.TABLE(id), body)
+  return data.data
+}
+
+export async function deleteTable(id: string): Promise<void> {
+  await api.delete(API.TABLE(id))
 }
 
 export type ManualTableStatus = 'AVAILABLE' | 'OCCUPIED'

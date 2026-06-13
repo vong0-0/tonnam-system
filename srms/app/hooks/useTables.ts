@@ -1,7 +1,7 @@
 import { useQuery, useInfiniteQuery, useMutation, useQueryClient } from '@tanstack/react-query'
-import { listTables, getTableById, createTable, moveTable, updateTableStatus } from '@/services/table.service'
+import { listTables, getTableById, createTable, moveTable, updateTable, deleteTable, updateTableStatus } from '@/services/table.service'
 import type { ManualTableStatus } from '@/services/table.service'
-import type { CreateTableInput } from '@/schemas/table.schema'
+import type { CreateTableInput, UpdateTableInput } from '@/schemas/table.schema'
 import type { Table } from '@/types/entities'
 import type { TableStatus } from '@/types/enums'
 import { toastSuccess, toastError } from '@/lib/toast'
@@ -78,6 +78,44 @@ export function useMoveTable() {
     },
     onError: (error) => {
       toastError(error, 'ບໍ່ສາມາດຍ້າຍໂຕະໄດ້ ກະລຸນາລອງໃໝ່')
+    },
+  })
+}
+
+export function useAdminTables() {
+  return useQuery({
+    queryKey: TABLE_KEYS.list({ limit: 200 }),
+    queryFn:  () => listTables({ limit: 200 }),
+    staleTime: 30_000,
+  })
+}
+
+export function useUpdateTable() {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: ({ id, ...body }: { id: string } & UpdateTableInput) =>
+      updateTable(id, body),
+    onSuccess: (_, { id }) => {
+      queryClient.invalidateQueries({ queryKey: TABLE_KEYS.all })
+      queryClient.invalidateQueries({ queryKey: TABLE_KEYS.detail(id) })
+      toastSuccess('ແກ້ໄຂໂຕະສຳເລັດ')
+    },
+    onError: (error) => {
+      toastError(error, 'ບໍ່ສາມາດແກ້ໄຂໂຕະໄດ້ ກະລຸນາລອງໃໝ່')
+    },
+  })
+}
+
+export function useDeleteTable() {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: (id: string) => deleteTable(id),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: TABLE_KEYS.all })
+      toastSuccess('ລຶບໂຕະສຳເລັດ')
+    },
+    onError: (error) => {
+      toastError(error, 'ບໍ່ສາມາດລຶບໂຕະໄດ້ ກະລຸນາລອງໃໝ່')
     },
   })
 }

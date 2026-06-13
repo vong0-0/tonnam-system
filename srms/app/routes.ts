@@ -8,6 +8,7 @@ export default [
     route("select", "routes/select.tsx"),
     layout("layouts/admin.layout.tsx", [
       route("admin", "routes/admin/index.tsx"),
+      route("admin/tables", "routes/admin/tables.tsx"),
     ]),
     layout("layouts/waiter.layout.tsx", [
       route("waiter", "routes/waiter/index.tsx"),
