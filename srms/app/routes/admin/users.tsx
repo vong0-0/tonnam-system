@@ -1,5 +1,5 @@
 import { useState, useMemo } from 'react'
-import { Plus } from 'lucide-react'
+import { Plus, RefreshCw } from 'lucide-react'
 import { useDebounce } from 'use-debounce'
 import { ConfirmDialog } from '@/components/common/ConfirmDialog'
 import { AppSelect } from '@/components/common/AppSelect'
@@ -9,6 +9,7 @@ import { UserTable } from '@/components/admin/users/UserTable'
 import { UserDialog } from '@/components/admin/users/UserDialog'
 import { useUsers, useDeactivateUser, useReactivateUser } from '@/hooks/useUsers'
 import { ROLES } from '@/constants/roles'
+import { cn } from '@/lib/utils'
 import type { User } from '@/types/entities'
 import type { Role } from '@/constants/roles'
 
@@ -22,7 +23,7 @@ export default function AdminUsers() {
   const [deactivateTarget, setDeactivateTarget] = useState<User | null>(null)
   const [reactivateTarget, setReactivateTarget] = useState<User | null>(null)
 
-  const { data: usersData, isLoading } = useUsers()
+  const { data: usersData, isLoading, refetch, isFetching } = useUsers()
   const { mutate: deactivate } = useDeactivateUser()
   const { mutate: reactivate } = useReactivateUser()
 
@@ -80,13 +81,25 @@ export default function AdminUsers() {
             triggerClassName="w-52 border-ink-300 bg-paper"
           />
         </div>
-        <Button
-          onClick={() => setCreateOpen(true)}
-          className="gap-1.5 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2"
-        >
-          <Plus size={15} />
-          ເພີ່ມພະນັກງານ
-        </Button>
+        <div className="flex items-center gap-2">
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => refetch()}
+            disabled={isFetching}
+            className="h-9 gap-1.5 border-ink-300 bg-paper text-ink-700"
+          >
+            <RefreshCw className={cn("h-4 w-4", isFetching && "animate-spin")} />
+            ໂຫລດໃໝ່
+          </Button>
+          <Button
+            onClick={() => setCreateOpen(true)}
+            className="gap-1.5 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2"
+          >
+            <Plus size={15} />
+            ເພີ່ມພະນັກງານ
+          </Button>
+        </div>
       </div>
 
       {/* Table */}

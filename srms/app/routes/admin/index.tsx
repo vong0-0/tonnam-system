@@ -6,7 +6,7 @@ import {
   type CSSProperties,
 } from "react";
 import { cn } from "@/lib/utils";
-import { TrendingUp, Receipt, BarChart3, Clock } from "lucide-react";
+import { TrendingUp, Receipt, BarChart3, Clock, RefreshCw } from "lucide-react";
 import {
   BarChart,
   Bar,
@@ -20,6 +20,7 @@ import {
   Cell,
 } from "recharts";
 import { Card, CardContent } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useSalesSummary, useMenuBestSellers } from "@/hooks/useAnalytics";
 import { useAuditLogs } from "@/hooks/useAuditLogs";
@@ -88,16 +89,24 @@ function FadeIn({
 export default function AdminDashboard() {
   const today = formatDate(new Date(), DATE_FORMATS.DATE_ISO);
 
-  const { data: summary, isLoading: summaryLoading } = useSalesSummary({
+  const { data: summary, isLoading: summaryLoading, refetch: refetchSales, isFetching: f1 } = useSalesSummary({
     period: "daily",
     date: today,
   });
-  const { data: bestSellers, isLoading: bestSellersLoading } =
+  const { data: bestSellers, isLoading: bestSellersLoading, refetch: refetchBest, isFetching: f2 } =
     useMenuBestSellers({ period: "daily", date: today, limit: 8 });
-  const { data: auditData, isLoading: auditLoading } = useAuditLogs({
+  const { data: auditData, isLoading: auditLoading, refetch: refetchLogs, isFetching: f3 } = useAuditLogs({
     limit: 6,
   });
-  const { data: tableData, isLoading: tablesLoading } = useTableStatusSummary();
+  const { data: tableData, isLoading: tablesLoading, refetch: refetchTables, isFetching: f4 } = useTableStatusSummary();
+
+  const isFetching = f1 || f2 || f3 || f4;
+  function handleRefresh() {
+    refetchSales();
+    refetchBest();
+    refetchLogs();
+    refetchTables();
+  }
 
   const totalRevenue = summary?.total_revenue ?? 0;
   const cashAmount = summary?.payment_breakdown.cash ?? 0;
@@ -132,6 +141,16 @@ export default function AdminDashboard() {
               {formatDate(new Date(), DATE_FORMATS.DATE)}
             </p>
           </div>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={handleRefresh}
+            disabled={isFetching}
+            className="h-9 gap-1.5 border-ink-300 bg-paper text-ink-700"
+          >
+            <RefreshCw className={cn("h-4 w-4", isFetching && "animate-spin")} />
+            ໂຫລດໃໝ່
+          </Button>
         </div>
       </FadeIn>
 

@@ -1,6 +1,6 @@
 import { useState, useMemo } from "react";
 import { useDebounce } from "use-debounce";
-import { ChevronLeft, ChevronRight } from "lucide-react";
+import { ChevronLeft, ChevronRight, RefreshCw } from "lucide-react";
 import { DatePickerFilter } from "@/components/common/DatePickerFilter";
 import { formatDate, DATE_FORMATS } from "@/lib/date";
 import { DataTable } from "@/components/admin/DataTable";
@@ -10,6 +10,7 @@ import { AppSelect, type SelectOption } from "@/components/common/AppSelect";
 import { SearchInput } from "@/components/common/SearchInput";
 import { Button } from "@/components/ui/button";
 import { useBillsPage } from "@/hooks/useBills";
+import { cn } from "@/lib/utils";
 import type { BillStatus } from "@/types/enums";
 import type { Bill } from "@/types/entities";
 
@@ -31,7 +32,7 @@ export default function PosBills() {
   const [dateFrom, setDateFrom] = useState<Date | undefined>(undefined);
   const [dateTo, setDateTo] = useState<Date | undefined>(undefined);
 
-  const { data, isLoading } = useBillsPage({
+  const { data, isLoading, refetch, isFetching } = useBillsPage({
     page,
     limit: LIMIT,
     status,
@@ -104,6 +105,16 @@ export default function PosBills() {
           placeholder="ຫາວັນທີ"
           className="w-40 [&_button]:bg-paper"
         />
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={() => refetch()}
+          disabled={isFetching}
+          className="h-9 gap-1.5 border-ink-300 bg-paper text-ink-700"
+        >
+          <RefreshCw className={cn("h-4 w-4", isFetching && "animate-spin")} />
+          ໂຫລດໃໝ່
+        </Button>
       </div>
 
       <DataTable columns={columns} data={bills} isLoading={isLoading} />
