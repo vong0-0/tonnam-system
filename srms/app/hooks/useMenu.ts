@@ -3,10 +3,19 @@ import {
   listMenuItems,
   listMenuCategories,
   updateMenuItemAvailability,
+  listAllMenuItems,
+  createMenuItem,
+  updateMenuItem,
+  deleteMenuItem,
+  createMenuCategory,
+  updateMenuCategory,
+  deleteMenuCategory,
   type ListMenuItemsParams,
   type UpdateMenuItemAvailabilityInput,
 } from '@/services/menu.service'
+import type { CreateMenuItemInput, UpdateMenuItemInput, CreateMenuCategoryInput, UpdateMenuCategoryInput } from '@/schemas/menu.schema'
 import type { MenuItem } from '@/types/entities'
+import { toastSuccess, toastError } from '@/lib/toast'
 
 export const MENU_ITEM_KEYS = {
   all:  ['menu-items'] as const,
@@ -51,6 +60,104 @@ export function useUpdateMenuItemAvailability() {
       updateMenuItemAvailability(id, input),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: MENU_ITEM_KEYS.all })
+    },
+  })
+}
+
+export function useAdminMenuItems() {
+  return useQuery({
+    queryKey: MENU_ITEM_KEYS.list({ limit: 500 }),
+    queryFn:  listAllMenuItems,
+    staleTime: 30_000,
+  })
+}
+
+export function useCreateMenuItem() {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: (body: CreateMenuItemInput) => createMenuItem(body),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: MENU_ITEM_KEYS.all })
+      queryClient.invalidateQueries({ queryKey: MENU_CATEGORY_KEYS.all })
+      toastSuccess('ເພີ່ມເມນູສຳເລັດ')
+    },
+    onError: (error) => {
+      toastError(error, 'ບໍ່ສາມາດເພີ່ມເມນູໄດ້ ກະລຸນາລອງໃໝ່')
+    },
+  })
+}
+
+export function useUpdateMenuItem() {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: ({ id, ...body }: { id: string } & UpdateMenuItemInput) =>
+      updateMenuItem(id, body),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: MENU_ITEM_KEYS.all })
+      queryClient.invalidateQueries({ queryKey: MENU_CATEGORY_KEYS.all })
+      toastSuccess('ແກ້ໄຂເມນູສຳເລັດ')
+    },
+    onError: (error) => {
+      toastError(error, 'ບໍ່ສາມາດແກ້ໄຂເມນູໄດ້ ກະລຸນາລອງໃໝ່')
+    },
+  })
+}
+
+export function useDeleteMenuItem() {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: (id: string) => deleteMenuItem(id),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: MENU_ITEM_KEYS.all })
+      queryClient.invalidateQueries({ queryKey: MENU_CATEGORY_KEYS.all })
+      toastSuccess('ລຶບເມນູສຳເລັດ')
+    },
+    onError: (error) => {
+      toastError(error, 'ບໍ່ສາມາດລຶບເມນູໄດ້ ກະລຸນາລອງໃໝ່')
+    },
+  })
+}
+
+export function useCreateMenuCategory() {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: (body: CreateMenuCategoryInput) => createMenuCategory(body),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: MENU_CATEGORY_KEYS.all })
+      toastSuccess('ເພີ່ມໝວດໝູ່ສຳເລັດ')
+    },
+    onError: (error) => {
+      toastError(error, 'ບໍ່ສາມາດເພີ່ມໝວດໝູ່ໄດ້ ກະລຸນາລອງໃໝ່')
+    },
+  })
+}
+
+export function useUpdateMenuCategory() {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: ({ id, ...body }: { id: string } & UpdateMenuCategoryInput) =>
+      updateMenuCategory(id, body),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: MENU_CATEGORY_KEYS.all })
+      toastSuccess('ແກ້ໄຂໝວດໝູ່ສຳເລັດ')
+    },
+    onError: (error) => {
+      toastError(error, 'ບໍ່ສາມາດແກ້ໄຂໝວດໝູ່ໄດ້ ກະລຸນາລອງໃໝ່')
+    },
+  })
+}
+
+export function useDeleteMenuCategory() {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: (id: string) => deleteMenuCategory(id),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: MENU_CATEGORY_KEYS.all })
+      queryClient.invalidateQueries({ queryKey: MENU_ITEM_KEYS.all })
+      toastSuccess('ລຶບໝວດໝູ່ສຳເລັດ')
+    },
+    onError: (error) => {
+      toastError(error, 'ບໍ່ສາມາດລຶບໝວດໝູ່ໄດ້ ກະລຸນາລອງໃໝ່')
     },
   })
 }

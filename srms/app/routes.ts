@@ -9,6 +9,7 @@ export default [
     layout("layouts/admin.layout.tsx", [
       route("admin", "routes/admin/index.tsx"),
       route("admin/tables", "routes/admin/tables.tsx"),
+      route("admin/menu", "routes/admin/menu.tsx"),
     ]),
     layout("layouts/waiter.layout.tsx", [
       route("waiter", "routes/waiter/index.tsx"),
