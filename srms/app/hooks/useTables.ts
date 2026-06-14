@@ -112,10 +112,10 @@ export function useDeleteTable() {
     mutationFn: (id: string) => deleteTable(id),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: TABLE_KEYS.all })
-      toastSuccess('ລຶບໂຕະສຳເລັດ')
+      toastSuccess('ລົບໂຕະສຳເລັດ')
     },
     onError: (error) => {
-      toastError(error, 'ບໍ່ສາມາດລຶບໂຕະໄດ້ ກະລຸນາລອງໃໝ່')
+      toastError(error, 'ບໍ່ສາມາດລົບໂຕະໄດ້ ກະລຸນາລອງໃໝ່')
     },
   })
 }

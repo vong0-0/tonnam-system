@@ -110,10 +110,10 @@ export function useDeleteMenuItem() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: MENU_ITEM_KEYS.all })
       queryClient.invalidateQueries({ queryKey: MENU_CATEGORY_KEYS.all })
-      toastSuccess('ລຶບເມນູສຳເລັດ')
+      toastSuccess('ລົບເມນູສຳເລັດ')
     },
     onError: (error) => {
-      toastError(error, 'ບໍ່ສາມາດລຶບເມນູໄດ້ ກະລຸນາລອງໃໝ່')
+      toastError(error, 'ບໍ່ສາມາດລົບເມນູໄດ້ ກະລຸນາລອງໃໝ່')
     },
   })
 }
@@ -154,10 +154,10 @@ export function useDeleteMenuCategory() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: MENU_CATEGORY_KEYS.all })
       queryClient.invalidateQueries({ queryKey: MENU_ITEM_KEYS.all })
-      toastSuccess('ລຶບໝວດໝູ່ສຳເລັດ')
+      toastSuccess('ລົບໝວດໝູ່ສຳເລັດ')
     },
     onError: (error) => {
-      toastError(error, 'ບໍ່ສາມາດລຶບໝວດໝູ່ໄດ້ ກະລຸນາລອງໃໝ່')
+      toastError(error, 'ບໍ່ສາມາດລົບໝວດໝູ່ໄດ້ ກະລຸນາລອງໃໝ່')
     },
   })
 }
