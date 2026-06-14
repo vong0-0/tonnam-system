@@ -9,6 +9,8 @@ import { type Pagination } from '@/types/index.js'
 import logger from '@/utils/logger.js'
 import { problem } from '@/utils/problem.js'
 import { successList } from '@/utils/response.js'
+import { io } from '@/websocket/handlers.js'
+import { WS_EVENTS } from '@/websocket/events.js'
 
 interface ListMenuCategoriesQuery {
   page?: number
@@ -92,6 +94,14 @@ export async function createMenuCategory(
   }
 
   const category = await MenuCategoryModel.create(input)
+
+  io.to('menu').emit('message', JSON.stringify({
+    event: WS_EVENTS.MENU_CATEGORY_CREATED,
+    channel: 'menu',
+    data: { category_id: String(category._id) },
+    timestamp: new Date().toISOString(),
+  }))
+
   logger.info('Menu category created', { categoryId: String(category._id), name: category.name })
   return withItemCount(category)
 }
@@ -125,6 +135,13 @@ export async function updateMenuCategory(
   })
   if (!updated) notFoundError(id)
 
+  io.to('menu').emit('message', JSON.stringify({
+    event: WS_EVENTS.MENU_CATEGORY_UPDATED,
+    channel: 'menu',
+    data: { category_id: id },
+    timestamp: new Date().toISOString(),
+  }))
+
   return withItemCount(updated)
 }
 
@@ -142,6 +159,14 @@ export async function deleteMenuCategory(id: string): Promise<null> {
   }
 
   await MenuCategoryModel.findByIdAndDelete(id)
+
+  io.to('menu').emit('message', JSON.stringify({
+    event: WS_EVENTS.MENU_CATEGORY_DELETED,
+    channel: 'menu',
+    data: { category_id: id },
+    timestamp: new Date().toISOString(),
+  }))
+
   logger.info('Menu category deleted', { categoryId: id })
   return null
 }

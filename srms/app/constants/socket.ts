@@ -20,7 +20,13 @@ export const WS_EVENTS = {
   ORDER_STATUS_UPDATED:      'order:status_updated',
 
   // Menu
+  MENU_ITEM_CREATED:              'menu:item_created',
+  MENU_ITEM_UPDATED:              'menu:item_updated',
+  MENU_ITEM_DELETED:              'menu:item_deleted',
   MENU_ITEM_AVAILABILITY_UPDATED: 'menu:item_availability_updated',
+  MENU_CATEGORY_CREATED:          'menu:category_created',
+  MENU_CATEGORY_UPDATED:          'menu:category_updated',
+  MENU_CATEGORY_DELETED:          'menu:category_deleted',
 
   // Reservation
   RESERVATION_CREATED:        'reservation:created',

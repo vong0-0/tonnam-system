@@ -84,11 +84,19 @@ export interface WsOrderStatusUpdatedPayload {
   status:   OrderStatus
 }
 
+export interface WsMenuItemCreatedPayload    { item_id: string }
+export interface WsMenuItemUpdatedPayload    { item_id: string }
+export interface WsMenuItemDeletedPayload    { item_id: string }
+
 export interface WsMenuItemAvailabilityUpdatedPayload {
   item_id:      string
   is_available: boolean
   is_sold_out:  boolean
 }
+
+export interface WsMenuCategoryCreatedPayload { category_id: string }
+export interface WsMenuCategoryUpdatedPayload { category_id: string }
+export interface WsMenuCategoryDeletedPayload { category_id: string }
 
 export interface WsSystemTokenExpiredPayload {
   message: string
@@ -113,7 +121,13 @@ export type WsPayloadMap = {
   'order:new_order_received':       WsOrderNewOrderReceivedPayload
   'order:item_status_updated':      WsOrderItemStatusUpdatedPayload
   'order:status_updated':           WsOrderStatusUpdatedPayload
+  'menu:item_created':              WsMenuItemCreatedPayload
+  'menu:item_updated':              WsMenuItemUpdatedPayload
+  'menu:item_deleted':              WsMenuItemDeletedPayload
   'menu:item_availability_updated': WsMenuItemAvailabilityUpdatedPayload
+  'menu:category_created':          WsMenuCategoryCreatedPayload
+  'menu:category_updated':          WsMenuCategoryUpdatedPayload
+  'menu:category_deleted':          WsMenuCategoryDeletedPayload
   'reservation:created':            WsReservationPayload
   'reservation:updated':            WsReservationPayload
   'reservation:status_updated':     WsReservationPayload

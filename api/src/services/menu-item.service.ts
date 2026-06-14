@@ -113,6 +113,14 @@ export async function createMenuItem(input: CreateMenuItemInput): Promise<IMenuI
   }
 
   const item = await MenuItemModel.create({ ...input, is_sold_out: false })
+
+  io.to('menu').emit('message', JSON.stringify({
+    event: WS_EVENTS.MENU_ITEM_CREATED,
+    channel: 'menu',
+    data: { item_id: String(item._id) },
+    timestamp: new Date().toISOString(),
+  }))
+
   logger.info('Menu item created', { itemId: String(item._id), name: item.name })
   return item
 }
@@ -156,12 +164,27 @@ export async function updateMenuItem(id: string, input: UpdateMenuItemInput): Pr
     })
   }
 
+  io.to('menu').emit('message', JSON.stringify({
+    event: WS_EVENTS.MENU_ITEM_UPDATED,
+    channel: 'menu',
+    data: { item_id: id },
+    timestamp: new Date().toISOString(),
+  }))
+
   return updated
 }
 
 export async function deleteMenuItem(id: string): Promise<null> {
   await getMenuItemById(id)
   await MenuItemModel.findByIdAndDelete(id)
+
+  io.to('menu').emit('message', JSON.stringify({
+    event: WS_EVENTS.MENU_ITEM_DELETED,
+    channel: 'menu',
+    data: { item_id: id },
+    timestamp: new Date().toISOString(),
+  }))
+
   logger.info('Menu item deleted', { itemId: id })
   return null
 }
