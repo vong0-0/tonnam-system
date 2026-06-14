@@ -412,17 +412,14 @@ export default function AdminReservations() {
 
   const filtered = useMemo(() => {
     const lower = debouncedSearch.toLowerCase();
-    return allReservations
-      .filter((r) => {
-        const matchStatus =
-          statusFilter === "ALL" || r.status === statusFilter;
-        const matchSearch =
-          !lower ||
-          r.reserver_name.toLowerCase().includes(lower) ||
-          r.phone.includes(lower);
-        return matchStatus && matchSearch;
-      })
-      .sort((a, b) => (b._id > a._id ? 1 : b._id < a._id ? -1 : 0));
+    return allReservations.filter((r) => {
+      const matchStatus = statusFilter === "ALL" || r.status === statusFilter;
+      const matchSearch =
+        !lower ||
+        r.reserver_name.toLowerCase().includes(lower) ||
+        r.phone.includes(lower);
+      return matchStatus && matchSearch;
+    });
   }, [allReservations, statusFilter, debouncedSearch]);
 
   const columns = useMemo<ColumnDef<Reservation>[]>(

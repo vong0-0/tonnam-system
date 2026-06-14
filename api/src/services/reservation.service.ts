@@ -50,7 +50,7 @@ export async function listReservations(
 
   const skip = (page - 1) * limit
   const [rawItems, total] = await Promise.all([
-    ReservationModel.find(filter).skip(skip).limit(limit).lean(),
+    ReservationModel.find(filter).sort({ _id: -1 }).skip(skip).limit(limit).lean(),
     ReservationModel.countDocuments(filter),
   ])
 
