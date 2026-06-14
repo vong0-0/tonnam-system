@@ -40,7 +40,10 @@ export async function listUsers(
     UserModel.countDocuments(filter),
   ])
 
-  const items = rawItems as IUser[]
+  const items = rawItems.map(({ _id, password: _pw, ...rest }) => ({
+    id: String(_id),
+    ...rest,
+  })) as unknown as IUser[]
   const totalPages = Math.ceil(total / limit)
   return { items, pagination: { page, limit, total, totalPages } }
 }

@@ -32,7 +32,10 @@ const userSchema = new Schema<IUser>(
 )
 
 userSchema.set('toJSON', {
+  virtuals: true,
   transform: (_doc, ret) => {
+    ;(ret as unknown as Record<string, unknown>)['id'] = ret._id?.toString()
+    Reflect.deleteProperty(ret, '_id')
     Reflect.deleteProperty(ret, 'password')
     return ret
   },
