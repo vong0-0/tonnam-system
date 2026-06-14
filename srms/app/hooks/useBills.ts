@@ -1,5 +1,5 @@
 import { useQuery, useInfiniteQuery, useMutation, useQueryClient, keepPreviousData } from '@tanstack/react-query'
-import { listBills, getBillById, createBill, cancelBill } from '@/services/bill.service'
+import { listBills, getBillById, createBill, cancelBill, updateBill } from '@/services/bill.service'
 import type { Bill, BillDetail } from '@/types/entities'
 import { TABLE_KEYS } from '@/hooks/useTables'
 import type { BillStatus } from '@/types/enums'
@@ -85,6 +85,22 @@ export function useCancelBill() {
     },
     onError: (error) => {
       toastError(error, 'ບໍ່ສາມາດຍົກເລີກບິນໄດ້ ກະລຸນາລອງໃໝ່')
+    },
+  })
+}
+
+export function useUpdateBill() {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: ({ id, body }: { id: string; body: { name?: string; reason: string } }) =>
+      updateBill(id, body),
+    onSuccess: (_, variables) => {
+      queryClient.invalidateQueries({ queryKey: BILL_KEYS.detail(variables.id) })
+      queryClient.invalidateQueries({ queryKey: BILL_KEYS.all })
+      toastSuccess('ແກ້ໄຂຊື່ບິນສຳເລັດ')
+    },
+    onError: (error) => {
+      toastError(error, 'ບໍ່ສາມາດແກ້ໄຂຊື່ບິນໄດ້ ກະລຸນາລອງໃໝ່')
     },
   })
 }

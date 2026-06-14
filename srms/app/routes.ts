@@ -12,6 +12,7 @@ export default [
       route("admin/menu", "routes/admin/menu.tsx"),
       route("admin/users", "routes/admin/users.tsx"),
       route("admin/reservations", "routes/admin/reservations.tsx"),
+      route("admin/bills", "routes/admin/bills.tsx"),
     ]),
     layout("layouts/waiter.layout.tsx", [
       route("waiter", "routes/waiter/index.tsx"),

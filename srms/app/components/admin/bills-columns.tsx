@@ -8,6 +8,8 @@ import type { Bill } from "@/types/entities";
 
 export function makeBillColumns(
   onManage: (bill: Bill) => void,
+  onEdit?: (bill: Bill) => void,
+  onCancel?: (bill: Bill) => void,
 ): ColumnDef<Bill>[] {
   return [
     {
@@ -118,16 +120,41 @@ export function makeBillColumns(
     {
       id: "actions",
       header: "ຈັດການ",
-      cell: ({ row }) => (
-        <Button
-          variant="outline"
-          size="sm"
-          className="h-7 px-3 text-xs border-ink-200 text-ink-700 hover:bg-ink-50"
-          onClick={() => onManage(row.original)}
-        >
-          ຈັດການ
-        </Button>
-      ),
+      cell: ({ row }) => {
+        const bill = row.original
+        return (
+          <div className="flex items-center gap-1.5">
+            <Button
+              variant="outline"
+              size="sm"
+              className="h-7 px-3 text-xs border-ink-200 text-ink-700 hover:bg-ink-50"
+              onClick={() => onManage(bill)}
+            >
+              ລາຍລະອຽດ
+            </Button>
+            {onEdit && bill.status !== "CANCELLED" && (
+              <Button
+                variant="outline"
+                size="sm"
+                className="h-7 px-3 text-xs border-ink-200 text-ink-700 hover:bg-ink-50"
+                onClick={() => onEdit(bill)}
+              >
+                ແກ້ໄຂ
+              </Button>
+            )}
+            {onCancel && bill.status === "OPEN" && (
+              <Button
+                variant="outline"
+                size="sm"
+                className="h-7 px-3 text-xs border-danger/30 text-danger hover:bg-danger/5"
+                onClick={() => onCancel(bill)}
+              >
+                ຍົກເລີກ
+              </Button>
+            )}
+          </div>
+        )
+      },
     },
   ];
 }
