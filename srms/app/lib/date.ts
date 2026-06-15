@@ -1,5 +1,10 @@
 import { useState, useEffect } from 'react'
-import { format, formatDistanceToNow, isValid, isSameDay, parseISO } from 'date-fns'
+import {
+  format, formatDistanceToNow, isValid, isSameDay, parseISO,
+  subDays, subWeeks, subMonths, subYears,
+  startOfWeek, endOfWeek, startOfMonth, endOfMonth, startOfYear, endOfYear,
+} from 'date-fns'
+import type { AnalyticsPeriod } from '@/types/analytics'
 
 export const DATE_FORMATS = {
   DATE: 'dd/MM/yyyy',
@@ -51,6 +56,36 @@ export function formatDateLao(date: Date | string | undefined | null): string {
     return `${day} ${month} ${year}`
   } catch {
     return '—'
+  }
+}
+
+export function getPreviousPeriodDate(period: AnalyticsPeriod, dateStr: string): string {
+  const d = toDate(dateStr)
+  switch (period) {
+    case 'daily':   return format(subDays(d, 1), DATE_FORMATS.DATE_ISO)
+    case 'weekly':  return format(subWeeks(d, 1), DATE_FORMATS.DATE_ISO)
+    case 'monthly': return format(subMonths(d, 1), DATE_FORMATS.DATE_ISO)
+    case 'yearly':  return format(subYears(d, 1), DATE_FORMATS.DATE_ISO)
+  }
+}
+
+export function getPeriodRange(
+  period: AnalyticsPeriod,
+  dateStr: string
+): { start: Date; end: Date } {
+  const d = toDate(dateStr)
+  switch (period) {
+    case 'daily':
+      return { start: d, end: d }
+    case 'weekly':
+      return {
+        start: startOfWeek(d, { weekStartsOn: 1 }),
+        end:   endOfWeek(d,   { weekStartsOn: 1 }),
+      }
+    case 'monthly':
+      return { start: startOfMonth(d), end: endOfMonth(d) }
+    case 'yearly':
+      return { start: startOfYear(d),  end: endOfYear(d) }
   }
 }
 

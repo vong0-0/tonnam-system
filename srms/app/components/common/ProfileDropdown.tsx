@@ -1,5 +1,7 @@
+import { useState } from 'react'
 import { CircleUserRound, User, LogOut, ChevronsUpDown } from 'lucide-react'
 import { useNavigate } from 'react-router'
+import { ConfirmDialog } from '@/components/common/ConfirmDialog'
 import {
   DropdownMenu,
   DropdownMenuTrigger,
@@ -21,12 +23,14 @@ interface ProfileDropdownProps {
 export function ProfileDropdown({ className, iconClassName }: ProfileDropdownProps) {
   const navigate = useNavigate()
   const { mutate: logout } = useLogout()
+  const [confirmOpen, setConfirmOpen] = useState(false)
   const canSwitch = useAuthStore((s) => {
     const role = s.user?.role
     return role === ROLES.ADMIN || role === ROLES.CASHIER
   })
 
   return (
+    <>
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <button
@@ -65,12 +69,24 @@ export function ProfileDropdown({ className, iconClassName }: ProfileDropdownPro
         <DropdownMenuItem
           variant="destructive"
           className="cursor-pointer gap-2.5 py-2 text-sm"
-          onSelect={() => logout()}
+          onSelect={() => setConfirmOpen(true)}
         >
           <LogOut size={14} />
           ອອກຈາກລະບົບ
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
+
+    <ConfirmDialog
+      open={confirmOpen}
+      onOpenChange={setConfirmOpen}
+      title="ອອກຈາກລະບົບ"
+      description="ທ່ານຕ້ອງການອອກຈາກລະບົບຫຼືບໍ່?"
+      confirmLabel="ອອກຈາກລະບົບ"
+      cancelLabel="ຍົກເລີກ"
+      variant="destructive"
+      onConfirm={() => logout()}
+    />
+    </>
   )
 }

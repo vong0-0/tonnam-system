@@ -1,7 +1,7 @@
-"use client"
+"use client";
 
-import Link from "next/link"
-import { Navbar, NavItems, NavItem, NavCta } from "@/components/common/navbar"
+import Link from "next/link";
+import { Navbar, NavItems, NavItem, NavCta } from "@/components/common/navbar";
 
 function TonNamLogo() {
   return (
@@ -13,14 +13,14 @@ function TonNamLogo() {
         Nam
       </span>
     </Link>
-  )
+  );
 }
 
 const NAV_LINKS = [
   { href: "/#about", label: "ກ່ຽວກັບເຮົາ" },
   { href: "/#menu-preview", label: "ເມນູ" },
   { href: "/#contact", label: "ຕິດຕໍ່" },
-]
+];
 
 export default function SiteNavbar() {
   return (
@@ -36,8 +36,7 @@ export default function SiteNavbar() {
             {label}
           </NavItem>
         ))}
-        <NavCta href="/login">ເຂົ້າສູ່ລະບົບ</NavCta>
       </NavItems>
     </Navbar>
-  )
+  );
 }
