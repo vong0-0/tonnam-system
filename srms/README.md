@@ -1,167 +1,143 @@
-# TonNam (ต้นน้ำ) — Internal Staff Frontend (srms/)
+# TonNam (ຕົ້ນນ້ຳ) — Staff Frontend (`srms/`)
 
-## Project Overview
-Internal staff management system for TonNam restaurant.
-4 subsystems: POS (Cashier), Waiter App, Kitchen Display, Admin Backend.
+The internal **staff** web app for the TonNam restaurant. One codebase serves four role-based
+subsystems:
 
-See @README.md for full project context.
-See @package.json for available npm commands.
+- **POS** (Cashier) — bills, orders, payments, reservations, summary
+- **Waiter** — tables, take orders, reservations
+- **Kitchen** — live kitchen display, order history
+- **Admin** — tables, menu, users, reservations, bills, audit logs, analytics
 
-## Tech Stack
+The UI is in **Lao**. It talks to the [`api/`](../api) backend over HTTP (`/v1`) and a WebSocket for
+live updates (table status, kitchen orders, etc.).
+
+---
+
+## Tech stack
+
+| Area | Choice |
+|---|---|
+| Framework | **React 19** + **React Router 7** (framework mode, **SSR enabled**) |
+| Build/dev | React Router CLI (Vite under the hood) |
+| Language | TypeScript (strict) |
+| Styling | **Tailwind CSS v4** (tokens via `@theme` in `app/app.css`) |
+| Components | shadcn/ui (`app/components/ui/`, style preset `radix-mira`) |
+| Icons | Hugeicons (`@hugeicons/react`); `lucide-react` also available |
+| Server state | TanStack Query v5 |
+| Tables | TanStack Table v8 |
+| Charts | Recharts |
+| Client state | Zustand |
+| HTTP | Axios (`app/lib/api.ts`) |
+| Realtime | socket.io-client (`app/lib/socket.ts`) |
+| Forms | React Hook Form + Zod |
+| Fonts | Inter, Playfair Display, **Noto Sans Lao**, JetBrains Mono |
+| E2E tests | Playwright |
+
+> This is **not** a Vite SPA and **not** React Router DOM v6. It is React Router 7 framework mode
+> with SSR (`react-router.config.ts` → `ssr: true`), so dev/build/start go through the
+> `react-router` CLI.
+
+---
+
+## Requirements
+
+- **Node.js 20+** (22 recommended) and **npm**
+- A running **`api/`** backend reachable at `VITE_API_URL` (default dev: `http://localhost:8080`)
+
+---
+
+## Getting started
+
+```bash
+cp .env.example .env.development     # VITE_API_URL=http://localhost:8080
+npm install
+npm run dev                          # → http://localhost:5173
 ```
-Framework:    React 18 + Vite
-Language:     TypeScript
-Styling:      Tailwind CSS
-Components:   shadcn/ui
-Icons:        Lucide React
-Routing:      React Router DOM v6
-State:        Zustand
-Server State: TanStack Query v5
-Tables:       TanStack Table v8
-Charts:       Recharts
-WebSocket:    socket.io-client
-Env prefix:   VITE_
-```
+
+> Make sure the API is running first. In development the API listens on **8080** (its
+> `.env.development` sets `PORT=8080`), even though the API's own code default is `3000` — which is
+> why `.env.development` here points at `http://localhost:8080`.
+
+### Environment variables
+
+| Variable | Description | Dev value |
+|---|---|---|
+| `VITE_API_URL` | Base URL of the backend API | `http://localhost:8080` |
+
+Only `VITE_`-prefixed variables are exposed to the client.
+
+---
 
 ## Commands
-```bash
-npm run dev      # vite dev server
-npm run build    # tsc + vite build
-npm run preview  # preview production build
-npm run lint     # eslint
-npx tsc --noEmit # typecheck only
-```
 
-## Import Convention
-ALWAYS use @/ alias — never relative paths with ../
-```ts
-// CORRECT
-import { api } from '@/lib/api'
-import { socket } from '@/lib/socket'
-import { useAuth } from '@/hooks/useAuth'
-import { ROUTES } from '@/constants/routes'
-import { WS_EVENTS } from '@/constants/socket'
-import { authStore } from '@/stores/auth.store'
-import { Button } from '@/components/ui/button'
-
-// WRONG
-import { api } from '../../lib/api'
-import { ROUTES } from '../constants/routes'
-```
-Exception: same directory only → `import { x } from './x'`
-
-## Roles & Pages
-| Role | Pages |
+| Command | Description |
 |---|---|
-| ADMIN | ทุกหน้า |
-| CASHIER | /pos, /pos/bills/:id, /pos/bills/:id/orders/new, /pos/bills/:id/payment, /pos/reservations |
-| WAITER | /waiter, /waiter/tables/:id, /waiter/orders/new, /waiter/orders/:id |
-| KITCHEN | /kitchen, /kitchen/history |
+| `npm run dev` | Start the React Router dev server (`:5173`) |
+| `npm run build` | Production build (`react-router build`) |
+| `npm run start` | Serve the production build (`react-router-serve ./build/server/index.js`) |
+| `npm run typecheck` | Generate route types and type-check (`react-router typegen && tsc`) |
+| `npx playwright test` | Run the Playwright end-to-end smoke tests (see `e2e/`) |
 
-## Design System — Internal Personality
-Tone: Clean, Fast, Functional
+---
 
-### Colors
-```
-Primary action:  Forest Green  #1B4332  (bg-green)
-Hover:           Forest Light  #2D6A4F  (bg-green-light)
-Page bg:         Near White    #F1F3F5  (bg-ink-50)
-Surface/Card:    Paper White   #FFFFFF  (bg-paper)
-Border:          Border Grey   #DEE2E6  (border-ink-100)
-Text primary:    Deep Charcoal #1F2326  (text-ink-900)
-Text body:       Slate Body    #495057  (text-ink-700)
-Text secondary:  Muted Slate   #6C757D  (text-ink-500)
-Text disabled:   Light Slate   #ADB5BD  (text-ink-300)
-Success:         Teal Jade     #0F9B8E  (text-success)
-Warning:         Warm Amber    #F5A623  (text-warning)
-Danger:          Chili Red     #C0392B  (text-danger)
-```
+## Project structure
 
-### Typography
 ```
-Font: Noto Sans Thai ONLY
-NO Playfair Display on internal pages — ever
-```
-
-### Viewport
-```
-Waiter + Kitchen: Mobile-first (375px)
-POS + Admin:      Desktop-first (1280px)
-```
-
-## Constants — ALWAYS Use, NEVER Hardcode
-```ts
-import { ROUTES } from '@/constants/routes'
-import { API } from '@/constants/api'
-import { ROLES } from '@/constants/roles'
-import { WS_EVENTS, WS_CHANNELS } from '@/constants/socket'
+srms/
+├── app/
+│   ├── routes.ts        # route config (RouteConfig: index/layout/route)
+│   ├── root.tsx         # root layout + document
+│   ├── app.css          # Tailwind v4 entry + @theme tokens + @font-face
+│   ├── routes/          # route modules (login, select, admin/*, waiter/*, kitchen/*, pos/*)
+│   ├── layouts/         # guard + per-role layouts (admin/waiter/kitchen/pos)
+│   ├── components/
+│   │   ├── ui/          # shadcn/ui — generated; do not edit by hand
+│   │   └── ...          # TonNam components
+│   ├── hooks/           # TanStack Query hooks (useTables, useBills, ...)
+│   ├── services/        # axios API calls (one file per resource)
+│   ├── stores/          # Zustand (auth.store, notification.store)
+│   ├── lib/             # api.ts, socket.ts, date.ts, form.ts, query-client.ts, ...
+│   ├── constants/       # api.ts, routes.ts, roles.ts, socket.ts
+│   ├── schemas/         # Zod schemas (per domain)
+│   ├── types/           # entities, enums, api, websocket
+│   ├── assets/
+│   └── mocks/           # UI-only mock data — never import in production
+├── e2e/                 # Playwright specs (smoke.spec.ts)
+├── playwright.config.ts
+├── react-router.config.ts
+└── components.json      # shadcn config
 ```
 
-## API Calls
-ALWAYS through `lib/api.ts` (Axios instance) only:
-```ts
-import { api } from '@/lib/api'
-const { data } = await api.get('/v1/tables')
+### Data flow — always 3 layers
+
+```
+service (axios)  →  hook (TanStack Query)  →  component (render only)
 ```
 
-## WebSocket
-ALWAYS through `lib/socket.ts` only.
-Auth flow: POST /auth/ws-ticket → ticket (30s TTL, one-time) → connect with ?ticket=xxx
-NEVER use access token directly for WS connection.
+Never call axios directly in a component or hook body, and never import a `services/*` file into a
+component. See [`CLAUDE.md`](./CLAUDE.md) for the full conventions (query keys, mutations, socket
+usage, auth/token rules, design system).
 
-```ts
-import { socket } from '@/lib/socket'
-import { WS_EVENTS, WS_CHANNELS } from '@/constants/socket'
+---
 
-// Subscribe to a channel
-socket.emit('message', JSON.stringify({ event: 'subscribe', channel: WS_CHANNELS.TABLES }))
+## Roles & routes
 
-// Listen to events
-socket.on('message', (raw) => {
-  const { event, data } = JSON.parse(raw)
-  if (event === WS_EVENTS.TABLE_STATUS_UPDATED) { ... }
-})
+| Role | Routes |
+|---|---|
+| `ADMIN` | everything, incl. `/admin`, `/admin/analytics`, `/admin/tables`, `/admin/menu`, `/admin/users`, `/admin/reservations`, `/admin/bills`, `/admin/audit-logs` |
+| `CASHIER` | `/pos`, `/pos/bills`, `/pos/bills/:id`, `/pos/bills/:id/orders/new`, `/pos/bills/:id/payment`, `/pos/reservations`, `/pos/summary`, `/pos/menu` |
+| `WAITER` | `/waiter`, `/waiter/tables/:id`, `/waiter/orders/new`, `/waiter/reservations` |
+| `KITCHEN` | `/kitchen`, `/kitchen/order-history` |
+
+---
+
+## End-to-end tests
+
+Playwright smoke tests live in `e2e/`. They drive the real UI against a live API, so they need:
+
+- the API running on `:8080` and the e2e login users seeded (from `api/`: `npm run e2e:users`),
+- the dev server (Playwright auto-starts `npm run dev` if it isn't already running).
+
+```bash
+npx playwright test
 ```
-
-All events are defined in `@/constants/socket` — see WS_EVENTS and WS_CHANNELS for full list.
-
-## State Management
-- Global state → Zustand stores in `stores/`
-- Server state → TanStack Query (useQuery, useMutation)
-- WebSocket state → `stores/notification.store.ts`
-- NEVER fetch data directly in components
-
-## Business Rules (CRITICAL)
-```
-Bill: OPEN → PAID | CANCELLED only (no partial)
-Table: AVAILABLE → RESERVED → OCCUPIED → PAID
-Table returns AVAILABLE only when Cashier clears it
-Every Bill edit requires reason → AuditLog
-Order: SENT_TO_KITCHEN → COOKED | CANCELLED
-Payment: CASH | QR_PROMPTPAY | MIXED
-```
-
-## Auth & Token Rules
-```
-Access token (15m):   stored in Zustand memory only — NEVER localStorage
-Refresh token:        HttpOnly cookie — browser sends automatically
-Token refresh:        Axios interceptor in lib/api.ts handles 401 → POST /auth/refresh automatically
-                      NEVER handle refresh token manually in component or hook code
-WS ticket (30s):      POST /auth/ws-ticket → one-time use → connect wss://...?ticket=xxx
-                      NEVER use access token directly for WS connection
-```
-
-## shadcn/ui
-```
-components/ui/       ← auto-generated by shadcn CLI — NEVER edit these files directly
-components/internal/ ← TonNam-specific components (Sidebar, TableCard, etc.) — edit here
-```
-
-## IMPORTANT
-- ALWAYS run `npx tsc --noEmit` after changes
-- NEVER use Playfair Display on any internal page
-- NEVER call API directly in components — use TanStack Query
-- NEVER use magic strings for routes, events, or roles
-- NEVER store tokens in localStorage — Zustand memory only
-- NEVER edit files in `components/ui/` — shadcn auto-generated
-- NEVER handle token refresh manually — Axios interceptor does it

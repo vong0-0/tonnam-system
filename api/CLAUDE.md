@@ -7,9 +7,9 @@ Monorepo: `api/` (Express) · `web/` (Next.js public) · `srms/` (React internal
 See @README.md for full project context.
 
 ## Tech Stack
-- **api/**: Node.js 20 · TypeScript · Express · MongoDB/Mongoose · Zod · Socket.io · JWT
-- **web/**: Next.js 14 App Router · TypeScript · Tailwind CSS
-- **srms/**: React 18 + Vite · TypeScript · Tailwind · Zustand · socket.io-client
+- **api/**: Node.js 20+ · TypeScript · Express 5 · MongoDB/Mongoose · Zod · Socket.io · JWT
+- **web/**: Next.js 16 App Router · React 19 · TypeScript · Tailwind v4 (public brochure, not API-wired)
+- **srms/**: React 19 + React Router 7 (SSR) · TypeScript · Tailwind v4 · Zustand · socket.io-client
 
 ## Repository Conventions
 
@@ -56,10 +56,10 @@ npm run lint       # next lint
 ### srms/
 ```bash
 cd srms
-npm run dev        # vite
-npm run build      # tsc + vite build
-npm run preview    # preview production build
-npm run lint       # eslint
+npm run dev        # react-router dev (:5173)
+npm run build      # react-router build
+npm run start      # react-router-serve ./build/server/index.js
+npm run typecheck  # react-router typegen && tsc
 ```
 
 ## Code Style

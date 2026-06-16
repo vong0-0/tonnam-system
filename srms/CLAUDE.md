@@ -9,12 +9,12 @@ See @package.json for available npm commands.
 
 ## Tech Stack
 ```
-Framework:    React 18 + Vite
+Framework:    React 19 + React Router 7 (framework mode, SSR enabled)
 Language:     TypeScript
-Styling:      Tailwind CSS
-Components:   shadcn/ui
-Icons:        Lucide React
-Routing:      React Router DOM v6
+Styling:      Tailwind CSS v4 (@theme tokens in app/app.css)
+Components:   shadcn/ui (style: radix-mira)
+Icons:        Hugeicons (@hugeicons/react) — lucide-react also available
+Routing:      React Router 7 (app/routes.ts RouteConfig — NOT react-router-dom v6)
 State:        Zustand
 Server State: TanStack Query v5
 Tables:       TanStack Table v8
@@ -25,11 +25,10 @@ Env prefix:   VITE_
 
 ## Commands
 ```bash
-npm run dev      # vite dev server
-npm run build    # tsc + vite build
-npm run preview  # preview production build
-npm run lint     # eslint
-npx tsc --noEmit # typecheck only
+npm run dev        # react-router dev server (:5173)
+npm run build      # react-router build
+npm run start      # react-router-serve ./build/server/index.js
+npm run typecheck  # react-router typegen && tsc
 ```
 
 ## Import Convention
@@ -79,7 +78,7 @@ Danger:          Chili Red     #C0392B  (text-danger)
 
 ### Typography
 ```
-Font: Noto Sans Thai ONLY
+Font: Noto Sans Lao (internal staff pages)
 NO Playfair Display on internal pages — ever
 ```
 
@@ -291,7 +290,7 @@ Payment: CASH | QR_PROMPTPAY | MIXED
 ```
 
 ## IMPORTANT
-- ALWAYS run `npx tsc --noEmit` after changes
+- ALWAYS run `npm run typecheck` after changes
 - NEVER use Playfair Display on any internal page
 - NEVER call API directly in components — use TanStack Query
 - NEVER import from `@/services/*` directly in a component
