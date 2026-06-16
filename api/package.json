@@ -9,7 +9,10 @@
     "build": "tsc && tsc-alias",
     "test": "cross-env NODE_OPTIONS=--experimental-vm-modules jest",
     "test:watch": "cross-env NODE_OPTIONS=--experimental-vm-modules jest --watch",
-    "lint": "eslint ."
+    "lint": "eslint .",
+    "seed:daily": "tsx --env-file=.env.development scripts/seed-daily.ts",
+    "test:flows": "tsx --env-file=.env.development scripts/test-flows.ts",
+    "e2e:users": "tsx --env-file=.env.development scripts/e2e-users.ts"
   },
   "author": "Vongsouvan",
   "license": "ISC",

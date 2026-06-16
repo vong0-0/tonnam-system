@@ -11,3 +11,4 @@
 
 # Override root monorepo lib/ ignore rule (Python template) — app/lib/ must be tracked
 !app/lib/
+/test-results/
