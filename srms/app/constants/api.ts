@@ -22,6 +22,7 @@ export const API = {
   MENU_CATEGORIES:        '/v1/menu-categories',
   MENU_CATEGORY:          (id: string) => `/v1/menu-categories/${id}`,
   MENU_ITEMS:             '/v1/menu-items',
+  MENU_ITEM_IMAGE:        '/v1/menu-items/image',
   MENU_ITEM:              (id: string) => `/v1/menu-items/${id}`,
   MENU_ITEM_AVAILABILITY: (id: string) => `/v1/menu-items/${id}/availability`,
 

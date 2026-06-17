@@ -7,6 +7,7 @@ import {
   createMenuItem,
   updateMenuItem,
   deleteMenuItem,
+  uploadMenuImage,
   createMenuCategory,
   updateMenuCategory,
   deleteMenuCategory,
@@ -99,6 +100,15 @@ export function useUpdateMenuItem() {
     },
     onError: (error) => {
       toastError(error, 'ບໍ່ສາມາດແກ້ໄຂເມນູໄດ້ ກະລຸນາລອງໃໝ່')
+    },
+  })
+}
+
+export function useUploadMenuImage() {
+  return useMutation({
+    mutationFn: (file: File) => uploadMenuImage(file),
+    onError: (error) => {
+      toastError(error, 'ອັບໂຫລດຮູບບໍ່ສຳເລັດ ກະລຸນາລອງໃໝ່')
     },
   })
 }

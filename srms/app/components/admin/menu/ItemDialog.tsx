@@ -1,3 +1,5 @@
+import { useRef, useState } from "react";
+import { ImagePlus, Loader2, UploadCloud } from "lucide-react";
 import {
   Dialog,
   DialogContent,
@@ -9,7 +11,8 @@ import {
 import { AppSelect } from "@/components/common/AppSelect";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { useCreateMenuItem, useUpdateMenuItem } from "@/hooks/useMenu";
+import { useCreateMenuItem, useUpdateMenuItem, useUploadMenuImage } from "@/hooks/useMenu";
+import { resolveImageUrl } from "@/lib/image";
 import { useZodForm, type SubmitHandler } from "@/lib/form";
 import {
   createMenuItemSchema,
@@ -32,7 +35,10 @@ export function ItemDialog({ item, open, onOpenChange, categories }: ItemDialogP
   const isEdit = !!item;
   const { mutate: create, isPending: creating } = useCreateMenuItem();
   const { mutate: update, isPending: updating } = useUpdateMenuItem();
+  const { mutateAsync: uploadImage, isPending: uploading } = useUploadMenuImage();
   const isPending = creating || updating;
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const [dragging, setDragging] = useState(false);
 
   const {
     register,
@@ -60,6 +66,30 @@ export function ItemDialog({ item, open, onOpenChange, categories }: ItemDialogP
   });
 
   const selectedCategoryId = watch("category_id");
+  const imagePreview = resolveImageUrl(watch("image_url"));
+
+  const handleFile = async (file: File | undefined) => {
+    if (!file) return;
+    try {
+      const filename = await uploadImage(file);
+      setValue("image_url", filename, { shouldValidate: true });
+    } catch {
+      // error toast is handled by the hook
+    }
+  };
+
+  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    e.target.value = ""; // allow re-selecting the same file
+    await handleFile(file);
+  };
+
+  const handleDrop = async (e: React.DragEvent<HTMLDivElement>) => {
+    e.preventDefault();
+    setDragging(false);
+    if (uploading) return;
+    await handleFile(e.dataTransfer.files?.[0]);
+  };
 
   const onSubmit: SubmitHandler<CreateMenuItemInput | UpdateMenuItemInput> = (values) => {
     const clean = {
@@ -143,10 +173,75 @@ export function ItemDialog({ item, open, onOpenChange, categories }: ItemDialogP
           </div>
 
           <div className="space-y-1.5">
-            <label className="text-sm font-medium">ຮູບພາບ (ຊື່ໄຟລ໌ ຫຼື URL)</label>
+            <label className="text-sm font-medium">ຮູບພາບ</label>
+
+            <input
+              ref={fileInputRef}
+              type="file"
+              accept="image/jpeg,image/png,image/webp"
+              className="hidden"
+              onChange={handleFileChange}
+            />
+
+            <div
+              role="button"
+              tabIndex={0}
+              onClick={() => !uploading && fileInputRef.current?.click()}
+              onKeyDown={(e) => {
+                if ((e.key === "Enter" || e.key === " ") && !uploading) {
+                  e.preventDefault();
+                  fileInputRef.current?.click();
+                }
+              }}
+              onDragOver={(e) => { e.preventDefault(); setDragging(true); }}
+              onDragLeave={() => setDragging(false)}
+              onDrop={handleDrop}
+              className={`flex cursor-pointer flex-col items-center justify-center gap-2 rounded-xl border-2 border-dashed px-4 py-6 text-center transition-colors ${
+                dragging
+                  ? "border-green bg-green-pale/40"
+                  : "border-ink-200 bg-ink-50/50 hover:bg-ink-50"
+              }`}
+            >
+              {uploading ? (
+                <>
+                  <Loader2 size={28} className="animate-spin text-green" />
+                  <p className="text-sm text-ink-600">ກຳລັງອັບໂຫລດ...</p>
+                </>
+              ) : imagePreview ? (
+                <>
+                  <img
+                    src={imagePreview}
+                    alt=""
+                    className="h-40 w-40 rounded-lg border border-ink-100 object-cover"
+                  />
+                  <p className="text-xs text-ink-500">ກົດ ຫຼື ລາກໄຟລ໌ໃໝ່ເພື່ອປ່ຽນຮູບ</p>
+                </>
+              ) : (
+                <>
+                  <div className="flex h-11 w-11 items-center justify-center rounded-full bg-ink-100 text-ink-500">
+                    <UploadCloud size={22} strokeWidth={1.75} />
+                  </div>
+                  <p className="text-sm font-medium text-ink-700">
+                    ເລືອກໄຟລ໌ ຫຼື ລາກວາງທີ່ນີ້
+                  </p>
+                  <p className="text-xs text-ink-400">JPG, PNG, WebP · ສູງສຸດ 5MB</p>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    className="mt-1 gap-1.5"
+                    onClick={(e) => { e.stopPropagation(); fileInputRef.current?.click(); }}
+                  >
+                    <ImagePlus size={14} />
+                    ເລືອກໄຟລ໌
+                  </Button>
+                </>
+              )}
+            </div>
+
             <Input
               {...register("image_url")}
-              placeholder="ຊື່ໄຟລ໌ ຫຼື https://..."
+              placeholder="ຫຼື ໃສ່ຊື່ໄຟລ໌ / https://..."
               className="border-ink-300 bg-paper"
             />
             {errors.image_url && (
@@ -165,7 +260,7 @@ export function ItemDialog({ item, open, onOpenChange, categories }: ItemDialogP
             </Button>
             <Button
               type="submit"
-              disabled={isPending}
+              disabled={isPending || uploading}
               className="gap-1.5 px-4 py-2 bg-green hover:bg-green-light text-white"
             >
               {isPending ? "ກຳລັງບັນທຶກ..." : isEdit ? "ບັນທຶກ" : "ເພີ່ມເມນູ"}

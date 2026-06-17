@@ -363,6 +363,56 @@ availability:
               status: 400
               detail: "At least one of is_available or is_sold_out must be provided."
               instance: "/v1/menu-items/64f1a2b3c4d5e6f7a8b9c0d1/availability"
+
+image:
+  post:
+    tags:
+      - MenuItems
+    summary: Upload a menu item image
+    description: >
+      Uploads an image file (JPG, PNG, or WebP; max 5MB) and stores it on the
+      server. Returns the stored filename, which the client puts into a menu
+      item's image_url. Accessible to ADMIN only.
+    operationId: uploadMenuItemImage
+    requestBody:
+      required: true
+      content:
+        multipart/form-data:
+          schema:
+            type: object
+            required:
+              - image
+            properties:
+              image:
+                type: string
+                format: binary
+                description: The image file (JPG, PNG, or WebP; max 5MB).
+    responses:
+      "201":
+        description: Image uploaded successfully.
+        content:
+          application/json:
+            schema:
+              allOf:
+                - $ref: "../components/schemas/EnvelopeResponse.yaml"
+                - type: object
+                  properties:
+                    data:
+                      type: object
+                      properties:
+                        filename:
+                          type: string
+                          example: "a1b2c3d4-e5f6-7890-abcd-ef1234567890.jpg"
+      "400":
+        description: No file provided, unsupported file type, or file too large.
+        content:
+          application/problem+json:
+            schema:
+              $ref: "../components/schemas/ProblemDetail.yaml"
+      "401":
+        $ref: "../components/responses/errors.yaml#/Unauthorized"
+      "403":
+        $ref: "../components/responses/errors.yaml#/Forbidden"
               traceId: "abc-123-xyz"
               timestamp: "2024-01-01T14:32:00Z"
               errors:

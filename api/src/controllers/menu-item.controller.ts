@@ -1,6 +1,7 @@
 import type { NextFunction, Request, Response } from 'express'
 import * as menuItemService from '@/services/menu-item.service.js'
 import { success } from '@/utils/response.js'
+import { problem } from '@/utils/problem.js'
 
 export async function listMenuItems(
   req: Request,
@@ -80,6 +81,28 @@ export async function deleteMenuItem(
   try {
     await menuItemService.deleteMenuItem(req.params['id'] as string)
     res.json(success(null, 'Menu item deleted'))
+  } catch (err) {
+    next(err)
+  }
+}
+
+export async function uploadMenuItemImage(
+  req: Request,
+  res: Response,
+  next: NextFunction,
+): Promise<void> {
+  try {
+    const file = (req as Request & { file?: Express.Multer.File }).file
+    if (!file) {
+      throw problem({
+        type: 'validation-error',
+        title: 'Bad Request',
+        status: 400,
+        detail: 'No image file provided. Send the file in the "image" form field.',
+        instance: '/v1/menu-items/image',
+      })
+    }
+    res.status(201).json(success({ filename: file.filename }, 'Image uploaded'))
   } catch (err) {
     next(err)
   }

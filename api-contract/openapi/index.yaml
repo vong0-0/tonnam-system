@@ -219,6 +219,8 @@ paths:
   # Menu Items
   /menu-items:
     $ref: './paths/menu-items.yaml#/list-create'
+  /menu-items/image:
+    $ref: './paths/menu-items.yaml#/image'
   /menu-items/{id}:
     $ref: './paths/menu-items.yaml#/by-id'
   /menu-items/{id}/availability:

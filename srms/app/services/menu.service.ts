@@ -67,6 +67,18 @@ export async function deleteMenuItem(id: string): Promise<void> {
   await api.delete(API.MENU_ITEM(id))
 }
 
+export async function uploadMenuImage(file: File): Promise<string> {
+  const form = new FormData()
+  form.append('image', file)
+  // Drop the instance's default `application/json` content-type: with a JSON
+  // content-type axios serializes the FormData to JSON (losing the file). Setting
+  // it to null removes the header so the browser sets multipart/form-data + boundary.
+  const { data } = await api.post<ApiResponse<{ filename: string }>>(API.MENU_ITEM_IMAGE, form, {
+    headers: { 'Content-Type': null },
+  })
+  return data.data.filename
+}
+
 export async function createMenuCategory(body: CreateMenuCategoryInput): Promise<MenuCategory> {
   const { data } = await api.post<ApiResponse<MenuCategory>>(API.MENU_CATEGORIES, body)
   return data.data
