@@ -15,6 +15,7 @@ import type { Route } from "./+types/root";
 import { queryClient } from '@/lib/query-client'
 import { useRestoreAuth } from '@/hooks/useAuth'
 import { useAuthStore } from '@/stores/auth.store'
+import { GlobalNavProgress } from '@/components/common/GlobalNavProgress'
 import { connectSocket, disconnectSocket } from '@/lib/socket'
 import { initNotificationListeners } from '@/stores/notification.store'
 import "./app.css";
@@ -63,6 +64,7 @@ function AppInner() {
 export default function App() {
   return (
     <QueryClientProvider client={queryClient}>
+      <GlobalNavProgress />
       <AppInner />
       <Toaster
         position="top-center"

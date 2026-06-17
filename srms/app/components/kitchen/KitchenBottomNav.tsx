@@ -1,5 +1,5 @@
 import { NavLink } from 'react-router'
-import { UtensilsCrossed, ClipboardList, UserRound, ChevronsUpDown, type LucideIcon } from 'lucide-react'
+import { UtensilsCrossed, ClipboardList, UserRound, ChevronsUpDown, Loader2, type LucideIcon } from 'lucide-react'
 import { useAuthStore } from '@/stores/auth.store'
 import { ROUTES } from '@/constants/routes'
 import { ROLES } from '@/constants/roles'
@@ -37,9 +37,13 @@ export default function KitchenBottomNav() {
               }`
             }
           >
-            {({ isActive }) => (
+            {({ isActive, isPending }) => (
               <>
-                <Icon size={22} strokeWidth={isActive ? 2.5 : 1.75} />
+                {isPending ? (
+                  <Loader2 size={22} className="animate-spin" />
+                ) : (
+                  <Icon size={22} strokeWidth={isActive ? 2.5 : 1.75} />
+                )}
                 <span className={`text-[11px] ${isActive ? 'font-semibold' : 'font-normal'}`}>
                   {label}
                 </span>

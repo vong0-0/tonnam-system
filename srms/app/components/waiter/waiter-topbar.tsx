@@ -1,4 +1,5 @@
 import { NavLink } from 'react-router'
+import { Loader2 } from 'lucide-react'
 import { ProfileDropdown } from '@/components/common/ProfileDropdown'
 import { ROUTES } from '@/constants/routes'
 
@@ -21,26 +22,36 @@ export default function WaiterTopbar() {
           to={ROUTES.WAITER}
           end
           className={({ isActive }) =>
-            `flex-1 text-center py-2 text-sm font-medium border-b-2 transition-colors ${
+            `flex-1 inline-flex items-center justify-center py-2 text-sm font-medium border-b-2 transition-colors ${
               isActive
                 ? 'text-white border-white'
                 : 'text-white/50 border-transparent hover:text-white/80'
             }`
           }
         >
-          ໂຕະ
+          {({ isPending }) => (
+            <>
+              {isPending && <Loader2 className="mr-1.5 h-3.5 w-3.5 animate-spin" />}
+              ໂຕະ
+            </>
+          )}
         </NavLink>
         <NavLink
           to={ROUTES.WAITER_RESERVATIONS}
           className={({ isActive }) =>
-            `flex-1 text-center py-2 text-sm font-medium border-b-2 transition-colors ${
+            `flex-1 inline-flex items-center justify-center py-2 text-sm font-medium border-b-2 transition-colors ${
               isActive
                 ? 'text-white border-white'
                 : 'text-white/50 border-transparent hover:text-white/80'
             }`
           }
         >
-          ການຈອງ
+          {({ isPending }) => (
+            <>
+              {isPending && <Loader2 className="mr-1.5 h-3.5 w-3.5 animate-spin" />}
+              ການຈອງ
+            </>
+          )}
         </NavLink>
       </div>
     </header>

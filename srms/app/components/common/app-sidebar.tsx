@@ -1,6 +1,6 @@
 import { NavLink, useNavigate } from 'react-router'
 import type { LucideIcon } from 'lucide-react'
-import { LogOut, ChevronsUpDown } from 'lucide-react'
+import { LogOut, ChevronsUpDown, Loader2 } from 'lucide-react'
 import {
   Sidebar,
   SidebarHeader,
@@ -67,12 +67,16 @@ export default function AppSidebar({ navGroups, profileHref }: AppSidebarProps) 
                 {group.items.map((item) => (
                   <SidebarMenuItem key={item.href}>
                     <NavLink to={item.href} end={item.end}>
-                      {({ isActive }) => (
+                      {({ isActive, isPending }) => (
                         <SidebarMenuButton
                           isActive={isActive}
                           className="text-white/70 hover:text-white hover:bg-green-light data-active:bg-green-light data-active:text-white gap-3 px-3 py-3 h-auto"
                         >
-                          <item.icon size={18} />
+                          {isPending ? (
+                            <Loader2 size={18} className="animate-spin" />
+                          ) : (
+                            <item.icon size={18} />
+                          )}
                           <span className='text-base'>{item.label}</span>
                         </SidebarMenuButton>
                       )}
