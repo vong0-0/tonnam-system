@@ -1,0 +1,801 @@
+<!DOCTYPE html>
+<html lang="lo">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>ລະບົບຈັດການຮ້ານອາຫານ ຕົ້ນນ້ຳ — TonNam SRMS</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400;1,600&family=Noto+Sans+Lao:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+<style>
+  /* ============================================================
+     Design tokens — extracted from /design-token.json
+     ============================================================ */
+  :root {
+    /* Brand */
+    --green:       #1B4332;
+    --green-light: #2D6A4F;
+    --green-pale:  #D8EDDF;
+    --gold:        #C9A84C;
+    --gold-dark:   #8B6A1A;
+    --gold-pale:   #F5EDCE;
+    --terra:       #C4623A;
+    --terra-dark:  #8B3A1F;
+    --terra-pale:  #F2D5C4;
+    --cream:       #FAF6F0;
+    --cream-dark:  #EDE8DC;
+    --brown:       #2C1810;
+    --brown-soft:  #4A3528;
+
+    /* Semantic */
+    --success: #0F9B8E;
+    --warning: #F5A623;
+    --danger:  #C0392B;
+    --info:    #2980B9;
+
+    /* Type */
+    --font-display: 'Playfair Display', Georgia, serif;
+    --font-body:    'Noto Sans Lao', sans-serif;
+
+    /* Radius */
+    --r-sm: 4px;
+    --r-md: 8px;
+    --r-lg: 10px;
+    --r-xl: 12px;
+    --r-2xl: 16px;
+    --r-pill: 999px;
+
+    /* Shadow (warm brown-toned) */
+    --shadow-sm: 0 1px 2px rgba(44,24,16,0.06);
+    --shadow-md: 0 2px 8px rgba(44,24,16,0.08), 0 1px 2px rgba(44,24,16,0.05);
+    --shadow-lg: 0 8px 24px rgba(44,24,16,0.12), 0 2px 6px rgba(44,24,16,0.06);
+    --shadow-hero: 0 24px 60px rgba(27,67,50,0.22);
+
+    /* Motion */
+    --ease-out: cubic-bezier(0.22, 0.61, 0.36, 1);
+    --dur-slow: 360ms;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html, body {
+    height: 100%;
+    font-family: var(--font-body);
+    color: var(--brown);
+    background: #14241b; /* dark letterbox surround */
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+  }
+
+  /* ============================================================
+     Deck / stage — 16:9 letterboxed
+     ============================================================ */
+  .deck {
+    position: fixed;
+    inset: 0;
+    display: grid;
+    place-items: center;
+    overflow: hidden;
+  }
+
+  .stage {
+    position: relative;
+    width: 1280px;
+    height: 720px;
+    /* scale to fit viewport while preserving 16:9 */
+    transform: scale(var(--scale, 1));
+    transform-origin: center center;
+    background: var(--cream);
+    box-shadow: 0 30px 80px rgba(0,0,0,0.45);
+    overflow: hidden;
+  }
+
+  /* ============================================================
+     Slides
+     ============================================================ */
+  .slide {
+    position: absolute;
+    inset: 0;
+    padding: 64px 72px;
+    display: none;
+    flex-direction: column;
+    opacity: 0;
+    transition: opacity var(--dur-slow) var(--ease-out);
+  }
+  .slide.active { display: flex; opacity: 1; }
+
+  /* shared bits */
+  .eyebrow {
+    font-family: var(--font-body);
+    font-size: 13px;
+    font-weight: 500;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: var(--terra);
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    margin-bottom: 18px;
+  }
+  .eyebrow::after {
+    content: "";
+    flex: 1;
+    height: 1px;
+    background: var(--terra);
+    opacity: 0.3;
+  }
+  .eyebrow.on-dark { color: var(--gold); }
+  .eyebrow.on-dark::after { background: var(--gold); }
+
+  h1.title {
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: 52px;
+    line-height: 1.1;
+    color: var(--green);
+    margin-bottom: 8px;
+  }
+  h2.title {
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: 40px;
+    line-height: 1.15;
+    color: var(--green);
+    margin-bottom: 6px;
+  }
+  .title em { font-style: italic; color: var(--gold); }
+
+  .subtitle {
+    font-size: 18px;
+    color: var(--brown-soft);
+    font-weight: 300;
+    margin-bottom: 28px;
+  }
+
+  .body-wrap { flex: 1; display: flex; gap: 44px; min-height: 0; }
+  .col { flex: 1; min-width: 0; display: flex; flex-direction: column; }
+  .col.narrow { flex: 0 0 42%; }
+
+  ul.bullets { list-style: none; display: flex; flex-direction: column; gap: 16px; }
+  ul.bullets li {
+    position: relative;
+    padding-left: 30px;
+    font-size: 19px;
+    line-height: 1.5;
+    color: var(--brown);
+  }
+  ul.bullets li::before {
+    content: "";
+    position: absolute;
+    left: 0; top: 10px;
+    width: 11px; height: 11px;
+    border-radius: var(--r-pill);
+    background: var(--gold);
+    box-shadow: 0 0 0 4px var(--gold-pale);
+  }
+  ul.bullets li b { color: var(--green); font-weight: 600; }
+  ul.bullets li .en { color: var(--brown-soft); font-weight: 400; }
+
+  /* cards */
+  .cards { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
+  .card {
+    background: #fff;
+    border: 0.5px solid rgba(44,24,16,0.1);
+    border-radius: var(--r-lg);
+    box-shadow: var(--shadow-md);
+    padding: 22px 22px;
+    display: flex;
+    gap: 16px;
+    align-items: flex-start;
+  }
+  .card .num {
+    flex: 0 0 auto;
+    width: 38px; height: 38px;
+    border-radius: var(--r-pill);
+    background: var(--terra-pale);
+    color: var(--terra-dark);
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: 19px;
+    display: grid; place-items: center;
+  }
+  .card .c-body h4 {
+    font-size: 18px; font-weight: 600; color: var(--green); margin-bottom: 4px;
+  }
+  .card .c-body p { font-size: 15px; color: var(--brown-soft); line-height: 1.45; }
+
+  /* role chips (overview) */
+  .roles { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  .role {
+    border-radius: var(--r-lg);
+    padding: 20px;
+    color: #fff;
+    box-shadow: var(--shadow-md);
+  }
+  .role h4 { font-size: 20px; font-weight: 700; margin-bottom: 4px; font-family: var(--font-display); }
+  .role p { font-size: 14px; opacity: 0.9; line-height: 1.4; }
+  .role.waiter  { background: var(--terra); }
+  .role.kitchen { background: #495057; }
+  .role.pos     { background: var(--gold-dark); }
+  .role.admin   { background: var(--green); }
+
+  /* stat chips */
+  .stats { display: flex; gap: 22px; margin-bottom: 26px; flex-wrap: wrap; }
+  .stat {
+    background: #fff;
+    border: 0.5px solid rgba(44,24,16,0.1);
+    border-radius: var(--r-xl);
+    box-shadow: var(--shadow-md);
+    padding: 20px 28px;
+    min-width: 200px;
+  }
+  .stat .big {
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: 46px;
+    line-height: 1;
+    color: var(--success);
+  }
+  .stat .lbl { font-size: 15px; color: var(--brown-soft); margin-top: 8px; }
+
+  /* compare table */
+  table.cmp { width: 100%; border-collapse: collapse; font-size: 17px; }
+  table.cmp th, table.cmp td { text-align: left; padding: 14px 18px; }
+  table.cmp thead th {
+    font-family: var(--font-body);
+    font-size: 13px; letter-spacing: 1px; text-transform: uppercase;
+    color: var(--brown-soft); border-bottom: 2px solid var(--cream-dark);
+  }
+  table.cmp tbody tr { border-bottom: 1px solid var(--cream-dark); }
+  table.cmp td.old { color: var(--danger); }
+  table.cmp td.arrow { color: var(--gold); text-align: center; font-weight: 700; width: 40px; }
+  table.cmp td.new { color: var(--green); font-weight: 600; }
+  table.cmp td.topic { font-weight: 600; color: var(--brown); }
+
+  /* two-column limitations */
+  .lim-head {
+    font-family: var(--font-display);
+    font-size: 22px; font-weight: 700; margin-bottom: 16px;
+    display: flex; align-items: center; gap: 10px;
+  }
+  .lim-head.warn { color: var(--terra-dark); }
+  .lim-head.future { color: var(--green); }
+  .lim-head .pin { width: 12px; height: 12px; border-radius: var(--r-pill); }
+  .lim-head.warn .pin { background: var(--warning); }
+  .lim-head.future .pin { background: var(--success); }
+
+  /* image placeholder */
+  .ph {
+    flex: 1;
+    min-height: 220px;
+    border: 2.5px dashed var(--gold);
+    border-radius: var(--r-xl);
+    background:
+      repeating-linear-gradient(45deg, rgba(201,168,76,0.05) 0 12px, transparent 12px 24px),
+      var(--gold-pale);
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    text-align: center; gap: 12px; padding: 24px;
+    color: var(--gold-dark);
+  }
+  .ph.green {
+    border-color: var(--green-light);
+    background:
+      repeating-linear-gradient(45deg, rgba(27,67,50,0.04) 0 12px, transparent 12px 24px),
+      var(--green-pale);
+    color: var(--green);
+  }
+  .ph .ico { font-size: 40px; line-height: 1; opacity: 0.7; }
+  .ph .ph-label { font-size: 16px; font-weight: 600; }
+  .ph .ph-hint { font-size: 13px; opacity: 0.8; max-width: 320px; line-height: 1.4; }
+  .ph .tag {
+    font-size: 11px; letter-spacing: 1.5px; text-transform: uppercase;
+    font-weight: 600; padding: 3px 10px; border-radius: var(--r-pill);
+    background: rgba(255,255,255,0.6);
+  }
+
+  /* ============================================================
+     COVER slide
+     ============================================================ */
+  .slide.cover {
+    background:
+      repeating-linear-gradient(45deg, rgba(201,168,76,0.07) 0 1px, transparent 1px 28px),
+      repeating-linear-gradient(-45deg, rgba(201,168,76,0.07) 0 1px, transparent 1px 28px),
+      var(--green);
+    color: var(--cream);
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 56px;
+  }
+  .cover .logo-zone {
+    width: 132px; height: 132px;
+    border-radius: var(--r-2xl);
+    border: 2.5px dashed rgba(250,246,240,0.45);
+    display: grid; place-items: center;
+    margin-bottom: 30px;
+    background: rgba(0,0,0,0.12);
+  }
+  .cover .logo-mark {
+    font-family: var(--font-display);
+    font-weight: 700; font-size: 56px; line-height: 1;
+  }
+  .cover .logo-mark .t { color: var(--cream); }
+  .cover .logo-mark .n { color: var(--gold); }
+  .cover .logo-hint {
+    font-size: 11px; letter-spacing: 2px; text-transform: uppercase;
+    color: rgba(250,246,240,0.55); margin-top: 8px;
+  }
+  .cover h1 {
+    font-family: var(--font-display);
+    font-weight: 700; font-size: 64px; line-height: 1.08;
+    color: var(--cream); margin-bottom: 14px;
+  }
+  .cover h1 em { font-style: italic; color: var(--gold); }
+  .cover .en-title {
+    font-family: var(--font-display);
+    font-style: italic; font-size: 22px;
+    color: var(--gold-pale); margin-bottom: 36px;
+  }
+  .cover .meta {
+    display: flex; gap: 56px; margin-top: 8px;
+    font-size: 15px; color: rgba(250,246,240,0.85);
+  }
+  .cover .meta .m-label {
+    font-size: 11px; letter-spacing: 2px; text-transform: uppercase;
+    color: var(--gold); margin-bottom: 6px;
+  }
+  .cover .meta .fill {
+    border-bottom: 1.5px dashed rgba(250,246,240,0.4);
+    min-width: 180px; padding-bottom: 4px; color: rgba(250,246,240,0.55);
+    font-style: italic; font-size: 14px;
+  }
+
+  /* ============================================================
+     Closing slide
+     ============================================================ */
+  .slide.closing {
+    background:
+      repeating-linear-gradient(45deg, rgba(201,168,76,0.07) 0 1px, transparent 1px 28px),
+      repeating-linear-gradient(-45deg, rgba(201,168,76,0.07) 0 1px, transparent 1px 28px),
+      var(--green);
+    color: var(--cream);
+    justify-content: center;
+  }
+  .slide.closing .eyebrow { color: var(--gold); }
+  .slide.closing .eyebrow::after { background: var(--gold); }
+  .slide.closing h2.title { color: var(--cream); }
+  .slide.closing ul.bullets li { color: var(--cream); font-size: 20px; }
+  .slide.closing ul.bullets li b { color: var(--gold); }
+  .slide.closing .thanks {
+    margin-top: 40px;
+    font-family: var(--font-display);
+    font-style: italic;
+    font-size: 30px;
+    color: var(--gold);
+  }
+  .slide.closing .qa {
+    margin-top: 6px; font-size: 16px; color: rgba(250,246,240,0.8);
+  }
+
+  /* page footer (number + brand) */
+  .foot {
+    position: absolute;
+    left: 72px; right: 72px; bottom: 26px;
+    display: flex; justify-content: space-between; align-items: center;
+    font-size: 12px; color: var(--brown-soft); opacity: 0.7;
+    letter-spacing: 0.5px;
+  }
+  .cover .foot, .closing .foot { color: rgba(250,246,240,0.6); }
+  .foot .brand-mark { font-family: var(--font-display); font-weight: 600; letter-spacing: 2px; }
+
+  /* ============================================================
+     Controls (outside the stage)
+     ============================================================ */
+  .controls {
+    position: fixed;
+    bottom: 18px; left: 50%;
+    transform: translateX(-50%);
+    display: flex; align-items: center; gap: 14px;
+    background: rgba(20,36,27,0.72);
+    backdrop-filter: blur(6px);
+    padding: 8px 14px;
+    border-radius: var(--r-pill);
+    z-index: 50;
+    border: 1px solid rgba(201,168,76,0.25);
+  }
+  .controls button {
+    border: none; cursor: pointer;
+    width: 34px; height: 34px; border-radius: var(--r-pill);
+    background: rgba(250,246,240,0.1);
+    color: var(--cream); font-size: 16px;
+    display: grid; place-items: center;
+    transition: background 150ms ease;
+  }
+  .controls button:hover { background: var(--gold); color: var(--green); }
+  .controls .counter {
+    color: var(--cream); font-size: 13px; min-width: 56px; text-align: center;
+    font-variant-numeric: tabular-nums; letter-spacing: 1px;
+  }
+  .dots { display: flex; gap: 7px; align-items: center; }
+  .dots .dot {
+    width: 8px; height: 8px; border-radius: var(--r-pill);
+    background: rgba(250,246,240,0.3); cursor: pointer;
+    transition: all 180ms ease; border: none; padding: 0;
+  }
+  .dots .dot.active { background: var(--gold); transform: scale(1.35); }
+
+  .hint {
+    position: fixed; top: 16px; right: 18px; z-index: 50;
+    font-size: 12px; color: rgba(250,246,240,0.5);
+    letter-spacing: 0.5px;
+  }
+</style>
+</head>
+<body>
+<div class="hint">← → ເລື່ອນສະໄລ້ · F ເຕັມຈໍ</div>
+<div class="deck">
+  <div class="stage" id="stage">
+
+    <!-- 1 · COVER -->
+    <section class="slide cover active">
+      <div class="logo-zone">
+        <div style="text-align:center">
+          <div class="logo-mark"><span class="t">T</span><span class="n">N</span></div>
+          <div class="logo-hint">ໃສ່ໂລໂກ້</div>
+        </div>
+      </div>
+      <h1>ລະບົບຈັດການຮ້ານອາຫານ <em>ຕົ້ນນ້ຳ</em></h1>
+      <div class="en-title">TonNam Smart Restaurant Management System</div>
+      <div class="meta">
+        <div>
+          <div class="m-label">ຜູ້ຈັດທຳ (Author)</div>
+          <div class="fill">ໃສ່ຊື່ຜູ້ຈັດທຳ</div>
+        </div>
+        <div>
+          <div class="m-label">ອາຈານທີ່ປຶກສາ (Advisor)</div>
+          <div class="fill">ໃສ່ຊື່ອາຈານທີ່ປຶກສາ</div>
+        </div>
+      </div>
+      <div class="foot"><span class="brand-mark">TONNAM</span><span>ການນຳສະເໜີວິທະຍານິພนธ์</span></div>
+    </section>
+
+    <!-- 2 · PROBLEMS -->
+    <section class="slide">
+      <div class="eyebrow">ບົດທີ 1 · ທີ່ມາ</div>
+      <h2 class="title">ປັນຫາຂອງ<em>ລະບົບເດີມ</em></h2>
+      <div class="subtitle">ການເຮັດວຽກແບບເກົ່າມີຂັ້ນຕອນຫຼາຍ ແລະ ຂໍ້ມູນບໍ່ເຊື່ອມຕໍ່ກັນ</div>
+      <div class="cards">
+        <div class="card"><div class="num">1</div><div class="c-body">
+          <h4>ຂັ້ນຕອນຮັບອໍເດີຊ້ຳຊ້ອນ</h4>
+          <p>ຈົດໃສ່ເຈ້ຍ → ສົ່ງໃຫ້ແຄຊເຊຍ → ພິມເຂົ້າ POS ອີກຮອບ</p>
+        </div></div>
+        <div class="card"><div class="num">2</div><div class="c-body">
+          <h4>ສົ່ງຂໍ້ມູນຊັກຊ້າ</h4>
+          <p>ກວ່າອໍເດີຈະເຖິງຄົວໃຊ້ເວລາ ແລະ ສ່ຽງຜິດພາດງ່າຍ</p>
+        </div></div>
+        <div class="card"><div class="num">3</div><div class="c-body">
+          <h4>ຂໍ້ມູນກະຈັດກະຈາຍ</h4>
+          <p>ຂໍ້ມູນເມນູ ແລະ ຍອດຂາຍຢູ່ Excel ກັບ POS ແຍກກັນ</p>
+        </div></div>
+        <div class="card"><div class="num">4</div><div class="c-body">
+          <h4>ບໍ່ມີລະບົບລາຍງານ</h4>
+          <p>ສະຫຼຸບຍອດຂາຍດ້ວຍມື ບໍ່ມີລາຍງານອັດຕະໂນมัด (Report)</p>
+        </div></div>
+      </div>
+      <div class="foot"><span class="brand-mark">TONNAM</span><span class="pageno"></span></div>
+    </section>
+
+    <!-- 3 · OVERVIEW -->
+    <section class="slide">
+      <div class="eyebrow">ບົດທີ 4 · ຜົນການดำเนินงาน</div>
+      <h2 class="title">ພາບລວມຂອງ<em>ລະບົບໃໝ່</em></h2>
+      <div class="subtitle">TonNam SRMS ແບ່ງເປັນ 4 ລະບົບຍ່ອຍຕາມบทบาท · ເຊື່ອມຕໍ່ກັນແບບ Real-time</div>
+      <div class="body-wrap">
+        <div class="col narrow">
+          <div class="roles">
+            <div class="role waiter"><h4>Waiter</h4><p>ພະນັກງານເສີບ — ສັ່ງอาหารจากโต๊ะ</p></div>
+            <div class="role kitchen"><h4>Kitchen</h4><p>ຫ້ອງຄົວ — ຮັບອໍເດີ Real-time</p></div>
+            <div class="role pos"><h4>POS</h4><p>ແຄຊເຊຍ — ໂຕະ, ບິນ, ຊຳລະເງິນ</p></div>
+            <div class="role admin"><h4>Admin</h4><p>ຜູ້ບໍລິຫານ — ຈັດການ ແລະ ລາຍງານ</p></div>
+          </div>
+        </div>
+        <div class="col">
+          <div class="ph green">
+            <div class="tag">Architecture</div>
+            <div class="ico">🗺️</div>
+            <div class="ph-label">ໃສ່ຮູບ ແຜนผังสถาปัตยกรรมระบบ (System Diagram)</div>
+            <div class="ph-hint">ສະແດງການເຊື່ອມຕໍ່ Waiter / Kitchen / POS / Admin ກັບ Backend ຜ່ານ WebSocket</div>
+          </div>
+        </div>
+      </div>
+      <div class="foot"><span class="brand-mark">TONNAM</span><span class="pageno"></span></div>
+    </section>
+
+    <!-- 4 · WAITER -->
+    <section class="slide">
+      <div class="eyebrow">ລະບົບຍ່ອຍ · 01</div>
+      <h2 class="title">ລະບົບ <em>Waiter</em> (ພະນັກງານເສີບ)</h2>
+      <div class="subtitle">ໃຊ້ງານເທິງມືຖື — ສັ່ງอาหารแล้วส่งเถิงครัวทันที</div>
+      <div class="body-wrap">
+        <div class="col">
+          <ul class="bullets">
+            <li>ເບິ່ງ<b>ສະຖານະໂຕະ</b> ແລະ ເປີດໂຕະ / ເປີດບິນ</li>
+            <li><b>ສັ່ງອາຫານ</b> ຈາກเมนูได้ทันที</li>
+            <li><b>ຍ້າຍໂຕะ</b> (Move table) ແລະ ເບິ່ງ<b>ການຈอง</b></li>
+            <li>ຂໍ້ມູນສົ່ງເຖິງຄົວ<b>ທັນທີ</b> <span class="en">— ບໍ່ຕ້ອງຜ່ານແຄຊເຊຍ</span></li>
+          </ul>
+        </div>
+        <div class="col">
+          <div class="ph">
+            <div class="tag">Mobile · 375px</div>
+            <div class="ico">📱</div>
+            <div class="ph-label">ໃສ່ຮູບໜ້າຈໍ Waiter</div>
+            <div class="ph-hint">ໜ້າລາຍການໂຕະ ຫຼື ໜ້າสั่งอาหาร</div>
+          </div>
+        </div>
+      </div>
+      <div class="foot"><span class="brand-mark">TONNAM</span><span class="pageno"></span></div>
+    </section>
+
+    <!-- 5 · KITCHEN -->
+    <section class="slide">
+      <div class="eyebrow">ລະບົບຍ່ອຍ · 02</div>
+      <h2 class="title">ລະບົບ <em>Kitchen</em> (ຫ້ອງຄົວ)</h2>
+      <div class="subtitle">ສະແดงอำเดี Real-time ບໍ່ຕ້ອງລໍพิมพ์ใบอำเดี</div>
+      <div class="body-wrap">
+        <div class="col">
+          <ul class="bullets">
+            <li>ສະແດງອໍເດີໃໝ່ແບບ <b>Real-time</b> ທັນທີ</li>
+            <li>ແຍກ <b>Tab</b> ລະຫວ່າງ "ລໍຖ້າดำเนินการ" ກັບ "ທຸກສະຖານະ"</li>
+            <li><b>ອັບເດດສະຖານະອາຫານ</b> ໄດ້ທັນທີ <span class="en">(ກຳລັງเฮัด / ສຳເລັດ)</span></li>
+            <li>ຫຼຸດການผิดพลาด ແລະ ใช้กระดาษ</li>
+          </ul>
+        </div>
+        <div class="col">
+          <div class="ph">
+            <div class="tag">Kitchen Display</div>
+            <div class="ico">🍳</div>
+            <div class="ph-label">ໃສ່ຮູບໜ້າຈໍ Kitchen</div>
+            <div class="ph-hint">ໜ້າจอแสดงอำเดีที่กำลังลำถ้า/ดำเนินการ</div>
+          </div>
+        </div>
+      </div>
+      <div class="foot"><span class="brand-mark">TONNAM</span><span class="pageno"></span></div>
+    </section>
+
+    <!-- 6 · POS -->
+    <section class="slide">
+      <div class="eyebrow">ລະບົບຍ່ອຍ · 03</div>
+      <h2 class="title">ລະບົບ <em>POS</em> (ແຄຊເຊຍ / Cashier)</h2>
+      <div class="subtitle">ຈັດການໂຕະ ແລະ ບິນ ຢູ່ບ່ອນດຽວ · ຊຳລະເງິນໄດ້ຫຼາຍຮູບແບບ</div>
+      <div class="body-wrap">
+        <div class="col">
+          <ul class="bullets">
+            <li>ຈັດການ<b>ໂຕະ ແລະ ບິນ</b> ໃນບ່ອນດຽວ</li>
+            <li>ຊຳລະ <b>3 ຮູບແບບ</b> <span class="en">— ເງິນສົດ (Cash) / QR PromptPay / ແບບປະສົມ (MIXED)</span></li>
+            <li><b>ຄິດໄລ່ເງິນທອນ</b> ອັດຕະໂນມັດ</li>
+            <li>ເບິ່ງ<b>ປະຫວັດບິນ</b> ແລະ <b>ສະຫຼຸບຍอດຂາຍ</b></li>
+          </ul>
+        </div>
+        <div class="col">
+          <div class="ph">
+            <div class="tag">Desktop · 1280px</div>
+            <div class="ico">💳</div>
+            <div class="ph-label">ໃສ່ຮູບໜ້າຈໍ POS</div>
+            <div class="ph-hint">ໜ້າຊຳລະເງິນ ຫຼື ໜ້າແຜนผังโต๊ะ (Table Map)</div>
+          </div>
+        </div>
+      </div>
+      <div class="foot"><span class="brand-mark">TONNAM</span><span class="pageno"></span></div>
+    </section>
+
+    <!-- 7 · ADMIN -->
+    <section class="slide">
+      <div class="eyebrow">ລະບົບຍ່ອຍ · 04</div>
+      <h2 class="title">ລະບົບ <em>Admin</em> (ຜູ້ບໍລິຫານ)</h2>
+      <div class="subtitle">ເບິ່ງພາພรวมธุรกิจ ແລະ ຈັດການຂໍ້ມູນຫຼັກ</div>
+      <div class="body-wrap">
+        <div class="col">
+          <ul class="bullets">
+            <li><b>Dashboard</b> ແລະ <b>Analytics</b> ແບບ Real-time</li>
+            <li>ຈັດການ <b>ໂຕະ · ເມນູ · ຜູ້ໃຊ້ · ການຈอง</b></li>
+            <li><b>Audit Log</b> ບັນທຶກທຸກການປ່ຽນແປງ<span class="en"> (ตรวจสอบย้อนหลังได้)</span></li>
+            <li>ແບ່ງສິດຕາມบทบาท <span class="en">(RBAC)</span></li>
+          </ul>
+        </div>
+        <div class="col">
+          <div class="ph">
+            <div class="tag">Admin Dashboard</div>
+            <div class="ico">📊</div>
+            <div class="ph-label">ໃສ່ຮູບໜ້າຈໍ Admin Dashboard</div>
+            <div class="ph-hint">ໜ້າ Analytics ສະແดงกราฟยอดขาย</div>
+          </div>
+        </div>
+      </div>
+      <div class="foot"><span class="brand-mark">TONNAM</span><span class="pageno"></span></div>
+    </section>
+
+    <!-- 8 · TESTING -->
+    <section class="slide">
+      <div class="eyebrow">ບົດທີ 4 · ການທົດສອບ</div>
+      <h2 class="title">ຜົນການ<em>ທົດສອບລະບົບ</em></h2>
+      <div class="subtitle">ທົດສອບ 2 ລະດັບ — ระดับ API ແລະ ระดับ Browser (E2E)</div>
+      <div class="stats">
+        <div class="stat"><div class="big">49 / 49</div><div class="lbl">API Flow ຜ່ານ<span class="en"> (ທຸກ Flow)</span></div></div>
+        <div class="stat"><div class="big">6 / 6</div><div class="lbl">Browser E2E ຜ່ານ</div></div>
+        <div class="stat"><div class="big">5</div><div class="lbl">ครอบคลุมทุก Role</div></div>
+      </div>
+      <ul class="bullets">
+        <li>ครอบคลุม<b>ທຸກ Role</b> <span class="en">(Auth · Waiter · Kitchen · POS · Admin)</span></li>
+        <li>ກວດສອບ<b>กฎทางธุรกิจ (Business Rules)</b> ที่สำคัญครบ</li>
+      </ul>
+      <div class="foot"><span class="brand-mark">TONNAM</span><span class="pageno"></span></div>
+    </section>
+
+    <!-- 9 · COMPARE -->
+    <section class="slide">
+      <div class="eyebrow">ບົດທີ 4 · ການປຽບທຽບ</div>
+      <h2 class="title">ປຽບທຽບ <em>ລະບົບເດີມ</em> ກັບ <em>ລະບົບໃໝ່</em></h2>
+      <div style="margin-top:14px">
+        <table class="cmp">
+          <thead><tr><th>ຫົວข้อ (Topic)</th><th>ລະບົບເດີม</th><th></th><th>ລະບົບໃໝ່</th></tr></thead>
+          <tbody>
+            <tr><td class="topic">ຂັ້ນຕอนຮັບອໍເດີ</td><td class="old">4 ຂັ້ນຕอน</td><td class="arrow">→</td><td class="new">2 ຂັ້ນຕอน</td></tr>
+            <tr><td class="topic">ສົ່ງຂໍ້ມູນເຖิงครัว</td><td class="old">ລໍพิมพ์ใบอำเดี</td><td class="arrow">→</td><td class="new">Real-time ທັນທີ</td></tr>
+            <tr><td class="topic">ຂໍ້ມູນເມນู</td><td class="old">ແຍກ Excel / POS</td><td class="arrow">→</td><td class="new">ລວมศูนย์บ่อนดຽว</td></tr>
+            <tr><td class="topic">ສະຫຼຸບຍอດຂາย</td><td class="old">ຈົดด้วยมือ</td><td class="arrow">→</td><td class="new">Dashboard Real-time</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="foot"><span class="brand-mark">TONNAM</span><span class="pageno"></span></div>
+    </section>
+
+    <!-- 10 · STRENGTHS -->
+    <section class="slide">
+      <div class="eyebrow">ບົດທີ 5 · ສະຫຼຸບ</div>
+      <h2 class="title">ຈຸດແຂງ<em>ຂອງລະບົບ</em></h2>
+      <div class="body-wrap">
+        <div class="col">
+          <ul class="bullets">
+            <li>ครอบคลุม<b>การทำงานหลักครบ</b> ในระบบเดียว</li>
+            <li>ຊຳລະເງິນ<b>ຫຼາຍຮູບແບບ</b> <span class="en">(Cash / QR / MIXED)</span></li>
+            <li><b>Real-time</b> ທຸກໜ້າຈໍ ຜ່ານ WebSocket</li>
+          </ul>
+        </div>
+        <div class="col">
+          <ul class="bullets">
+            <li><b>Audit Log</b> ກວດສອບย้อนหลังได้</li>
+            <li>ແບ່ງ<b>ສິດตามบทบาท</b> ຊັດເຈน <span class="en">(RBAC)</span></li>
+            <li>ໂຄຮงสร้าง<b>แยกชั้นชัดเจน</b> ดูแลต่อง่าย</li>
+          </ul>
+        </div>
+      </div>
+      <div class="foot"><span class="brand-mark">TONNAM</span><span class="pageno"></span></div>
+    </section>
+
+    <!-- 11 · LIMITATIONS & FUTURE -->
+    <section class="slide">
+      <div class="eyebrow">ບົດທີ 5 · ຂໍ້ສະເໜີແນະ</div>
+      <h2 class="title">ຂໍ້ຈຳກັດ ແລະ <em>ຂໍ້ສະເໜີແນະ</em></h2>
+      <div class="body-wrap" style="margin-top:6px">
+        <div class="col">
+          <div class="lim-head warn"><span class="pin"></span>ຂໍ້ຈຳກັດ (Limitations)</div>
+          <ul class="bullets">
+            <li>ຍັງบໍ່ຮองรับ<b>ຫຼາຍภาษา</b> <span class="en">(ลาวเท่านั้น)</span></li>
+            <li>ບໍ່ມີ<b>ระบบสต็อก</b> / ຄลังวัตถุดิบ</li>
+            <li>ບໍ່ຮองรับ<b>ຫຼາຍสาขา</b> (Multi-branch)</li>
+            <li>ບໍ່ມີ<b>ส่วนลด/โปรโมชัน</b> ແລະ ຄืนเงินบางส่วน</li>
+          </ul>
+        </div>
+        <div class="col">
+          <div class="lim-head future"><span class="pin"></span>ໃນອະนาคต (Future Work)</div>
+          <ul class="bullets">
+            <li><b>ระบบสต็อก</b> ວัตถุดิบ ແລະ ການแจ้งเตือน</li>
+            <li><b>ສະສົມແต้ม</b> ລูกค้า (Loyalty)</li>
+            <li><b>ສັ່ງອາຫານຜ່ານ QR</b> ທີ່ໂຕະ</li>
+            <li>ເຊື່ອມ<b>ເຄື່ອງพิมพ์ใบเสร็จ</b> ຄວາມຮ້ອນ</li>
+          </ul>
+        </div>
+      </div>
+      <div class="foot"><span class="brand-mark">TONNAM</span><span class="pageno"></span></div>
+    </section>
+
+    <!-- 12 · CONCLUSION -->
+    <section class="slide closing">
+      <div class="eyebrow">ບົດທີ 5 · ສະຫຼຸບ</div>
+      <h2 class="title">ສະຫຼຸບ (Conclusion)</h2>
+      <ul class="bullets" style="margin-top:10px">
+        <li>ລະບົບ<b>บรรลุวัตถุประสงค์</b>: ເພີ່ມ<b>ປະສິດທິພາบ</b> ໃນການเฮัดวຽก</li>
+        <li>ເພີ່ມຄວາມ<b>ຕໍ່ເนื่อง (Flow)</b> ຂອງຂໍ້ມູນ ແລະ ການบริการ</li>
+        <li>ເພີ່ມ<b>ຄວາມສະດວກ</b> ໃນการจัดการข้อมูลแบบรวมศูนย์</li>
+      </ul>
+      <div class="thanks">ຂອບໃຈ</div>
+      <div class="qa">ຊ່ວງຖາມ-ຕອບ (Q&amp;A)</div>
+      <div class="foot"><span class="brand-mark">TONNAM</span><span class="pageno"></span></div>
+    </section>
+
+  </div>
+</div>
+
+<!-- Controls -->
+<div class="controls">
+  <button id="prev" aria-label="ກ່ອນໜ້າ">‹</button>
+  <div class="dots" id="dots"></div>
+  <span class="counter" id="counter">1 / 12</span>
+  <button id="next" aria-label="ຕໍ່ໄປ">›</button>
+</div>
+
+<script>
+  (function () {
+    var slides = Array.prototype.slice.call(document.querySelectorAll('.slide'));
+    var total = slides.length;
+    var idx = 0;
+    var stage = document.getElementById('stage');
+    var counter = document.getElementById('counter');
+    var dotsWrap = document.getElementById('dots');
+
+    // build dots
+    slides.forEach(function (_, i) {
+      var d = document.createElement('button');
+      d.className = 'dot' + (i === 0 ? ' active' : '');
+      d.setAttribute('aria-label', 'ສະໄລ້ ' + (i + 1));
+      d.addEventListener('click', function () { go(i); });
+      dotsWrap.appendChild(d);
+    });
+    var dots = Array.prototype.slice.call(dotsWrap.children);
+
+    // per-slide page numbers in the footer
+    slides.forEach(function (s, i) {
+      var p = s.querySelector('.pageno');
+      if (p) p.textContent = (i + 1) + ' / ' + total;
+    });
+
+    function render() {
+      slides.forEach(function (s, i) { s.classList.toggle('active', i === idx); });
+      dots.forEach(function (d, i) { d.classList.toggle('active', i === idx); });
+      counter.textContent = (idx + 1) + ' / ' + total;
+      if (location.hash !== '#' + (idx + 1)) {
+        history.replaceState(null, '', '#' + (idx + 1));
+      }
+    }
+    function go(n) { idx = Math.max(0, Math.min(total - 1, n)); render(); }
+    function next() { go(idx + 1); }
+    function prev() { go(idx - 1); }
+
+    document.getElementById('next').addEventListener('click', next);
+    document.getElementById('prev').addEventListener('click', prev);
+
+    document.addEventListener('keydown', function (e) {
+      switch (e.key) {
+        case 'ArrowRight': case 'PageDown': case ' ': case 'Spacebar':
+          e.preventDefault(); next(); break;
+        case 'ArrowLeft': case 'PageUp':
+          e.preventDefault(); prev(); break;
+        case 'Home': e.preventDefault(); go(0); break;
+        case 'End': e.preventDefault(); go(total - 1); break;
+        case 'f': case 'F':
+          if (document.fullscreenElement) document.exitFullscreen();
+          else document.documentElement.requestFullscreen();
+          break;
+      }
+    });
+
+    // responsive scale to fit viewport (keep 16:9)
+    function fit() {
+      var pad = 24;
+      var sw = (window.innerWidth - pad) / 1280;
+      var sh = (window.innerHeight - pad) / 720;
+      stage.style.setProperty('--scale', Math.min(sw, sh).toFixed(4));
+    }
+    window.addEventListener('resize', fit);
+    fit();
+
+    // deep-link via hash
+    var start = parseInt((location.hash || '').replace('#', ''), 10);
+    if (start >= 1 && start <= total) idx = start - 1;
+    render();
+  })();
+</script>
+</body>
+</html>

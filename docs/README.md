@@ -8,6 +8,7 @@ Project documentation and quality-assurance material for TonNam SRMS.
 |---|---|
 | [`manual-uat-test-cases.md`](./manual-uat-test-cases.md) | Manual **User Acceptance Testing** checklist for the staff app (`srms/`). Detailed test cases per role (Auth, Waiter, Kitchen, POS, Admin, plus permission checks). Each case has an ID, preconditions, steps, expected result, a Pass/Fail/Skip box, and a notes column. The app UI is in **Lao**, so the test labels quote the real Lao strings. |
 | [`create-uat-form.gs`](./create-uat-form.gs) | A **Google Apps Script** that generates a Google Form version of the UAT checklist (in Lao), so testers can record results online instead of on paper. |
+| [`presentation/index.html`](./presentation/index.html) | Thesis-defense **slide deck** (Lao) for TonNam SRMS — a self-contained HTML presentation. Open in a browser; navigate with ← / → arrow keys (or the on-screen controls), `F` for fullscreen. Slides marked with a dashed box are **image placeholders** to fill in with real screenshots. |
 
 ## Running the UAT form generator
 
