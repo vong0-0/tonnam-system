@@ -3,6 +3,7 @@ import { Switch } from "@/components/ui/switch";
 import { Button } from "@/components/ui/button";
 import { SearchInput } from "@/components/common/SearchInput";
 import { formatNumber } from "@/lib/utils";
+import { resolveImageUrl } from "@/lib/image";
 import type { MenuItem } from "@/types/entities";
 
 const AVATAR_COLORS = ["#C45C3A", "#2D6A4F", "#6B7B3A", "#A0786E", "#2C7873", "#7B5E1A"];
@@ -126,9 +127,9 @@ export function MenuItemTable({
                       }`}
                   >
                     <td className="px-4 py-3">
-                      {item.image_url ? (
+                      {resolveImageUrl(item.image_url) ? (
                         <img
-                          src={item.image_url}
+                          src={resolveImageUrl(item.image_url)!}
                           alt={item.name}
                           className="w-11 h-11 rounded-lg object-cover"
                         />

@@ -5,7 +5,8 @@ export const createMenuItemSchema = z.object({
   name: z.string().min(1).max(200).trim(),
   price: z.number().min(0),
   description: z.string().trim().nullable().optional().default(null),
-  image_url: z.string().url().nullable().optional().default(null),
+  // Accepts a bare filename or a full URL — the frontend composes the display URL.
+  image_url: z.string().trim().max(500).nullable().optional().default(null),
 })
 
 export const updateMenuItemSchema = z
@@ -14,7 +15,7 @@ export const updateMenuItemSchema = z
     name: z.string().min(1).max(200).trim().optional(),
     price: z.number().min(0).optional(),
     description: z.string().trim().optional(),
-    image_url: z.string().url().optional(),
+    image_url: z.string().trim().max(500).optional(),
   })
   .refine((data) => Object.keys(data).length > 0, {
     message: 'At least one field must be provided',

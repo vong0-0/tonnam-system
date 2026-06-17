@@ -11,6 +11,8 @@
     "test:watch": "cross-env NODE_OPTIONS=--experimental-vm-modules jest --watch",
     "lint": "eslint .",
     "seed:daily": "tsx --env-file=.env.development scripts/seed-daily.ts",
+    "seed:menu": "tsx --env-file=.env.development scripts/seed-menu.ts",
+    "seed:menu:images": "tsx --env-file=.env.development scripts/map-menu-images.ts",
     "test:flows": "tsx --env-file=.env.development scripts/test-flows.ts",
     "e2e:users": "tsx --env-file=.env.development scripts/e2e-users.ts"
   },

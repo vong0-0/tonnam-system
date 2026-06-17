@@ -19,6 +19,7 @@ import { useMenuRealtime } from "@/hooks/useMenuRealtime";
 import { useCreateOrder } from "@/hooks/useOrders";
 import { useInfiniteScroll } from "@/hooks/useInfiniteScroll";
 import { formatNumber } from "@/lib/utils";
+import { resolveImageUrl } from "@/lib/image";
 import type { CartEntry, MenuCategory, MenuItem } from "@/types/entities";
 
 interface AddOrderModalProps {
@@ -285,9 +286,9 @@ export default function AddOrderModal({
             {selectedItem && (
               <div className="flex flex-col px-4 pb-6 overflow-y-auto">
                 <div className="flex items-center gap-4">
-                  {selectedItem.image_url ? (
+                  {resolveImageUrl(selectedItem.image_url) ? (
                     <img
-                      src={selectedItem.image_url}
+                      src={resolveImageUrl(selectedItem.image_url)!}
                       alt={selectedItem.name}
                       className="w-20 h-20 object-cover rounded-xl mt-2 mb-4"
                     />

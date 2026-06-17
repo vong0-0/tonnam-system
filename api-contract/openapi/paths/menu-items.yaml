@@ -82,9 +82,10 @@ list-create:
                 example: "Stir-fried rice noodles with shrimp, egg, and peanuts."
               image_url:
                 type: string
-                format: uri
+                maxLength: 500
                 nullable: true
-                example: "https://cdn.srms.example.com/images/pad-thai.jpg"
+                description: A bare filename or a full URL. The client composes the display URL from its image base.
+                example: "pad-thai.jpg"
               is_available:
                 type: boolean
                 default: true
@@ -215,9 +216,10 @@ by-id:
                 example: "Stir-fried rice noodles with prawns, egg, and peanuts."
               image_url:
                 type: string
-                format: uri
+                maxLength: 500
                 nullable: true
-                example: "https://cdn.srms.example.com/images/pad-thai-special.jpg"
+                description: A bare filename or a full URL. The client composes the display URL from its image base.
+                example: "pad-thai-special.jpg"
               is_available:
                 type: boolean
     responses:

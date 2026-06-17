@@ -143,10 +143,10 @@ export function ItemDialog({ item, open, onOpenChange, categories }: ItemDialogP
           </div>
 
           <div className="space-y-1.5">
-            <label className="text-sm font-medium">URL ຮູບພາບ</label>
+            <label className="text-sm font-medium">ຮູບພາບ (ຊື່ໄຟລ໌ ຫຼື URL)</label>
             <Input
               {...register("image_url")}
-              placeholder="https://..."
+              placeholder="ຊື່ໄຟລ໌ ຫຼື https://..."
               className="border-ink-300 bg-paper"
             />
             {errors.image_url && (

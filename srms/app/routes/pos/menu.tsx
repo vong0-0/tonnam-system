@@ -9,6 +9,7 @@ import { Button } from '@/components/ui/button'
 import { useMenuItems, useMenuCategories, useUpdateMenuItemAvailability } from '@/hooks/useMenu'
 import { useMenuRealtime } from '@/hooks/useMenuRealtime'
 import { formatNumber } from '@/lib/utils'
+import { resolveImageUrl } from '@/lib/image'
 import type { MenuItem } from '@/types/entities'
 
 const DEFAULT_WIDTH = 220
@@ -234,9 +235,9 @@ export default function PosMenu() {
                         className={`border-t border-ink-100 transition-opacity ${!item.is_available ? 'opacity-50' : ''}`}
                       >
                         <td className="px-4 py-3">
-                          {item.image_url ? (
+                          {resolveImageUrl(item.image_url) ? (
                             <img
-                              src={item.image_url}
+                              src={resolveImageUrl(item.image_url)!}
                               alt={item.name}
                               className="w-11 h-11 rounded-lg object-cover"
                             />

@@ -1,5 +1,6 @@
 import { Plus, UtensilsCrossed } from 'lucide-react'
 import { formatNumber } from '@/lib/utils'
+import { resolveImageUrl } from '@/lib/image'
 import type { MenuItem } from '@/types/entities'
 
 interface MenuItemCardProps {
@@ -10,15 +11,16 @@ interface MenuItemCardProps {
 
 export function MenuItemCard({ item, cartQty, onAdd }: MenuItemCardProps) {
   const isUnavailable = !item.is_available || item.is_sold_out
+  const imgSrc = resolveImageUrl(item.image_url)
 
   return (
     <div
       onClick={onAdd}
       className={`cursor-pointer flex items-center gap-3 bg-paper rounded-xl border shadow-sm border-ink-100 p-3 ${isUnavailable ? 'opacity-50' : ''}`}
     >
-      {item.image_url ? (
+      {imgSrc ? (
         <img
-          src={item.image_url}
+          src={imgSrc}
           alt={item.name}
           className="w-16 h-16 rounded-lg object-cover shrink-0"
         />

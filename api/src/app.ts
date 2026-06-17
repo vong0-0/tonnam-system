@@ -1,4 +1,5 @@
 import http from 'http'
+import { fileURLToPath } from 'node:url'
 import { checkMissingEnvVars } from '@/config/env.js'
 import { connectDB } from '@/config/db.js'
 import { corsOptions } from '@/config/cors.js'
@@ -29,6 +30,11 @@ const app = express()
 app.use(cors(corsOptions))
 app.use(express.json())
 app.use(cookieParser())
+
+// Static binary assets (e.g. menu photos at /uploads/menu/<id>.<ext>).
+// Directory is git-ignored and populated locally by `npm run seed:menu:images`.
+const uploadsDir = fileURLToPath(new URL('../uploads', import.meta.url))
+app.use('/uploads', express.static(uploadsDir))
 
 app.use('/v1/auth', authRouter)
 app.use('/v1/users', userRouter)

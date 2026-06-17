@@ -16,6 +16,7 @@ import { MenuItemCard } from '@/components/waiter/MenuItemCard'
 import { CartBar } from '@/components/waiter/CartBar'
 import { CartEntryRow } from '@/components/waiter/CartEntryRow'
 import { formatNumber } from '@/lib/utils'
+import { resolveImageUrl } from '@/lib/image'
 import type { MenuItem, MenuCategory, CartEntry } from '@/types/entities'
 
 export default function WaiterOrderNew() {
@@ -255,9 +256,9 @@ export default function WaiterOrderNew() {
             {selectedItem && (
               <div className="flex flex-col px-4 pb-6 overflow-y-auto">
                 <div className="flex items-center gap-4">
-                  {selectedItem.image_url ? (
+                  {resolveImageUrl(selectedItem.image_url) ? (
                     <img
-                      src={selectedItem.image_url}
+                      src={resolveImageUrl(selectedItem.image_url)!}
                       alt={selectedItem.name}
                       className="w-20 h-20 object-cover rounded-xl mt-2 mb-4"
                     />

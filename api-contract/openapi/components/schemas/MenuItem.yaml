@@ -25,9 +25,12 @@ properties:
     example: 120.00
   image_url:
     type: string
-    format: uri
+    maxLength: 500
     nullable: true
-    description: URL to the item's photo.
+    description: >-
+      The item's photo reference — either a bare filename (the client composes
+      the full URL from its own configured image base) or a full URL.
+    example: a339f067-0db8-480f-8185-44b251ac9f61.jpg
     example: "https://cdn.srms.example.com/images/pad-thai.jpg"
   is_available:
     type: boolean
