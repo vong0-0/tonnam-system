@@ -4,6 +4,14 @@ import toast from 'react-hot-toast'
 import { ChevronRight, X } from 'lucide-react'
 import { ConfirmDialog } from '@/components/common/ConfirmDialog'
 import { SearchInput } from '@/components/common/SearchInput'
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '@/components/ui/table'
 import { Switch } from '@/components/ui/switch'
 import { Button } from '@/components/ui/button'
 import { useMenuItems, useMenuCategories, useUpdateMenuItemAvailability } from '@/hooks/useMenu'
@@ -186,55 +194,55 @@ export default function PosMenu() {
             />
           </div>
 
-          <div className="bg-paper rounded-xl border border-ink-100 overflow-x-auto">
-            <table className="w-full border-collapse">
-              <thead>
-                <tr className="bg-ink-50">
-                  <th className="px-4 py-3 text-left text-xs font-medium text-ink-500 uppercase tracking-wider w-16">ຮູບ</th>
-                  <th className="px-4 py-3 text-left text-xs font-medium text-ink-500 uppercase tracking-wider">ຊື່ເມນູ</th>
-                  <th className="px-4 py-3 text-left text-xs font-medium text-ink-500 uppercase tracking-wider w-36">ໝວດໝູ່</th>
-                  <th className="px-4 py-3 text-right text-xs font-medium text-ink-500 uppercase tracking-wider w-28">ລາຄາ</th>
-                  <th className="px-4 py-3 text-center text-xs font-medium text-ink-500 uppercase tracking-wider w-24">ພ້ອມຂາຍ</th>
-                  <th className="px-4 py-3 text-center text-xs font-medium text-ink-500 uppercase tracking-wider w-20">ໝົດ</th>
-                </tr>
-              </thead>
-              <tbody>
+          <div className="overflow-x-auto rounded-lg border border-ink-100 bg-paper">
+            <Table>
+              <TableHeader>
+                <TableRow className="bg-green-light hover:bg-green-light">
+                  <TableHead className="w-16 px-4 py-2 font-semibold text-white">ຮູບ</TableHead>
+                  <TableHead className="px-4 py-2 font-semibold text-white">ຊື່ເມນູ</TableHead>
+                  <TableHead className="w-36 px-4 py-2 font-semibold text-white">ໝວດໝູ່</TableHead>
+                  <TableHead className="w-28 px-4 py-2 text-right font-semibold text-white">ລາຄາ</TableHead>
+                  <TableHead className="w-24 px-4 py-2 text-center font-semibold text-white">ພ້ອມຂາຍ</TableHead>
+                  <TableHead className="w-20 px-4 py-2 text-center font-semibold text-white">ໝົດ</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
                 {isLoading
                   ? Array.from({ length: 8 }).map((_, i) => (
-                    <tr key={i} className="border-t border-ink-100">
-                      <td className="px-4 py-3">
+                    <TableRow key={i} className="border-ink-100">
+                      <TableCell className="px-4 py-2">
                         <div className="w-11 h-11 rounded-lg bg-ink-50 animate-pulse" />
-                      </td>
-                      <td className="px-4 py-3">
+                      </TableCell>
+                      <TableCell className="px-4 py-2">
                         <div className="space-y-1.5">
                           <div className="h-3.5 bg-ink-50 rounded animate-pulse w-36" />
                           <div className="h-3 bg-ink-50 rounded animate-pulse w-24" />
                         </div>
-                      </td>
-                      <td className="px-4 py-3">
+                      </TableCell>
+                      <TableCell className="px-4 py-2">
                         <div className="h-5 bg-ink-50 rounded-full animate-pulse w-20" />
-                      </td>
-                      <td className="px-4 py-3">
+                      </TableCell>
+                      <TableCell className="px-4 py-2">
                         <div className="h-3.5 bg-ink-50 rounded animate-pulse w-16 ml-auto" />
-                      </td>
-                      <td className="px-4 py-3" />
-                      <td className="px-4 py-3" />
-                    </tr>
+                      </TableCell>
+                      <TableCell className="px-4 py-2" />
+                      <TableCell className="px-4 py-2" />
+                    </TableRow>
                   ))
                   : items.length === 0
                     ? (
-                      <tr>
-                        <td colSpan={6} className="px-4 py-16 text-center text-ink-500 text-sm">
+                      <TableRow>
+                        <TableCell colSpan={6} className="px-4 py-16 text-center text-ink-500 text-sm">
                           ບໍ່ພົບລາຍການ
-                        </td>
-                      </tr>
+                        </TableCell>
+                      </TableRow>
                     )
                     : items.map((item) => (
-                      <tr
+                      <TableRow
                         key={item._id}
-                        className={`border-t border-ink-100 transition-opacity ${!item.is_available ? 'opacity-50' : ''}`}
+                        className={`border-ink-100 transition-opacity hover:bg-ink-50/50 ${!item.is_available ? 'opacity-50' : ''}`}
                       >
-                        <td className="px-4 py-3">
+                        <TableCell className="px-4 py-2">
                           {resolveImageUrl(item.image_url) ? (
                             <img
                               src={resolveImageUrl(item.image_url)!}
@@ -249,39 +257,39 @@ export default function PosMenu() {
                               {item.name.charAt(0)}
                             </div>
                           )}
-                        </td>
-                        <td className="px-4 py-3">
+                        </TableCell>
+                        <TableCell className="px-4 py-2">
                           <p className="text-sm font-medium text-ink-900 line-clamp-1">{item.name}</p>
                           {item.description && (
                             <p className="text-xs text-ink-500 line-clamp-1 mt-0.5">{item.description}</p>
                           )}
-                        </td>
-                        <td className="px-4 py-3">
+                        </TableCell>
+                        <TableCell className="px-4 py-2">
                           <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs bg-ink-50 text-ink-600 border border-ink-100">
                             {categoryMap.get(item.category_id) ?? '—'}
                           </span>
-                        </td>
-                        <td className="px-4 py-3 text-right text-sm text-ink-700 tabular-nums">
+                        </TableCell>
+                        <TableCell className="px-4 py-2 text-right text-sm text-ink-700 tabular-nums">
                           {formatNumber(item.price)} ກີບ
-                        </td>
-                        <td className="px-4 py-3 text-center">
+                        </TableCell>
+                        <TableCell className="px-4 py-2 text-center">
                           <Switch
                             checked={item.is_available}
                             onCheckedChange={(v) => confirmToggle(item, 'is_available', v)}
                             disabled={isPending}
                           />
-                        </td>
-                        <td className="px-4 py-3 text-center">
+                        </TableCell>
+                        <TableCell className="px-4 py-2 text-center">
                           <Switch
                             checked={item.is_sold_out}
                             onCheckedChange={(v) => confirmToggle(item, 'is_sold_out', v)}
                             disabled={isPending || !item.is_available}
                           />
-                        </td>
-                      </tr>
+                        </TableCell>
+                      </TableRow>
                     ))}
-              </tbody>
-            </table>
+              </TableBody>
+            </Table>
           </div>
 
           {hasNextPage && (

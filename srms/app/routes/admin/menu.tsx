@@ -16,7 +16,7 @@ import {
 import { useMenuRealtime } from "@/hooks/useMenuRealtime";
 import type { MenuItem, MenuCategory } from "@/types/entities";
 
-const PAGE_SIZE = 50;
+const PAGE_SIZE = 10;
 
 export default function AdminMenu() {
   useMenuRealtime();
@@ -25,7 +25,7 @@ export default function AdminMenu() {
 
   const [search, setSearch] = useState("");
   const [debouncedSearch] = useDebounce(search, 300);
-  const [displayLimit, setDisplayLimit] = useState(PAGE_SIZE);
+  const [pageIndex, setPageIndex] = useState(0);
 
   const [createItemOpen, setCreateItemOpen] = useState(false);
   const [editItem, setEditItem] = useState<MenuItem | null>(null);
@@ -64,12 +64,19 @@ export default function AdminMenu() {
     });
   }, [allItems, debouncedSearch, selectedCategoryId]);
 
-  const displayed = filtered.slice(0, displayLimit);
-  const hasMore = filtered.length > displayLimit;
+  const total = filtered.length;
+  const pageCount = Math.max(1, Math.ceil(total / PAGE_SIZE));
+  const safePageIndex = Math.min(pageIndex, pageCount - 1);
+  const displayed = filtered.slice(safePageIndex * PAGE_SIZE, (safePageIndex + 1) * PAGE_SIZE);
 
   function handleSearchChange(value: string) {
     setSearch(value);
-    setDisplayLimit(PAGE_SIZE);
+    setPageIndex(0);
+  }
+
+  function handleSelectCategory(id: string | undefined) {
+    setSelectedCategoryId(id);
+    setPageIndex(0);
   }
 
   function confirmToggle(
@@ -116,7 +123,7 @@ export default function AdminMenu() {
         <MenuSidebar
           allCategories={allCategories}
           selectedCategoryId={selectedCategoryId}
-          onSelectCategory={setSelectedCategoryId}
+          onSelectCategory={handleSelectCategory}
           totalCount={allItems.length}
           onAddCategory={() => setCreateCategoryOpen(true)}
           onEditCategory={setEditCategory}
@@ -135,8 +142,11 @@ export default function AdminMenu() {
           onEdit={setEditItem}
           onDelete={setDeleteItem}
           onAddItem={() => setCreateItemOpen(true)}
-          hasMore={hasMore}
-          onLoadMore={() => setDisplayLimit((n) => n + PAGE_SIZE)}
+          page={safePageIndex + 1}
+          pageCount={pageCount}
+          total={total}
+          pageSize={PAGE_SIZE}
+          onPageChange={(p) => setPageIndex(p - 1)}
         />
       </div>
 
