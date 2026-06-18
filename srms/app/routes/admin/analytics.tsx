@@ -116,6 +116,9 @@ function formatTick(v: number): string {
   return String(v);
 }
 
+// Restaurant opens in the evening — the daily (hourly) chart shows 15:00 onward only.
+const DAILY_CHART_START_HOUR = 15;
+
 // ── Breakdown → chart data ─────────────────────────────────────
 function toChartData(
   breakdown: HourlyBreakdown[] | DailyBreakdown[] | MonthlyBreakdown[] | undefined,
@@ -123,10 +126,12 @@ function toChartData(
   if (!breakdown?.length) return [];
   const first = breakdown[0];
   if ("hour" in first) {
-    return (breakdown as HourlyBreakdown[]).map((b) => ({
-      label: `${String(b.hour).padStart(2, "0")}:00`,
-      revenue: b.revenue,
-    }));
+    return (breakdown as HourlyBreakdown[])
+      .filter((b) => b.hour >= DAILY_CHART_START_HOUR)
+      .map((b) => ({
+        label: `${String(b.hour).padStart(2, "0")}:00`,
+        revenue: b.revenue,
+      }));
   }
   if ("day" in first) {
     return (breakdown as DailyBreakdown[]).map((b) => ({

@@ -192,7 +192,7 @@ export async function deleteTable(id: string): Promise<null> {
 export async function updateTableStatus(
   id: string,
   input: UpdateTableStatusInput,
-  role: Role,
+  _role?: Role,
 ): Promise<ITable> {
   const table = await getTableById(id);
   const currentStatus = table.status;

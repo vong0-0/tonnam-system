@@ -117,11 +117,15 @@ export default function AdminDashboard() {
     { name: "QR PromptPay", value: qrAmount, color: "#C8A84B" },
   ];
 
+  // Restaurant opens in the evening — show the daily chart from 15:00 onward only.
+  const DAILY_CHART_START_HOUR = 15;
   const chartData = summary?.breakdown
-    ? (summary.breakdown as HourlyBreakdown[]).map((b) => ({
-        label: `${String(b.hour).padStart(2, "0")}:00`,
-        revenue: b.revenue,
-      }))
+    ? (summary.breakdown as HourlyBreakdown[])
+        .filter((b) => b.hour >= DAILY_CHART_START_HOUR)
+        .map((b) => ({
+          label: `${String(b.hour).padStart(2, "0")}:00`,
+          revenue: b.revenue,
+        }))
     : [];
 
   const tables = tableData?.data ?? [];
