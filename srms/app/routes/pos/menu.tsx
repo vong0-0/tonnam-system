@@ -244,11 +244,12 @@ export default function PosMenu() {
                       >
                         <TableCell className="px-4 py-2">
                           {resolveImageUrl(item.image_url) ? (
-                            <img
-                              src={resolveImageUrl(item.image_url)!}
-                              alt={item.name}
-                              className="w-11 h-11 rounded-lg object-cover"
-                            />
+                            <div className='w-11 h-11 rounded-lg overflow-hidden'>
+                              <img
+                                src={resolveImageUrl(item.image_url)!}
+                                alt={item.name}
+                                className="w-full h-full object-cover"
+                              /></div>
                           ) : (
                             <div
                               className="w-11 h-11 rounded-lg flex items-center justify-center text-white font-semibold text-sm select-none"

@@ -84,7 +84,7 @@ export function useMoveTable() {
 
 export function useAdminTables() {
   return useQuery({
-    queryKey: TABLE_KEYS.list({ limit: 200 }),
+    queryKey: ['tables', 'admin-list', { limit: 200 }] as const,
     queryFn:  () => listTables({ limit: 200 }),
     staleTime: 30_000,
   })

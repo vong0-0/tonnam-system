@@ -103,10 +103,10 @@ function FadeIn({
 
 // ── Period options ─────────────────────────────────────────────
 const PERIOD_OPTIONS = [
-  { value: "daily",   label: "ລາຍວັນ" },
-  { value: "weekly",  label: "ລາຍອາທິດ" },
+  { value: "daily", label: "ລາຍວັນ" },
+  { value: "weekly", label: "ລາຍອາທິດ" },
   { value: "monthly", label: "ລາຍເດືອນ" },
-  { value: "yearly",  label: "ລາຍປີ" },
+  { value: "yearly", label: "ລາຍປີ" },
 ];
 
 // ── Y-axis tick formatter ──────────────────────────────────────
@@ -119,10 +119,36 @@ function formatTick(v: number): string {
 // Restaurant opens in the evening — the daily (hourly) chart shows 15:00 onward only.
 const DAILY_CHART_START_HOUR = 15;
 
+const DAY_MAP: Record<string, string> = {
+  Monday: "ຈັນ",
+  Tuesday: "ອັງຄານ",
+  Wednesday: "ພຸດ",
+  Thursday: "ພະຫັດ",
+  Friday: "ສຸກ",
+  Saturday: "ເສົາ",
+  Sunday: "ອາທິດ",
+};
+
+const MONTH_MAP: Record<string, string> = {
+  January: "ມັງກອນ",
+  February: "ກຸມພາ",
+  March: "ມີນາ",
+  April: "ເມສາ",
+  May: "ພຶດສະພາ",
+  June: "ມິຖຸນາ",
+  July: "ກໍລະກົດ",
+  August: "ສິງຫາ",
+  September: "ກັນຍາ",
+  October: "ຕຸລາ",
+  November: "ພະຈິກ",
+  December: "ທັນວາ",
+};
+
 // ── Breakdown → chart data ─────────────────────────────────────
 function toChartData(
   breakdown: HourlyBreakdown[] | DailyBreakdown[] | MonthlyBreakdown[] | undefined,
-): { label: string; revenue: number }[] {
+  period?: AnalyticsPeriod
+): { label: string; tooltipLabel?: string; revenue: number }[] {
   if (!breakdown?.length) return [];
   const first = breakdown[0];
   if ("hour" in first) {
@@ -134,13 +160,24 @@ function toChartData(
       }));
   }
   if ("day" in first) {
-    return (breakdown as DailyBreakdown[]).map((b) => ({
-      label: b.day,
-      revenue: b.revenue,
-    }));
+    return (breakdown as DailyBreakdown[]).map((b) => {
+      const dayName = DAY_MAP[b.day] || b.day;
+      let tooltipLabel = dayName;
+      if (period === "monthly" && b.date) {
+        const parts = b.date.split("-");
+        if (parts.length >= 3) {
+          tooltipLabel = `${dayName} ${parts[2]}/${parts[1]}`;
+        }
+      }
+      return {
+        label: dayName,
+        tooltipLabel,
+        revenue: b.revenue,
+      };
+    });
   }
   return (breakdown as MonthlyBreakdown[]).map((b) => ({
-    label: b.month,
+    label: MONTH_MAP[b.month] || b.month,
     revenue: b.revenue,
   }));
 }
@@ -150,7 +187,7 @@ export default function AdminAnalytics() {
   const [period, setPeriod] = useState<AnalyticsPeriod>("daily");
   const [selectedDate, setSelectedDate] = useState<Date>(() => new Date());
 
-  const dateStr  = formatDate(selectedDate, DATE_FORMATS.DATE_ISO);
+  const dateStr = formatDate(selectedDate, DATE_FORMATS.DATE_ISO);
   const prevDate = getPreviousPeriodDate(period, dateStr);
 
   const { start: rangeStart, end: rangeEnd } = getPeriodRange(period, dateStr);
@@ -159,17 +196,17 @@ export default function AdminAnalytics() {
       ? formatDate(rangeStart, DATE_FORMATS.DATE)
       : `${formatDate(rangeStart, DATE_FORMATS.DATE)} – ${formatDate(rangeEnd, DATE_FORMATS.DATE)}`;
 
-  const { data: summary,     isLoading: loadingSummary,    isFetching: f1, refetch: r1 } =
+  const { data: summary, isLoading: loadingSummary, isFetching: f1, refetch: r1 } =
     useSalesSummary({ period, date: dateStr });
-  const { data: comparison,  isLoading: loadingComparison, isFetching: f2, refetch: r2 } =
+  const { data: comparison, isLoading: loadingComparison, isFetching: f2, refetch: r2 } =
     useSalesComparison({ period, current_date: dateStr, previous_date: prevDate });
-  const { data: byCategory,  isLoading: loadingCategory,   isFetching: f3, refetch: r3 } =
+  const { data: byCategory, isLoading: loadingCategory, isFetching: f3, refetch: r3 } =
     useSalesByCategory({ period, date: dateStr });
-  const { data: bestSellers, isLoading: loadingBest,       isFetching: f4, refetch: r4 } =
+  const { data: bestSellers, isLoading: loadingBest, isFetching: f4, refetch: r4 } =
     useMenuBestSellers({ period, date: dateStr, limit: 10 });
-  const { data: menuMix,     isLoading: loadingMix,        isFetching: f5, refetch: r5 } =
+  const { data: menuMix, isLoading: loadingMix, isFetching: f5, refetch: r5 } =
     useMenuMix({ period, date: dateStr });
-  const { data: deadItems,   isLoading: loadingDead,       isFetching: f6, refetch: r6 } =
+  const { data: deadItems, isLoading: loadingDead, isFetching: f6, refetch: r6 } =
     useMenuDeadItems(
       period !== "daily"
         ? { period: period as Exclude<AnalyticsPeriod, "daily">, date: dateStr }
@@ -182,13 +219,13 @@ export default function AdminAnalytics() {
   }
 
   // Chart data
-  const chartData = toChartData(summary?.breakdown);
+  const chartData = toChartData(summary?.breakdown, period);
   const totalRevenue = summary?.total_revenue ?? 0;
-  const cashAmount   = summary?.payment_breakdown.cash ?? 0;
-  const qrAmount     = summary?.payment_breakdown.qr_promptpay ?? 0;
-  const paymentData  = [
-    { name: "ກີບສົດ",       value: cashAmount, color: "#00bba7" },
-    { name: "QR PromptPay", value: qrAmount,   color: "#C8A84B" },
+  const cashAmount = summary?.payment_breakdown.cash ?? 0;
+  const qrAmount = summary?.payment_breakdown.qr_promptpay ?? 0;
+  const paymentData = [
+    { name: "ກີບສົດ", value: cashAmount, color: "#00bba7" },
+    { name: "ໂອນຈ່າຍ", value: qrAmount, color: "#C8A84B" },
   ];
 
   const categoryData = byCategory?.categories.map((c) => ({
@@ -295,9 +332,10 @@ export default function AdminAnalytics() {
                       content={({ active, payload, label }) => {
                         if (!active || !payload?.length) return null;
                         const val = payload[0]?.value;
+                        const displayLabel = payload[0]?.payload?.tooltipLabel || label;
                         return (
                           <div className="rounded-lg border border-ink-100 bg-white p-3 text-xs shadow-md">
-                            <p className="mb-1 text-ink-500">{label}</p>
+                            <p className="mb-1 text-ink-500">{displayLabel}</p>
                             <p className="font-semibold text-ink-900">
                               {typeof val === "number" ? formatNumber(val) : "—"} ກີບ
                             </p>
@@ -526,13 +564,6 @@ export default function AdminAnalytics() {
             <Tabs defaultValue="best-sellers">
               <TabsList className="mb-4">
                 <TabsTrigger value="best-sellers">ສິນຄ້າຂາຍດີ</TabsTrigger>
-                <TabsTrigger value="menu-mix">ສ່ວນຜະສົມເມນູ</TabsTrigger>
-                <TabsTrigger value="dead-items" disabled={period === "daily"}>
-                  ຂາຍຊ້າ
-                  {period === "daily" && (
-                    <span className="ml-1 text-[10px] opacity-50">(ບໍ່ຮອງຮັບ)</span>
-                  )}
-                </TabsTrigger>
               </TabsList>
 
               {/* Best Sellers */}
@@ -596,30 +627,6 @@ export default function AdminAnalytics() {
                   </div>
                 )}
               </TabsContent>
-
-              {/* Menu Mix */}
-              <TabsContent value="menu-mix">
-                <DataTable
-                  columns={MENU_MIX_COLUMNS}
-                  data={menuMix?.items ?? []}
-                  isLoading={loadingMix}
-                />
-              </TabsContent>
-
-              {/* Dead Items */}
-              <TabsContent value="dead-items">
-                {period === "daily" ? (
-                  <p className="py-6 text-center text-sm text-ink-400">
-                    ຂໍ້ມູນນີ້ບໍ່ຮອງຮັບລາຍວັນ — ກະລຸນາເລືອກລາຍອາທິດ, ລາຍເດືອນ, ຫຼື ລາຍປີ
-                  </p>
-                ) : (
-                  <DataTable
-                    columns={DEAD_ITEMS_COLUMNS}
-                    data={deadItems?.items ?? []}
-                    isLoading={loadingDead}
-                  />
-                )}
-              </TabsContent>
             </Tabs>
           </CardContent>
         </Card>
@@ -674,16 +681,12 @@ function ComparisonMetric({
   changePercent: number;
 }) {
   const isPositive = changePercent > 0;
-  const isNeutral  = changePercent === 0;
+  const isNeutral = changePercent === 0;
 
   return (
     <div className="flex flex-col gap-1 p-5">
       <span className="text-xs text-ink-500">{label}</span>
-      <div className="flex items-baseline gap-1">
-        <span className="text-2xl font-bold text-ink-900">{current}</span>
-        <span className="text-xs text-ink-400">{unit}</span>
-      </div>
-      <div className="flex items-center gap-1.5 text-xs">
+      <div className="flex items-center gap-1.5">
         {isNeutral ? (
           <Minus size={12} className="text-ink-400" />
         ) : isPositive ? (
@@ -693,19 +696,27 @@ function ComparisonMetric({
         )}
         <span
           className={cn(
-            "font-medium",
+            "font-medium text-2xl",
             isNeutral ? "text-ink-400" : isPositive ? "text-success" : "text-danger",
           )}
         >
           {isNeutral ? "0" : `${isPositive ? "+" : ""}${changePercent.toFixed(1)}`}%
         </span>
+      </div>
+      <div className="flex items-center gap-1.5 text-xs">
+
+        <div className="flex items-baseline gap-1">
+          <span className="font-bold text-ink-900 underline">ປັດຈຸບັນ:</span>
+          <span>{current}</span>
+          <span>{unit}</span>
+        </div>
         <span className="text-ink-400">vs {previous} {unit}</span>
       </div>
     </div>
   );
 }
 
-// ── Table columns ──────────────────────────────────────────────
+// ── Table columns ──  ────────────────────────────────────────────
 
 type MenuMixItem = {
   menu_item_id: string;

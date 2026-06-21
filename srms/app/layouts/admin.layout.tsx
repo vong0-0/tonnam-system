@@ -25,7 +25,7 @@ const ADMIN_NAV: SidebarNavGroup[] = [
         icon: LayoutDashboard,
         end: true,
       },
-      { label: "Analytics", href: ROUTES.ADMIN_ANALYTICS, icon: BarChart2 },
+      { label: "ວິເຄາະຂໍ້ມູນ", href: ROUTES.ADMIN_ANALYTICS, icon: BarChart2 },
       { label: "ໂຕະ", href: ROUTES.ADMIN_TABLES, icon: LayoutGrid },
       { label: "ເມນູ", href: ROUTES.ADMIN_MENU, icon: UtensilsCrossed },
       { label: "ຜູ້ໃຊ້", href: ROUTES.ADMIN_USERS, icon: Users },
