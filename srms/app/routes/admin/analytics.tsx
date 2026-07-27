@@ -15,6 +15,7 @@ import {
   RefreshCw,
   TrendingDown,
   Minus,
+  AlertTriangle,
 } from "lucide-react";
 import {
   BarChart,
@@ -564,6 +565,7 @@ export default function AdminAnalytics() {
             <Tabs defaultValue="best-sellers">
               <TabsList className="mb-4">
                 <TabsTrigger value="best-sellers">ສິນຄ້າຂາຍດີ</TabsTrigger>
+                <TabsTrigger value="dead-items">ເມນູຂາຍບໍ່ດີ</TabsTrigger>
               </TabsList>
 
               {/* Best Sellers */}
@@ -624,6 +626,39 @@ export default function AdminAnalytics() {
                         </FadeIn>
                       );
                     })}
+                  </div>
+                )}
+              </TabsContent>
+
+              {/* Dead Items */}
+              <TabsContent value="dead-items">
+                {period === "daily" ? (
+                  <div className="flex items-center gap-2 rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800">
+                    <AlertTriangle size={15} className="shrink-0" />
+                    <span>ບໍ່ຮອງຮັບການເບິ່ງລາຍວັນ — ກະລຸນາເລືອກ ລາຍອາທິດ, ລາຍເດືອນ ຫຼື ລາຍປີ</span>
+                  </div>
+                ) : loadingDead ? (
+                  <div className="space-y-2">
+                    {Array.from({ length: 6 }).map((_, i) => (
+                      <Skeleton key={i} className="h-10 w-full rounded" />
+                    ))}
+                  </div>
+                ) : (
+                  <div className="space-y-3">
+                    {deadItems && (
+                      <div className="flex items-center gap-1.5 text-xs text-ink-400">
+                        <AlertTriangle size={12} className="text-amber-500" />
+                        <span>
+                          ສະແດງເມນູທີ່ຂາຍໄດ້ &lt;{" "}
+                          <span className="font-semibold text-ink-700">{deadItems.threshold}</span>
+                          {" "}ໜ່ວຍ ({deadItems.items.length} ລາຍການ)
+                        </span>
+                      </div>
+                    )}
+                    <DataTable
+                      columns={DEAD_ITEMS_COLUMNS}
+                      data={deadItems?.items ?? []}
+                    />
                   </div>
                 )}
               </TabsContent>
