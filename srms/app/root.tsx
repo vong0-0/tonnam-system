@@ -6,18 +6,18 @@ import {
   Scripts,
   ScrollRestoration,
 } from "react-router";
-import { useEffect } from 'react'
-import { QueryClientProvider } from '@tanstack/react-query'
-import { ReactQueryDevtools } from '@tanstack/react-query-devtools'
-import { Toaster } from 'react-hot-toast'
+import { useEffect } from "react";
+import { QueryClientProvider } from "@tanstack/react-query";
+import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
+import { Toaster } from "react-hot-toast";
 
 import type { Route } from "./+types/root";
-import { queryClient } from '@/lib/query-client'
-import { useRestoreAuth } from '@/hooks/useAuth'
-import { useAuthStore } from '@/stores/auth.store'
-import { GlobalNavProgress } from '@/components/common/GlobalNavProgress'
-import { connectSocket, disconnectSocket } from '@/lib/socket'
-import { initNotificationListeners } from '@/stores/notification.store'
+import { queryClient } from "@/lib/query-client";
+import { useRestoreAuth } from "@/hooks/useAuth";
+import { useAuthStore } from "@/stores/auth.store";
+import { GlobalNavProgress } from "@/components/common/GlobalNavProgress";
+import { connectSocket, disconnectSocket } from "@/lib/socket";
+import { initNotificationListeners } from "@/stores/notification.store";
 import "./app.css";
 
 export const links: Route.LinksFunction = () => [];
@@ -28,6 +28,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
       <head>
         <meta charSet="utf-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <link rel="icon" href="/favicon.svg"></link>
         <Meta />
         <Links />
       </head>
@@ -41,24 +42,24 @@ export function Layout({ children }: { children: React.ReactNode }) {
 }
 
 function AppInner() {
-  const { isLoading } = useRestoreAuth()
-  const isAuthenticated = useAuthStore((state) => state.isAuthenticated())
+  const { isLoading } = useRestoreAuth();
+  const isAuthenticated = useAuthStore((state) => state.isAuthenticated());
 
   useEffect(() => {
-    if (!isAuthenticated) return
-    connectSocket().then(() => initNotificationListeners())
-    return () => disconnectSocket()
-  }, [isAuthenticated])
+    if (!isAuthenticated) return;
+    connectSocket().then(() => initNotificationListeners());
+    return () => disconnectSocket();
+  }, [isAuthenticated]);
 
   if (isLoading) {
     return (
       <div className="min-h-screen bg-ink-50 flex items-center justify-center">
         <div className="w-6 h-6 border-2 border-green border-t-transparent rounded-full animate-spin" />
       </div>
-    )
+    );
   }
 
-  return <Outlet />
+  return <Outlet />;
 }
 
 export default function App() {
@@ -66,13 +67,10 @@ export default function App() {
     <QueryClientProvider client={queryClient}>
       <GlobalNavProgress />
       <AppInner />
-      <Toaster
-        position="top-center"
-        toastOptions={{ duration: 3000 }}
-      />
-      {import.meta.env.DEV && <ReactQueryDevtools initialIsOpen={false} />}
+      <Toaster position="top-center" toastOptions={{ duration: 3000 }} />
+      {/* {import.meta.env.DEV && <ReactQueryDevtools initialIsOpen={false} />} */}
     </QueryClientProvider>
-  )
+  );
 }
 
 export function ErrorBoundary({ error }: Route.ErrorBoundaryProps) {
