@@ -13,6 +13,7 @@ import {
   ShoppingCart,
   BarChart3,
   RefreshCw,
+  Download,
   TrendingDown,
   Minus,
   AlertTriangle,
@@ -46,6 +47,8 @@ import {
   useMenuMix,
 } from "@/hooks/useAnalytics";
 import { formatDate, DATE_FORMATS, getPreviousPeriodDate, getPeriodRange } from "@/lib/date";
+import { exportAnalyticsExcel } from "@/lib/analytics-excel";
+import toast from "react-hot-toast";
 import type {
   AnalyticsPeriod,
   HourlyBreakdown,
@@ -187,6 +190,7 @@ function toChartData(
 export default function AdminAnalytics() {
   const [period, setPeriod] = useState<AnalyticsPeriod>("daily");
   const [selectedDate, setSelectedDate] = useState<Date>(() => new Date());
+  const [isExporting, setIsExporting] = useState(false);
 
   const dateStr = formatDate(selectedDate, DATE_FORMATS.DATE_ISO);
   const prevDate = getPreviousPeriodDate(period, dateStr);
@@ -217,6 +221,34 @@ export default function AdminAnalytics() {
   const isFetching = f1 || f2 || f3 || f4 || f5 || f6;
   function handleRefresh() {
     r1(); r2(); r3(); r4(); r5(); r6();
+  }
+
+  async function handleExport() {
+    if (!summary || !comparison || !byCategory || !bestSellers || !menuMix) {
+      toast.error("Unable to export: analytics data is not ready yet.");
+      return;
+    }
+
+    setIsExporting(true);
+    try {
+      await exportAnalyticsExcel({
+        period,
+        date: dateStr,
+        rangeLabel,
+        summary,
+        comparison,
+        byCategory,
+        bestSellers,
+        menuMix,
+        deadItems: period === "daily" ? undefined : deadItems,
+      });
+      toast.success("Excel report downloaded successfully.");
+    } catch (error) {
+      console.error("Failed to export analytics Excel report", error);
+      toast.error("Unable to export the Excel report. Please try again.");
+    } finally {
+      setIsExporting(false);
+    }
   }
 
   // Chart data
@@ -266,6 +298,10 @@ export default function AdminAnalytics() {
             >
               <RefreshCw className={cn("h-4 w-4", isFetching && "animate-spin")} />
               ໂຫລດໃໝ່
+            </Button>
+            <Button size="sm" onClick={handleExport} disabled={isFetching || isExporting} className="h-9 gap-1.5">
+              <Download data-icon="inline-start" />
+              {isExporting ? "Exporting..." : "Export Excel"}
             </Button>
           </div>
         </div>
