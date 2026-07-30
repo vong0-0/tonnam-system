@@ -9,6 +9,7 @@ import {
 } from "@/components/ui/table";
 import { Switch } from "@/components/ui/switch";
 import { Button } from "@/components/ui/button";
+import { ExportExcelButton } from "@/components/common/ExportExcelButton";
 import { SearchInput } from "@/components/common/SearchInput";
 import { formatNumber } from "@/lib/utils";
 import { resolveImageUrl } from "@/lib/image";
@@ -42,6 +43,7 @@ interface MenuItemTableProps {
   onEdit: (item: MenuItem) => void;
   onDelete: (item: MenuItem) => void;
   onAddItem: () => void;
+  onExport: () => void;
   page: number;
   pageCount: number;
   total: number;
@@ -61,6 +63,7 @@ export function MenuItemTable({
   onEdit,
   onDelete,
   onAddItem,
+  onExport,
   page,
   pageCount,
   total,
@@ -77,13 +80,16 @@ export function MenuItemTable({
           placeholder="ຄົ້ນຫາເມນູ..."
           className="w-64 bg-white"
         />
-        <Button
-          className="gap-1.5 flex-shrink-0 bg-blue-500 hover:bg-blue-600 text-white px-4 py-2"
-          onClick={onAddItem}
-        >
-          <Plus className="h-4 w-4" />
-          ເພີ່ມເມນູໃໝ່
-        </Button>
+        <div className="flex items-center gap-2">
+          <ExportExcelButton onClick={onExport} disabled={isLoading} />
+          <Button
+            className="gap-1.5 flex-shrink-0 bg-blue-500 hover:bg-blue-600 text-white px-4 py-2"
+            onClick={onAddItem}
+          >
+            <Plus className="h-4 w-4" />
+            ເພີ່ມເມນູໃໝ່
+          </Button>
+        </div>
       </div>
 
       <div className="overflow-x-auto rounded-lg border border-ink-100 bg-paper">
@@ -150,9 +156,8 @@ export function MenuItemTable({
               displayed.map((item) => (
                 <TableRow
                   key={item._id}
-                  className={`border-ink-100 transition-opacity hover:bg-ink-50/50 ${
-                    !item.is_available ? "opacity-50" : ""
-                  }`}
+                  className={`border-ink-100 transition-opacity hover:bg-ink-50/50 ${!item.is_available ? "opacity-50" : ""
+                    }`}
                 >
                   <TableCell className="px-4 py-2">
                     {resolveImageUrl(item.image_url) ? (

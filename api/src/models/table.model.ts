@@ -22,7 +22,7 @@ const tableSchema = new Schema<ITable>(
     bill_ids: { type: [Schema.Types.ObjectId], ref: 'Bill', default: [] },
   },
   {
-    timestamps: true,
+    timestamps: { createdAt: 'created_at', updatedAt: 'updated_at' },
     versionKey: false,
   },
 )

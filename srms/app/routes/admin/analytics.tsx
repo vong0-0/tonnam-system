@@ -13,7 +13,6 @@ import {
   ShoppingCart,
   BarChart3,
   RefreshCw,
-  Download,
   TrendingDown,
   Minus,
   AlertTriangle,
@@ -32,6 +31,7 @@ import {
 } from "recharts";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { ExportExcelButton } from "@/components/common/ExportExcelButton";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { type ColumnDef } from "@tanstack/react-table";
@@ -225,7 +225,7 @@ export default function AdminAnalytics() {
 
   async function handleExport() {
     if (!summary || !comparison || !byCategory || !bestSellers || !menuMix) {
-      toast.error("Unable to export: analytics data is not ready yet.");
+      toast.error("ບໍ່ສາມາດ export ໄດ້: ຂໍ້ມູນວິເຄາະຍັງບໍ່ພ້ອມ.");
       return;
     }
 
@@ -242,10 +242,10 @@ export default function AdminAnalytics() {
         menuMix,
         deadItems: period === "daily" ? undefined : deadItems,
       });
-      toast.success("Excel report downloaded successfully.");
+      toast.success("ດາວໂຫຼດລາຍງານ Excel ສຳເລັດແລ້ວ.");
     } catch (error) {
       console.error("Failed to export analytics Excel report", error);
-      toast.error("Unable to export the Excel report. Please try again.");
+      toast.error("ບໍ່ສາມາດ export ລາຍງານ Excel ໄດ້. ກະລຸນາລອງໃໝ່.");
     } finally {
       setIsExporting(false);
     }
@@ -299,10 +299,11 @@ export default function AdminAnalytics() {
               <RefreshCw className={cn("h-4 w-4", isFetching && "animate-spin")} />
               ໂຫລດໃໝ່
             </Button>
-            <Button size="sm" onClick={handleExport} disabled={isFetching || isExporting} className="h-9 gap-1.5">
-              <Download data-icon="inline-start" />
-              {isExporting ? "Exporting..." : "Export Excel"}
-            </Button>
+            <ExportExcelButton
+              onClick={handleExport}
+              disabled={isFetching}
+              isExporting={isExporting}
+            />
           </div>
         </div>
       </FadeIn>

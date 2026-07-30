@@ -13,7 +13,7 @@ const menuCategorySchema = new Schema<IMenuCategory>(
     description: { type: String, default: null },
   },
   {
-    timestamps: true,
+    timestamps: { createdAt: 'created_at', updatedAt: 'updated_at' },
     versionKey: false,
   },
 )
