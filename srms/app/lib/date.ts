@@ -52,7 +52,7 @@ export function formatDateLao(date: Date | string | undefined | null): string {
     const d = toDate(date)
     const day = d.getDate()
     const month = LAO_MONTHS[d.getMonth()]
-    const year = d.getFullYear() + 543
+    const year = d.getFullYear()
     return `${day} ${month} ${year}`
   } catch {
     return '—'

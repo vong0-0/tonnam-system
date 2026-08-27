@@ -21,6 +21,7 @@ import orderRouter from '@/routes/order.routes.js'
 import paymentRouter from '@/routes/payment.routes.js'
 import auditLogRouter from '@/routes/audit-log.routes.js'
 import analyticsRouter from '@/routes/analytics.routes.js'
+import publicMenuRouter from '@/routes/public-menu.routes.js'
 
 checkMissingEnvVars()
 await connectDB()
@@ -48,6 +49,7 @@ app.use('/v1/orders', orderRouter)
 app.use('/v1/payments', paymentRouter)
 app.use('/v1/audit-logs', auditLogRouter)
 app.use('/v1/analytics', analyticsRouter)
+app.use('/v1/public', publicMenuRouter)
 
 app.use(errorHandler)
 

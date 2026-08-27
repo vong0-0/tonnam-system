@@ -1,5 +1,6 @@
 import { useState, useMemo, useEffect } from "react";
 import { useDebounce } from "use-debounce";
+import toast from "react-hot-toast";
 import {
   useReactTable,
   getCoreRowModel,
@@ -28,6 +29,7 @@ import {
   DialogFooter,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
+import { ExportExcelButton } from "@/components/common/ExportExcelButton";
 import { Input } from "@/components/ui/input";
 import { Skeleton } from "@/components/ui/skeleton";
 import { SearchInput } from "@/components/common/SearchInput";
@@ -49,22 +51,24 @@ import type {
 import { TableStatus } from "@/types/enums";
 import type { Table as TableEntity } from "@/types/entities";
 import { cn } from "@/lib/utils";
+import { exportMasterDataExcel } from "@/lib/master-data-excel";
+import { formatDate, DATE_FORMATS } from "@/lib/date";
 
 const PAGE_SIZE = 20;
 
 const STATUS_CONFIG = {
-  [TableStatus.AVAILABLE]: { dot: "bg-teal-500",  label: "ວ່າງ" },
-  [TableStatus.RESERVED]:  { dot: "bg-blue-500",  label: "ຈອງແລ້ວ" },
-  [TableStatus.OCCUPIED]:  { dot: "bg-amber-500", label: "ມີລູກຄ້າ" },
-  [TableStatus.PAID]:      { dot: "bg-slate-400", label: "ຊຳລະແລ້ວ" },
+  [TableStatus.AVAILABLE]: { dot: "bg-teal-500", label: "ວ່າງ" },
+  [TableStatus.RESERVED]: { dot: "bg-blue-500", label: "ຈອງແລ້ວ" },
+  [TableStatus.OCCUPIED]: { dot: "bg-amber-500", label: "ມີລູກຄ້າ" },
+  [TableStatus.PAID]: { dot: "bg-slate-400", label: "ຊຳລະແລ້ວ" },
 } as const;
 
 const STATUS_FILTERS = [
   { value: "ALL" as const, label: "ທັງໝົດ" },
   { value: TableStatus.AVAILABLE, label: "ວ່າງ" },
-  { value: TableStatus.RESERVED,  label: "ຈອງແລ້ວ" },
-  { value: TableStatus.OCCUPIED,  label: "ມີລູກຄ້າ" },
-  { value: TableStatus.PAID,      label: "ຊຳລະແລ້ວ" },
+  { value: TableStatus.RESERVED, label: "ຈອງແລ້ວ" },
+  { value: TableStatus.OCCUPIED, label: "ມີລູກຄ້າ" },
+  { value: TableStatus.PAID, label: "ຊຳລະແລ້ວ" },
 ];
 
 function SortButton({
@@ -361,6 +365,7 @@ export default function AdminTables() {
   const [pageIndex, setPageIndex] = useState(0);
 
   const [createOpen, setCreateOpen] = useState(false);
+  const [isExporting, setIsExporting] = useState(false);
   const [editTarget, setEditTarget] = useState<TableEntity | null>(null);
   const [deleteTarget, setDeleteTarget] = useState<TableEntity | null>(null);
 
@@ -489,6 +494,45 @@ export default function AdminTables() {
   const pageCount = table.getPageCount();
   const currentPage = pageIndex + 1;
 
+  async function handleExport() {
+    const exportTables = table.getSortedRowModel().rows.map((row) => row.original);
+    setIsExporting(true);
+    try {
+      await exportMasterDataExcel(
+        "TonNam_Tables_" + formatDate(new Date(), DATE_FORMATS.DATE_ISO) + ".xlsx",
+        [{
+          name: "ໂຕະ - Tables",
+          title: "ໂຕະຮ້ານອາຫານ / Restaurant tables",
+          headers: [
+            "ຊື່ໂຕະ / Table name",
+            "ຈຳນວນທີ່ນັ່ງ / Capacity",
+            "ສະຖານະ / Status",
+            "ປະເພດ / Type",
+          ],
+          rows: exportTables.map((item) => [
+            item.table_name,
+            item.capacity,
+            {
+              AVAILABLE: "ວ່າງ",
+              RESERVED: "ຈອງແລ້ວ",
+              OCCUPIED: "ມີລູກຄ້າ",
+              PAID: "ເຊັກບິນແລ້ວ",
+            }[item.status],
+            item.is_temporary ? "ຊົ່ວຄາວ" : "ປົກກະຕິ",
+
+          ]),
+          columnWidths: [24, 22, 22, 18, 22, 22],
+        }],
+      );
+      toast.success("ດາວໂຫລດ Excel ສຳເລັດ.");
+    } catch (error) {
+      console.error("Failed to export table data", error);
+      toast.error("ດາວໂຫລດ Excel ບໍ່ສຳເລັດ. ກະລຸນາລອງໃໝ່ພາຍຫຼັງ.");
+    } finally {
+      setIsExporting(false);
+    }
+  }
+
   return (
     <div className="space-y-5">
       {/* Toolbar: search (left) | create button (right) */}
@@ -500,59 +544,65 @@ export default function AdminTables() {
           onClear={() => handleSearchChange("")}
           className="w-64 [&_input]:border-ink-300 [&_input]:bg-paper"
         />
-        <Button
-          onClick={() => setCreateOpen(true)}
-          className="gap-1.5 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2"
-        >
-          <Plus size={15} />
-          ເພີ່ມໂຕະໃໝ່
-        </Button>
+        <div className="flex items-center gap-2">
+          <ExportExcelButton
+            onClick={handleExport}
+            disabled={isLoading}
+            isExporting={isExporting}
+          />
+          <Button
+            onClick={() => setCreateOpen(true)}
+            className="gap-1.5 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2"
+          >
+            <Plus size={15} />
+            ເພີ່ມໂຕະໃໝ່
+          </Button></div>
       </div>
 
       {/* Status filter chips */}
       <div className="flex flex-wrap gap-3">
         {isLoading
           ? Array.from({ length: 5 }).map((_, i) => (
-              <Skeleton key={i} className="h-9 w-28 rounded-full" />
-            ))
+            <Skeleton key={i} className="h-9 w-28 rounded-full" />
+          ))
           : STATUS_FILTERS.map(({ value, label }) => {
-              const count = value === "ALL" ? stats.total : stats[value];
-              const isActive = statusFilter === value;
-              return (
-                <button
-                  key={value}
-                  onClick={() => handleStatusFilter(value)}
-                  className={cn(
-                    "flex items-center gap-2 rounded-full border px-3 py-1.5 text-sm font-medium transition-colors",
-                    isActive
-                      ? "border-green bg-green text-white"
-                      : "border-ink-100 bg-paper text-ink-700 hover:border-green/40 hover:text-green",
-                  )}
-                >
-                  {value !== "ALL" && (
-                    <span
-                      className={cn(
-                        "size-2 rounded-full",
-                        isActive
-                          ? "bg-white"
-                          : STATUS_CONFIG[value as TableStatus].dot,
-                      )}
-                    />
-                  )}
-                  {label}
+            const count = value === "ALL" ? stats.total : stats[value];
+            const isActive = statusFilter === value;
+            return (
+              <button
+                key={value}
+                onClick={() => handleStatusFilter(value)}
+                className={cn(
+                  "flex items-center gap-2 rounded-full border px-3 py-1.5 text-sm font-medium transition-colors",
+                  isActive
+                    ? "border-green bg-green text-white"
+                    : "border-ink-100 bg-paper text-ink-700 hover:border-green/40 hover:text-green",
+                )}
+              >
+                {value !== "ALL" && (
                   <span
                     className={cn(
-                      "rounded-full px-1.5 py-0.5 text-xs leading-none",
+                      "size-2 rounded-full",
                       isActive
-                        ? "bg-white/20 text-white"
-                        : "bg-ink-100 text-ink-600",
+                        ? "bg-white"
+                        : STATUS_CONFIG[value as TableStatus].dot,
                     )}
-                  >
-                    {count}
-                  </span>
-                </button>
-              );
-            })}
+                  />
+                )}
+                {label}
+                <span
+                  className={cn(
+                    "rounded-full px-1.5 py-0.5 text-xs leading-none",
+                    isActive
+                      ? "bg-white/20 text-white"
+                      : "bg-ink-100 text-ink-600",
+                  )}
+                >
+                  {count}
+                </span>
+              </button>
+            );
+          })}
       </div>
 
       {/* Table */}
@@ -572,9 +622,9 @@ export default function AdminTables() {
                     {header.isPlaceholder
                       ? null
                       : flexRender(
-                          header.column.columnDef.header,
-                          header.getContext(),
-                        )}
+                        header.column.columnDef.header,
+                        header.getContext(),
+                      )}
                   </TableHead>
                 ))}
               </TableRow>

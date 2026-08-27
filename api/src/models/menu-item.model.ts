@@ -23,7 +23,7 @@ const menuItemSchema = new Schema<IMenuItem>(
     is_sold_out: { type: Boolean, required: true, default: false },
   },
   {
-    timestamps: true,
+    timestamps: { createdAt: 'created_at', updatedAt: 'updated_at' },
     versionKey: false,
   },
 )

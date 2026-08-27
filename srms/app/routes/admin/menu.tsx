@@ -6,6 +6,7 @@ import { MenuSidebar } from "@/components/admin/menu/MenuSidebar";
 import { MenuItemTable } from "@/components/admin/menu/MenuItemTable";
 import { ItemDialog } from "@/components/admin/menu/ItemDialog";
 import { CategoryDialog } from "@/components/admin/menu/CategoryDialog";
+import { MenuExportDialog } from "@/components/admin/menu/MenuExportDialog";
 import {
   useAdminMenuItems,
   useMenuCategories,
@@ -28,6 +29,7 @@ export default function AdminMenu() {
   const [pageIndex, setPageIndex] = useState(0);
 
   const [createItemOpen, setCreateItemOpen] = useState(false);
+  const [exportOpen, setExportOpen] = useState(false);
   const [editItem, setEditItem] = useState<MenuItem | null>(null);
   const [deleteItem, setDeleteItem] = useState<MenuItem | null>(null);
 
@@ -142,6 +144,7 @@ export default function AdminMenu() {
           onEdit={setEditItem}
           onDelete={setDeleteItem}
           onAddItem={() => setCreateItemOpen(true)}
+          onExport={() => setExportOpen(true)}
           page={safePageIndex + 1}
           pageCount={pageCount}
           total={total}
@@ -149,6 +152,15 @@ export default function AdminMenu() {
           onPageChange={(p) => setPageIndex(p - 1)}
         />
       </div>
+
+      <MenuExportDialog
+        open={exportOpen}
+        onOpenChange={setExportOpen}
+        items={filtered}
+        categories={allCategories}
+        categoryMap={categoryMap}
+        selectedCategoryId={selectedCategoryId}
+      />
 
       {/* Item dialogs */}
       <ItemDialog
