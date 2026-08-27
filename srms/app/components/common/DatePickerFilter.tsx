@@ -64,7 +64,7 @@ export function DatePickerFilter({
             weekStartsOn={1}
             formatters={{
               formatCaption: (date: Date) =>
-                `${LAO_MONTHS[date.getMonth()]} ${date.getFullYear() + 543}`,
+                `${LAO_MONTHS[date.getMonth()]} ${date.getFullYear()}`,
               formatMonthDropdown: (date: Date) => LAO_MONTHS[date.getMonth()] ?? '',
               formatWeekdayName: (date: Date) => LAO_WEEKDAYS[date.getDay()] ?? '',
             }}

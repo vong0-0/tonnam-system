@@ -4,6 +4,7 @@ export default [
   index("routes/home.tsx"),
   route("login", "routes/login.tsx"),
   route("unauthorized", "routes/unauthorized.tsx"),
+  route("menu", "routes/customer-menu.tsx"),
   layout("layouts/guard.layout.tsx", [
     route("select", "routes/select.tsx"),
     layout("layouts/admin.layout.tsx", [

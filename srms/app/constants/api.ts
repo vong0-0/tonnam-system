@@ -26,6 +26,9 @@ export const API = {
   MENU_ITEM:              (id: string) => `/v1/menu-items/${id}`,
   MENU_ITEM_AVAILABILITY: (id: string) => `/v1/menu-items/${id}/availability`,
 
+  PUBLIC_MENU_ITEMS: '/v1/public/menu-items',
+  PUBLIC_MENU_CATEGORIES: '/v1/public/menu-categories',
+
   RESERVATIONS:       '/v1/reservations',
   RESERVATION:        (id: string) => `/v1/reservations/${id}`,
   RESERVATION_STATUS: (id: string) => `/v1/reservations/${id}/status`,
